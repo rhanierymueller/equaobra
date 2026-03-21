@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useTeams } from '@/src/features/team/hooks/useTeams'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
+import { api } from '@/src/services/api'
 import type { User, UserRole, Address } from '@/src/types/user.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import { lookupCep, formatCep } from '@/src/utils/cep'
@@ -239,7 +240,7 @@ export function ProfilePage() {
   }
 
   // ── Save profile
-  function handleSaveProfile() {
+  async function handleSaveProfile() {
     setSaveError('')
 
     if (!name.trim()) { setSaveError('Nome é obrigatório'); setShowSaveConfirm(false); return }
@@ -255,34 +256,71 @@ export function ProfilePage() {
       if (facebook.trim() && /\s/.test(facebook.trim())) { setSaveError('Facebook inválido'); setShowSaveConfirm(false); return }
     }
 
-    const addressObj: Address | undefined = cep.replace(/\D/g, '').length === 8 ? {
-      cep: cep.replace(/\D/g, ''), street, neighborhood, city, state: addrState, number: addrNumber,
-    } : user!.address
+    const addrCep = cep.replace(/\D/g, '')
+    const compAddrCep = companyCep.replace(/\D/g, '')
 
-    const companyAddressObj: Address | undefined = isCont && companyCep.replace(/\D/g, '').length === 8 ? {
-      cep: companyCep.replace(/\D/g, ''), street: companyStreet, neighborhood: companyNeighborhood,
-      city: companyCity, state: companyAddrState, number: companyAddrNumber,
-    } : user!.companyAddress
+    const addressObj: Address | undefined = addrCep.length === 8
+      ? { cep: addrCep, street, neighborhood, city, state: addrState, number: addrNumber }
+      : user!.address
 
-    const updated: User = {
-      ...user!,
-      name: name.trim(),
-      role: roles[0],
-      roles,
-      professions,
-      profession: professions[0] ?? user!.profession,
-      hourlyRate: showRate && hourlyRate ? Number(hourlyRate) : undefined,
-      showHourlyRate: showRate,
-      companyName: isCont ? companyName.trim() : user!.companyName,
-      cnpj: isCont ? cnpj.replace(/\D/g, '') : user!.cnpj,
-      website: isCont ? website.trim() : user!.website,
-      instagram: isCont ? instagram.trim() : user!.instagram,
-      facebook: isCont ? facebook.trim() : user!.facebook,
-      address: addressObj,
-      companyAddress: companyAddressObj,
+    const companyAddressObj: Address | undefined = isCont && compAddrCep.length === 8
+      ? { cep: compAddrCep, street: companyStreet, neighborhood: companyNeighborhood, city: companyCity, state: companyAddrState, number: companyAddrNumber }
+      : user!.companyAddress
+
+    try {
+      // Persist to API
+      const apiPayload = {
+        name: name.trim(),
+        professions,
+        profession: professions[0] ?? user!.profession,
+        hourlyRate: showRate && hourlyRate ? Number(hourlyRate) : null,
+        showHourlyRate: showRate,
+        companyName: isCont ? companyName.trim() || null : null,
+        cnpj: isCont ? cnpj.replace(/\D/g, '') || null : null,
+        website: isCont ? website.trim() || null : null,
+        instagram: isCont ? instagram.trim() || null : null,
+        facebook: isCont ? facebook.trim() || null : null,
+        addrCep: addressObj?.cep ?? null,
+        addrStreet: addressObj?.street ?? null,
+        addrNeighborhood: addressObj?.neighborhood ?? null,
+        addrCity: addressObj?.city ?? null,
+        addrState: addressObj?.state ?? null,
+        addrNumber: addressObj?.number ?? null,
+        compAddrCep: companyAddressObj?.cep ?? null,
+        compAddrStreet: companyAddressObj?.street ?? null,
+        compAddrNeighborhood: companyAddressObj?.neighborhood ?? null,
+        compAddrCity: companyAddressObj?.city ?? null,
+        compAddrState: companyAddressObj?.state ?? null,
+        compAddrNumber: companyAddressObj?.number ?? null,
+      }
+      const apiUser = await api.patch<User>('/api/users/me', apiPayload)
+
+      // Update local state from API response (authoritative)
+      saveUser(apiUser)
+      setUser(apiUser)
+    } catch {
+      // API failed — save locally as fallback
+      const updated: User = {
+        ...user!,
+        name: name.trim(),
+        role: roles[0],
+        roles,
+        professions,
+        profession: professions[0] ?? user!.profession,
+        hourlyRate: showRate && hourlyRate ? Number(hourlyRate) : undefined,
+        showHourlyRate: showRate,
+        companyName: isCont ? companyName.trim() : user!.companyName,
+        cnpj: isCont ? cnpj.replace(/\D/g, '') : user!.cnpj,
+        website: isCont ? website.trim() : user!.website,
+        instagram: isCont ? instagram.trim() : user!.instagram,
+        facebook: isCont ? facebook.trim() : user!.facebook,
+        address: addressObj,
+        companyAddress: companyAddressObj,
+      }
+      saveUser(updated)
+      setUser(updated)
     }
-    saveUser(updated)
-    setUser(updated)
+
     setSaveMsg('Salvo!')
     setTimeout(() => setSaveMsg(''), 2500)
     setShowSaveConfirm(false)
@@ -312,26 +350,31 @@ export function ProfilePage() {
     }
   }
 
-  function handleSaveOpportunity() {
+  async function handleSaveOpportunity() {
     if (!user) return
     if (!oppDescription.trim()) { setOppSaveMsg('Descreva a obra'); return }
     if (!oppLocation.trim()) { setOppSaveMsg('Informe a localização'); return }
     if (oppProfessions.length === 0) { setOppSaveMsg('Adicione ao menos uma profissão'); return }
-    publish({
-      contractorId: user.id,
-      contractorName: user.name,
-      companyName: user.companyName,
-      avatarInitials: user.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase(),
-      obraDescription: oppDescription.trim(),
-      obraLocation: oppLocation.trim(),
-      obraStart: oppStart || undefined,
-      obraDuration: oppDuration.trim() || undefined,
-      lookingForProfessions: oppProfessions,
-      contactEmail: user.email,
-    })
-    setOppActive(true)
-    setOppSaveMsg('Publicado! Profissionais já podem ver sua oportunidade.')
-    setTimeout(() => setOppSaveMsg(''), 4000)
+    try {
+      await publish({
+        contractorId: user.id,
+        contractorName: user.name,
+        companyName: user.companyName,
+        avatarInitials: user.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase(),
+        obraDescription: oppDescription.trim(),
+        obraLocation: oppLocation.trim(),
+        obraStart: oppStart || undefined,
+        obraDuration: oppDuration.trim() || undefined,
+        lookingForProfessions: oppProfessions,
+        contactEmail: user.email,
+      })
+      setOppActive(true)
+      setOppSaveMsg('Publicado! Profissionais já podem ver sua oportunidade.')
+      setTimeout(() => setOppSaveMsg(''), 4000)
+    } catch {
+      setOppSaveMsg('Erro ao publicar. Verifique se você está logado.')
+      setTimeout(() => setOppSaveMsg(''), 4000)
+    }
   }
 
   // ── Change password (mock — just validates format, saves to localStorage)

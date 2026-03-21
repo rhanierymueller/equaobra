@@ -108,7 +108,7 @@ function OppForm({ user, editing, onSaved, onCancelEdit, publish, updateOpportun
     setMsg('')
   }, [editing?.id])
 
-  function handleSave() {
+  async function handleSave() {
     if (!description.trim() || !location.trim() || professions.length === 0) {
       setMsg('Preencha descrição, localização e ao menos uma profissão.')
       setTimeout(() => setMsg(''), 3000)
@@ -123,12 +123,17 @@ function OppForm({ user, editing, onSaved, onCancelEdit, publish, updateOpportun
       obraStart: start || undefined, obraDuration: duration.trim() || undefined,
       lookingForProfessions: professions, contactEmail: user.email ?? '', contactPhone: undefined,
     }
-    if (editing) {
-      updateOpportunity(editing.id, data)
-    } else {
-      publish(data)
+    try {
+      if (editing) {
+        await updateOpportunity(editing.id, data)
+      } else {
+        await publish(data)
+      }
+      onSaved()
+    } catch {
+      setMsg('Erro ao salvar vaga. Verifique se você está logado.')
+      setTimeout(() => setMsg(''), 4000)
     }
-    onSaved()
   }
 
   const isEdit = !!editing
