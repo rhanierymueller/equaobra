@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { api } from '@/src/services/api'
 
 export interface Interest {
   id: string
@@ -15,36 +16,33 @@ export interface Interest {
   createdAt: string
 }
 
-const STORAGE_KEY = 'equobra_interests'
-
-function load(): Interest[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Interest[]) : []
-  } catch { return [] }
-}
-
-function save(list: Interest[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-}
-
 export function useInterests(contractorId?: string) {
   const [interests, setInterests] = useState<Interest[]>([])
 
   useEffect(() => {
-    const all = load()
-    setInterests(contractorId ? all.filter(i => i.contractorId === contractorId) : all)
+    const url = contractorId
+      ? `/api/interests/contractor/${contractorId}`
+      : '/api/interests'
+    api.get<Interest[]>(url)
+      .then(data => setInterests(data))
+      .catch(() => setInterests([]))
   }, [contractorId])
 
-  const addInterest = useCallback((interest: Omit<Interest, 'id' | 'createdAt'>) => {
-    const all = load()
-    if (all.some(i => i.contractorId === interest.contractorId && i.professionalId === interest.professionalId)) return
-    const entry: Interest = { ...interest, id: `int-${Date.now()}`, createdAt: new Date().toISOString() }
-    const next = [...all, entry]
-    save(next)
-    if (contractorId) setInterests(next.filter(i => i.contractorId === contractorId))
-  }, [contractorId])
+  const addInterest = useCallback(async (interest: Omit<Interest, 'id' | 'createdAt'>) => {
+    try {
+      const created = await api.post<Interest>('/api/interests', interest)
+      setInterests(prev => {
+        const alreadyExists = prev.some(
+          i => i.contractorId === interest.contractorId && i.professionalId === interest.professionalId
+        )
+        return alreadyExists ? prev : [...prev, created]
+      })
+    } catch (e: unknown) {
+      // 409 = already registered, ignore silently
+      if (e instanceof Error && e.message.includes('já registrado')) return
+      console.error('useInterests.addInterest:', e)
+    }
+  }, [])
 
   return { interests, addInterest }
 }

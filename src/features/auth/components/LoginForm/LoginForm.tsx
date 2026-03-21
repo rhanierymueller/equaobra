@@ -61,10 +61,12 @@ function Field({ id, label, type, value, placeholder, error, autoComplete, onCha
 interface LoginFormProps {
   form: UseLoginFormReturn
   onSuccess: () => void
+  isLoading?: boolean
 }
 
-export function LoginForm({ form, onSuccess }: LoginFormProps) {
+export function LoginForm({ form, onSuccess, isLoading }: LoginFormProps) {
   const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit } = form
+  const busy = isSubmitting || !!isLoading
 
   return (
     <form
@@ -134,14 +136,14 @@ export function LoginForm({ form, onSuccess }: LoginFormProps) {
 
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={busy}
         className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all duration-200 mt-1"
         style={{
-          background: isSubmitting ? 'rgba(224,123,42,0.6)' : '#E07B2A',
-          cursor: isSubmitting ? 'not-allowed' : 'pointer',
+          background: busy ? 'rgba(224,123,42,0.6)' : '#E07B2A',
+          cursor: busy ? 'not-allowed' : 'pointer',
         }}
       >
-        {isSubmitting ? 'Entrando...' : 'Entrar'}
+        {busy ? 'Entrando...' : 'Entrar'}
       </button>
     </form>
   )

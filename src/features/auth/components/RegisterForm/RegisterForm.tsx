@@ -238,10 +238,12 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
 interface RegisterFormProps {
   form: UseRegisterFormReturn
   onSuccess: () => void
+  isLoading?: boolean
 }
 
-export function RegisterForm({ form, onSuccess }: RegisterFormProps) {
+export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) {
   const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit } = form
+  const busy = isSubmitting || !!isLoading
   const [step, setStep] = useState(0)
 
   const isPro = values.roles.includes('profissional')
@@ -492,14 +494,14 @@ export function RegisterForm({ form, onSuccess }: RegisterFormProps) {
         )}
         <button
           type="submit"
-          disabled={step < totalSteps - 1 ? !canGoNext : isSubmitting}
+          disabled={step < totalSteps - 1 ? !canGoNext : busy}
           className="flex-1 py-3 rounded-xl font-bold text-white text-sm transition-all duration-200"
           style={{
-            background: (step < totalSteps - 1 ? !canGoNext : isSubmitting) ? 'rgba(224,123,42,0.4)' : '#E07B2A',
-            cursor: (step < totalSteps - 1 ? !canGoNext : isSubmitting) ? 'not-allowed' : 'pointer',
+            background: (step < totalSteps - 1 ? !canGoNext : busy) ? 'rgba(224,123,42,0.4)' : '#E07B2A',
+            cursor: (step < totalSteps - 1 ? !canGoNext : busy) ? 'not-allowed' : 'pointer',
           }}
         >
-          {step < totalSteps - 1 ? 'Continuar' : isSubmitting ? 'Criando conta...' : 'Criar conta'}
+          {step < totalSteps - 1 ? 'Continuar' : busy ? 'Criando conta...' : 'Criar conta'}
         </button>
       </div>
     </form>

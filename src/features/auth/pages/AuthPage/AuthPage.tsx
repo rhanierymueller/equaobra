@@ -5,44 +5,16 @@ import { useRouter } from 'next/navigation'
 import { LoginForm } from '../../components/LoginForm'
 import { RegisterForm } from '../../components/RegisterForm'
 import { useLoginForm, useRegisterForm } from '../../hooks/useAuthForm'
+import { api, setToken } from '@/src/services/api'
 import type { AuthMode } from '@/src/types/auth.types'
 import type { LoginCredentials, RegisterCredentials } from '@/src/types/auth.types'
 
-// ── Auth state (bypass — localStorage) ────────────────────────────────────────
+// ── Persist user from API response ────────────────────────────────────────────
 
-function persistUser(creds: {
-  name: string; email: string; role: string; roles?: string[];
-  profession?: string; hourlyRate?: number; companyName?: string;
-  address?: Record<string, string>; companyAddress?: Record<string, string>;
-}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function persistUser(user: any) {
   if (typeof window === 'undefined') return
-  let existingId: string | undefined
-  let existingCreatedAt: string | undefined
-  try {
-    const raw = localStorage.getItem('equobra_user')
-    if (raw) {
-      const parsed = JSON.parse(raw)
-      existingId = parsed.id
-      existingCreatedAt = parsed.createdAt
-    }
-  } catch { /* ignore */ }
-  localStorage.setItem(
-    'equobra_user',
-    JSON.stringify({
-      id: existingId ?? crypto.randomUUID(),
-      name: creds.name,
-      email: creds.email,
-      role: creds.role,
-      roles: creds.roles || [creds.role],
-      profession: creds.profession || undefined,
-      hourlyRate: creds.hourlyRate || undefined,
-      companyName: creds.companyName || undefined,
-      address: creds.address || undefined,
-      companyAddress: creds.companyAddress || undefined,
-      token: 'mock_token',
-      createdAt: existingCreatedAt ?? new Date().toISOString(),
-    }),
-  )
+  localStorage.setItem('equobra_user', JSON.stringify(user))
 }
 
 // ── Background decorations ─────────────────────────────────────────────────────
@@ -133,54 +105,71 @@ function Tabs({ mode, onChange }: TabsProps) {
 export default function AuthPage() {
   const router = useRouter()
   const [mode, setMode] = useState<AuthMode>('login')
-  const [loginError, setLoginError] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
   const loginForm = useLoginForm()
   const registerForm = useRegisterForm()
 
   const handleModeChange = useCallback((next: AuthMode) => {
     setMode(next)
-    setLoginError('')
+    setAuthError('')
     loginForm.reset()
     registerForm.reset()
   }, [loginForm, registerForm])
 
-  const handleLoginSuccess = useCallback((creds: LoginCredentials) => {
+  const handleLoginSuccess = useCallback(async (creds: LoginCredentials) => {
+    setIsAuthenticating(true)
+    setAuthError('')
     try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) {
-        const existing = JSON.parse(raw)
-        // Usuário já cadastrado — apenas navega
-        if (existing.email === creds.email) {
-          router.push('/home')
-          return
-        }
-      }
-    } catch { /* ignore */ }
-    // E-mail não encontrado — redireciona para cadastro
-    setLoginError('E-mail não encontrado. Crie uma conta para continuar.')
-    setMode('register')
+      const res = await api.post<{ token: string; user: unknown }>('/api/auth/login', {
+        email: creds.email,
+        password: creds.password,
+      })
+      setToken(res.token)
+      persistUser(res.user)
+      router.push('/home')
+    } catch (e: unknown) {
+      setAuthError(e instanceof Error ? e.message : 'Erro ao entrar. Tente novamente.')
+    } finally {
+      setIsAuthenticating(false)
+    }
   }, [router])
 
-  const handleRegisterSuccess = useCallback((creds: RegisterCredentials) => {
-    const hourlyRate = creds.hourlyRate ? Number(creds.hourlyRate) : undefined
-    const address = creds.cep ? {
-      cep: creds.cep.replace(/\D/g, ''),
-      street: creds.street, neighborhood: creds.neighborhood,
-      city: creds.city, state: creds.state, number: creds.addressNumber,
-    } : undefined
-    const companyAddress = creds.roles.includes('contratante') && creds.companyCep ? {
-      cep: creds.companyCep.replace(/\D/g, ''),
-      street: creds.companyStreet, neighborhood: creds.companyNeighborhood,
-      city: creds.companyCity, state: creds.companyState, number: creds.companyAddressNumber,
-    } : undefined
-    persistUser({
-      name: creds.name, email: creds.email,
-      role: creds.roles[0] || creds.role, roles: creds.roles,
-      profession: creds.profession || undefined, hourlyRate,
-      companyName: creds.companyName || undefined,
-      address, companyAddress,
-    })
-    router.push('/home')
+  const handleRegisterSuccess = useCallback(async (creds: RegisterCredentials) => {
+    setIsAuthenticating(true)
+    setAuthError('')
+    try {
+      const res = await api.post<{ token: string; user: unknown }>('/api/auth/register', {
+        name: creds.name,
+        email: creds.email,
+        password: creds.password,
+        role: creds.roles[0] || creds.role,
+        roles: creds.roles,
+        profession: creds.profession || undefined,
+        professions: creds.profession ? [creds.profession] : undefined,
+        hourlyRate: creds.hourlyRate ? Number(creds.hourlyRate) : undefined,
+        companyName: creds.companyName || undefined,
+        addrCep: creds.cep ? creds.cep.replace(/\D/g, '') : undefined,
+        addrStreet: creds.street || undefined,
+        addrNeighborhood: creds.neighborhood || undefined,
+        addrCity: creds.city || undefined,
+        addrState: creds.state || undefined,
+        addrNumber: creds.addressNumber || undefined,
+        compAddrCep: creds.companyCep ? creds.companyCep.replace(/\D/g, '') : undefined,
+        compAddrStreet: creds.companyStreet || undefined,
+        compAddrNeighborhood: creds.companyNeighborhood || undefined,
+        compAddrCity: creds.companyCity || undefined,
+        compAddrState: creds.companyState || undefined,
+        compAddrNumber: creds.companyAddressNumber || undefined,
+      })
+      setToken(res.token)
+      persistUser(res.user)
+      router.push('/home')
+    } catch (e: unknown) {
+      setAuthError(e instanceof Error ? e.message : 'Erro ao criar conta. Tente novamente.')
+    } finally {
+      setIsAuthenticating(false)
+    }
   }, [router])
 
   return (
@@ -234,10 +223,10 @@ export default function AuthPage() {
 
         <Tabs mode={mode} onChange={handleModeChange} />
 
-        {/* Login error banner */}
-        {loginError && mode === 'register' && (
-          <div className="mb-4 px-3 py-2.5 rounded-xl text-xs" style={{ background: 'rgba(224,123,42,0.1)', border: '1px solid rgba(224,123,42,0.25)', color: '#E07B2A' }}>
-            {loginError}
+        {/* API error banner */}
+        {authError && (
+          <div className="mb-4 px-3 py-2.5 rounded-xl text-xs" style={{ background: 'rgba(229,57,53,0.1)', border: '1px solid rgba(229,57,53,0.25)', color: '#E53935' }}>
+            {authError}
           </div>
         )}
 
@@ -250,9 +239,9 @@ export default function AuthPage() {
           }}
         >
           {mode === 'login' ? (
-            <LoginForm form={loginForm} onSuccess={() => handleLoginSuccess(loginForm.values)} />
+            <LoginForm form={loginForm} onSuccess={() => handleLoginSuccess(loginForm.values)} isLoading={isAuthenticating} />
           ) : (
-            <RegisterForm form={registerForm} onSuccess={() => handleRegisterSuccess(registerForm.values)} />
+            <RegisterForm form={registerForm} onSuccess={() => handleRegisterSuccess(registerForm.values)} isLoading={isAuthenticating} />
           )}
         </div>
 

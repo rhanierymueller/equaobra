@@ -1,11 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { api, getToken } from '@/src/services/api'
 import type { Opportunity } from '@/src/types/opportunity.types'
 
-const STORAGE_KEY = 'equobra_opportunities'
-
-// ── Mock seed data ─────────────────────────────────────────────────────────────
+// ── Fallback mock data (shown when API is unavailable) ────────────────────────
 
 const MOCK_OPPORTUNITIES: Opportunity[] = [
   {
@@ -38,91 +37,70 @@ const MOCK_OPPORTUNITIES: Opportunity[] = [
     contactEmail: 'roberto.lima@gmail.com',
     createdAt: new Date(Date.now() - 7 * 86400000).toISOString(), active: true,
   },
-  {
-    id: 'opp-mock-4', contractorId: 'mock-contractor-4', contractorName: 'Mariana Costa',
-    companyName: 'Reformas Costa', avatarInitials: 'MC',
-    obraDescription: 'Reforma de apartamento 80m² — troca de revestimentos, pintura, elétrica e hidráulica.',
-    obraLocation: 'Santo André, SP', lat: -23.6639, lng: -46.5338,
-    obraStart: '2026-03-25', obraDuration: '20 dias',
-    lookingForProfessions: ['Azulejista', 'Eletricista', 'Pintor'],
-    contactEmail: 'mariana@reformascosta.com', contactPhone: '11977770004',
-    createdAt: new Date(Date.now() - 2 * 86400000).toISOString(), active: true,
-  },
-  {
-    id: 'opp-mock-5', contractorId: 'mock-contractor-5', contractorName: 'Fernando Braga',
-    companyName: 'Braga Construções', avatarInitials: 'FB',
-    obraDescription: 'Obra de condomínio horizontal com 12 casas. Etapa atual: fundação e alvenaria.',
-    obraLocation: 'Osasco, SP', lat: -23.5329, lng: -46.7916,
-    obraStart: '2026-04-10', obraDuration: '120 dias',
-    lookingForProfessions: ['Pedreiro', 'Carpinteiro', 'Servente de Obras'],
-    contactEmail: 'fernando@bragaconstrucoes.com', contactPhone: '11966660005',
-    createdAt: new Date(Date.now() - 5 * 86400000).toISOString(), active: true,
-  },
 ]
-
-// ── Storage helpers ────────────────────────────────────────────────────────────
-
-function loadStored(): Opportunity[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Opportunity[]) : []
-  } catch { return [] }
-}
-
-function persistStored(list: Opportunity[]) {
-  const real = list.filter(o => !o.id.startsWith('opp-mock-'))
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(real))
-}
-
-function buildFeed(stored: Opportunity[]): Opportunity[] {
-  const realContractorIds = new Set(stored.map(o => o.contractorId))
-  const mocks = MOCK_OPPORTUNITIES.filter(m => !realContractorIds.has(m.contractorId))
-  return [...mocks, ...stored].filter(o => o.active)
-}
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 export function useOpportunities() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([])
 
-  const refresh = useCallback(() => {
-    setOpportunities(buildFeed(loadStored()))
+  const refresh = useCallback(async () => {
+    try {
+      // Always load public feed
+      const feedPromise = api.get<Opportunity[]>('/api/opportunities')
+
+      // If authenticated, also load own opportunities (includes inactive)
+      const minePromise = getToken()
+        ? api.get<Opportunity[]>('/api/opportunities/mine').catch(() => [] as Opportunity[])
+        : Promise.resolve([] as Opportunity[])
+
+      const [feed, mine] = await Promise.all([feedPromise, minePromise])
+
+      // Merge: own opps first (includes inactive), then public from others
+      const myIds = new Set(mine.map(o => o.id))
+      const merged = [...mine, ...feed.filter(o => !myIds.has(o.id))]
+      setOpportunities(merged)
+    } catch {
+      // API unavailable — use mock fallback
+      setOpportunities(MOCK_OPPORTUNITIES)
+    }
   }, [])
 
   useEffect(() => { refresh() }, [refresh])
 
-  // Always creates a new opportunity (no upsert)
-  const publish = useCallback((opp: Omit<Opportunity, 'id' | 'createdAt' | 'active'>): Opportunity => {
-    const stored = loadStored()
-    const entry: Opportunity = {
-      ...opp, id: `opp-${Date.now()}`,
-      createdAt: new Date().toISOString(), active: true,
+  // ── Mutations (optimistic updates) ────────────────────────────────────────
+
+  const publish = useCallback(async (opp: Omit<Opportunity, 'id' | 'createdAt' | 'active'>): Promise<Opportunity> => {
+    const created = await api.post<Opportunity>('/api/opportunities', opp)
+    setOpportunities(prev => [created, ...prev])
+    return created
+  }, [])
+
+  const updateOpportunity = useCallback(async (id: string, data: Partial<Omit<Opportunity, 'id' | 'createdAt'>>) => {
+    // Optimistic
+    setOpportunities(prev => prev.map(o => o.id === id ? { ...o, ...data } : o))
+    try {
+      const updated = await api.patch<Opportunity>(`/api/opportunities/${id}`, data)
+      setOpportunities(prev => prev.map(o => o.id === id ? updated : o))
+    } catch {
+      refresh() // rollback via re-fetch
     }
-    const next = [...stored, entry]
-    persistStored(next)
-    setOpportunities(buildFeed(next))
-    return entry
-  }, [])
+  }, [refresh])
 
-  const updateOpportunity = useCallback((id: string, data: Partial<Omit<Opportunity, 'id' | 'createdAt'>>) => {
-    const stored = loadStored()
-    const next = stored.map(o => o.id === id ? { ...o, ...data } : o)
-    persistStored(next)
-    setOpportunities(buildFeed(next))
-  }, [])
+  const deleteOpportunity = useCallback(async (id: string) => {
+    setOpportunities(prev => prev.filter(o => o.id !== id))
+    try {
+      await api.delete(`/api/opportunities/${id}`)
+    } catch {
+      refresh()
+    }
+  }, [refresh])
 
-  const deleteOpportunity = useCallback((id: string) => {
-    const stored = loadStored()
-    const next = stored.filter(o => o.id !== id)
-    persistStored(next)
-    setOpportunities(buildFeed(next))
-  }, [])
-
-  // Returns all opportunities for a specific contractor (active + inactive)
+  // Returns all opportunities for a contractor from loaded state
+  // Own opps (active + inactive) are merged on load when authenticated
   const getContractorOpportunities = useCallback((contractorId: string): Opportunity[] => {
-    return loadStored().filter(o => o.contractorId === contractorId)
-  }, [])
+    return opportunities.filter(o => o.contractorId === contractorId)
+  }, [opportunities])
 
   return { opportunities, publish, updateOpportunity, deleteOpportunity, getContractorOpportunities, refresh }
 }

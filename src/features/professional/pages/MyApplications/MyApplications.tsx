@@ -152,16 +152,8 @@ export function MyApplications() {
     setLoaded(true)
   }, [])
 
-  // Read interests where this user is the professional
-  const [myInterests, setMyInterests] = useState<Interest[]>([])
-  useEffect(() => {
-    if (!user) return
-    try {
-      const raw = localStorage.getItem('equobra_interests')
-      const all: Interest[] = raw ? JSON.parse(raw) : []
-      setMyInterests(all.filter(i => i.professionalId === user.id))
-    } catch { /* ignore */ }
-  }, [user])
+  // Load interests for this professional from API (no contractorId = professional view)
+  const { interests: myInterests } = useInterests()
 
   if (!loaded) return null
 
