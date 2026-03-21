@@ -77,10 +77,10 @@ interface OppFormProps {
   user: User
   opp: Opportunity | undefined
   publish: ReturnType<typeof useOpportunities>['publish']
-  unpublish: ReturnType<typeof useOpportunities>['unpublish']
+  updateOpportunity: ReturnType<typeof useOpportunities>['updateOpportunity']
 }
 
-function OppFormSection({ contractorId, user, opp, publish, unpublish }: OppFormProps) {
+function OppFormSection({ contractorId, user, opp, publish, updateOpportunity }: OppFormProps) {
   const [active, setActive] = useState(opp?.active ?? false)
   const [description, setDescription] = useState(opp?.obraDescription ?? '')
   const [location, setLocation] = useState(opp?.obraLocation ?? '')
@@ -119,7 +119,7 @@ function OppFormSection({ contractorId, user, opp, publish, unpublish }: OppForm
   function handleToggle(val: boolean) {
     setActive(val)
     if (!val) {
-      unpublish(contractorId)
+      if (opp) updateOpportunity(opp.id, { active: false })
       setSaveMsg('Vaga removida do feed.')
     } else {
       handleSave()
@@ -426,7 +426,7 @@ function CandidatesSection({ contractorId, onChat }: CandidatesProps) {
 
 export function ContractorProfile({ id }: { id: string }) {
   const router = useRouter()
-  const { opportunities, publish, unpublish } = useOpportunities()
+  const { opportunities, publish, updateOpportunity } = useOpportunities()
   const { addInterest } = useInterests(id)
   const [user, setUser] = useState<User | null>(null)
   const [loaded, setLoaded] = useState(false)
@@ -671,7 +671,7 @@ export function ContractorProfile({ id }: { id: string }) {
               user={user}
               opp={opp}
               publish={publish}
-              unpublish={unpublish}
+              updateOpportunity={updateOpportunity}
             />
             <CandidatesSection
               contractorId={id}

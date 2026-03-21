@@ -133,7 +133,8 @@ export function ProfilePage() {
   const [oppSaveMsg, setOppSaveMsg] = useState('')
 
   const { teams } = useTeams()
-  const { publish, unpublish, getMyOpportunity } = useOpportunities()
+  const { publish, updateOpportunity, getContractorOpportunities } = useOpportunities()
+  const [myOppId, setMyOppId] = useState<string | undefined>()
 
   useEffect(() => {
     try {
@@ -170,8 +171,9 @@ export function ProfilePage() {
         }
         // Load existing opportunity if contractor
         if (u.role === 'contratante') {
-          const existing = getMyOpportunity(u.id)
+          const existing = getContractorOpportunities(u.id)[0]
           if (existing) {
+            setMyOppId(existing.id)
             setOppActive(existing.active)
             setOppDescription(existing.obraDescription)
             setOppLocation(existing.obraLocation)
@@ -183,7 +185,7 @@ export function ProfilePage() {
       }
     } catch { /* ignore */ }
     setLoaded(true)
-  }, [getMyOpportunity])
+  }, [getContractorOpportunities])
 
   const myTeams = user
     ? teams.filter(t => t.ownerId === user.id || t.members.some(m => m.professionalId === user.id))
@@ -301,7 +303,7 @@ export function ProfilePage() {
   function handleToggleOpportunity(on: boolean) {
     if (!user) return
     if (!on) {
-      unpublish(user.id)
+      if (myOppId) updateOpportunity(myOppId, { active: false })
       setOppActive(false)
       setOppSaveMsg('Oportunidade removida do feed.')
       setTimeout(() => setOppSaveMsg(''), 3000)
