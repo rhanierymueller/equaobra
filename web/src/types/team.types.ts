@@ -15,7 +15,7 @@ export interface Team {
   obraLocation: string
   estimatedDays: number
   observations: string
-  scheduledStart: string 
+  scheduledStart: string
   members: TeamMember[]
   ownerId: string
   createdAt: string

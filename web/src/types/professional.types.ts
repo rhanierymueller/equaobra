@@ -30,7 +30,7 @@ export interface Professional {
   avatarInitials: string
   avatarUrl?: string
   tags: string[]
-  hourlyRate?: number 
+  hourlyRate?: number
 }
 
 export interface ProfessionalFilters {
@@ -54,12 +54,12 @@ export const ALL_PROFESSIONS: Profession[] = [
 ]
 
 export const PROFESSION_COLORS: Record<Profession, string> = {
-  'Pedreiro': '#E07B2A',
-  'Eletricista': '#FFD166',
-  'Encanador': '#4ECDC4',
-  'Pintor': '#A8E6CF',
-  'Marceneiro': '#C4956A',
-  'Azulejista': '#74B9FF',
-  'Gesseiro': '#DFE6E9',
+  Pedreiro: '#E07B2A',
+  Eletricista: '#FFD166',
+  Encanador: '#4ECDC4',
+  Pintor: '#A8E6CF',
+  Marceneiro: '#C4956A',
+  Azulejista: '#74B9FF',
+  Gesseiro: '#DFE6E9',
   'Mestre de Obras': '#FF6B6B',
 }

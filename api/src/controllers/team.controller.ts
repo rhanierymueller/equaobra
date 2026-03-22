@@ -1,8 +1,9 @@
-import { Response } from 'express'
-import { AuthRequest } from '../middleware/auth'
+import type { Response } from 'express'
+
+import { isServiceError } from '../lib/errors'
+import type { AuthRequest } from '../middleware/auth'
 import { teamSchema, memberSchema, updateMemberSchema } from '../models/team.model'
 import * as service from '../services/team.service'
-import { isServiceError } from '../lib/errors'
 
 export async function list(req: AuthRequest, res: Response): Promise<void> {
   res.json(await service.listTeams(req.user!.userId))
@@ -19,22 +20,34 @@ export async function create(req: AuthRequest, res: Response): Promise<void> {
 
 export async function getById(req: AuthRequest, res: Response): Promise<void> {
   const result = await service.getTeamById(String(req.params.id), req.user!.userId)
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.json(result.data)
 }
 
 export async function update(req: AuthRequest, res: Response): Promise<void> {
   const partial = teamSchema.omit({ members: true }).partial().safeParse(req.body)
-  if (!partial.success) { res.status(400).json({ error: 'Dados inválidos' }); return }
+  if (!partial.success) {
+    res.status(400).json({ error: 'Dados inválidos' })
+    return
+  }
 
   const result = await service.updateTeam(String(req.params.id), req.user!.userId, partial.data)
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.json(result.data)
 }
 
 export async function remove(req: AuthRequest, res: Response): Promise<void> {
   const result = await service.deleteTeam(String(req.params.id), req.user!.userId)
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.status(204).send()
 }
 
@@ -46,25 +59,42 @@ export async function addMember(req: AuthRequest, res: Response): Promise<void> 
   }
 
   const result = await service.addMember(String(req.params.id), req.user!.userId, parsed.data)
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.status(201).json(result.data)
 }
 
 export async function updateMember(req: AuthRequest, res: Response): Promise<void> {
   const parsed = updateMemberSchema.safeParse(req.body)
-  if (!parsed.success) { res.status(400).json({ error: 'Dados inválidos' }); return }
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Dados inválidos' })
+    return
+  }
 
   const result = await service.updateMember(
-    String(req.params.id), String(req.params.professionalId), req.user!.userId, parsed.data,
+    String(req.params.id),
+    String(req.params.professionalId),
+    req.user!.userId,
+    parsed.data,
   )
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.json(result.data)
 }
 
 export async function removeMember(req: AuthRequest, res: Response): Promise<void> {
   const result = await service.removeMember(
-    String(req.params.id), String(req.params.professionalId), req.user!.userId,
+    String(req.params.id),
+    String(req.params.professionalId),
+    req.user!.userId,
   )
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.status(204).send()
 }

@@ -1,4 +1,6 @@
-import { View, TouchableOpacity, ViewStyle } from 'react-native'
+import type { ViewStyle } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
+
 import { colors, radius } from '../../design-system/tokens'
 
 interface CardProps {

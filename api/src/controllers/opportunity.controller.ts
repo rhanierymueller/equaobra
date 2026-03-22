@@ -1,8 +1,9 @@
-import { Request, Response } from 'express'
-import { AuthRequest } from '../middleware/auth'
+import type { Request, Response } from 'express'
+
+import { isServiceError } from '../lib/errors'
+import type { AuthRequest } from '../middleware/auth'
 import { opportunitySchema } from '../models/opportunity.model'
 import * as service from '../services/opportunity.service'
-import { isServiceError } from '../lib/errors'
 
 export async function list(req: Request, res: Response): Promise<void> {
   const { city, profession } = req.query
@@ -19,7 +20,10 @@ export async function listMine(req: AuthRequest, res: Response): Promise<void> {
 
 export async function getById(req: Request, res: Response): Promise<void> {
   const opp = await service.getOpportunityById(String(req.params.id))
-  if (!opp) { res.status(404).json({ error: 'Oportunidade não encontrada' }); return }
+  if (!opp) {
+    res.status(404).json({ error: 'Oportunidade não encontrada' })
+    return
+  }
   res.json(opp)
 }
 

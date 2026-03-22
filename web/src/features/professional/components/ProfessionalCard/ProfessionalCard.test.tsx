@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { ProfessionalCard } from './ProfessionalCard'
+
 import { MOCK_PROFESSIONALS } from '../../professional.mock'
+
+import { ProfessionalCard } from './ProfessionalCard'
 
 const mockPro = MOCK_PROFESSIONALS[0]
 

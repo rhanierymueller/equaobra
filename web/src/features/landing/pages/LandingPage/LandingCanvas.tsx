@@ -28,16 +28,86 @@ interface LandingCanvasProps {
 const GROUND_Y_RATIO = 0.82
 
 const BUILDINGS: BuildingSpec[] = [
-  { xRatio: 0.00, widthRatio: 0.055, maxHeightRatio: 0.28, startDelay: 0.02, windowCols: 2, windowRows: 5 },
-  { xRatio: 0.07, widthRatio: 0.075, maxHeightRatio: 0.42, startDelay: 0.06, windowCols: 2, windowRows: 7 },
-  { xRatio: 0.16, widthRatio: 0.090, maxHeightRatio: 0.54, startDelay: 0.10, windowCols: 3, windowRows: 9 },
-  { xRatio: 0.27, widthRatio: 0.108, maxHeightRatio: 0.65, startDelay: 0.14, windowCols: 3, windowRows: 11 },
-  { xRatio: 0.40, widthRatio: 0.125, maxHeightRatio: 0.79, startDelay: 0.20, windowCols: 4, windowRows: 14 },
-  { xRatio: 0.55, widthRatio: 0.102, maxHeightRatio: 0.61, startDelay: 0.16, windowCols: 3, windowRows: 10 },
-  { xRatio: 0.67, widthRatio: 0.085, maxHeightRatio: 0.46, startDelay: 0.11, windowCols: 3, windowRows: 8 },
-  { xRatio: 0.77, widthRatio: 0.075, maxHeightRatio: 0.35, startDelay: 0.07, windowCols: 2, windowRows: 6 },
-  { xRatio: 0.87, widthRatio: 0.060, maxHeightRatio: 0.25, startDelay: 0.03, windowCols: 2, windowRows: 4 },
-  { xRatio: 0.94, widthRatio: 0.060, maxHeightRatio: 0.31, startDelay: 0.01, windowCols: 2, windowRows: 5 },
+  {
+    xRatio: 0.0,
+    widthRatio: 0.055,
+    maxHeightRatio: 0.28,
+    startDelay: 0.02,
+    windowCols: 2,
+    windowRows: 5,
+  },
+  {
+    xRatio: 0.07,
+    widthRatio: 0.075,
+    maxHeightRatio: 0.42,
+    startDelay: 0.06,
+    windowCols: 2,
+    windowRows: 7,
+  },
+  {
+    xRatio: 0.16,
+    widthRatio: 0.09,
+    maxHeightRatio: 0.54,
+    startDelay: 0.1,
+    windowCols: 3,
+    windowRows: 9,
+  },
+  {
+    xRatio: 0.27,
+    widthRatio: 0.108,
+    maxHeightRatio: 0.65,
+    startDelay: 0.14,
+    windowCols: 3,
+    windowRows: 11,
+  },
+  {
+    xRatio: 0.4,
+    widthRatio: 0.125,
+    maxHeightRatio: 0.79,
+    startDelay: 0.2,
+    windowCols: 4,
+    windowRows: 14,
+  },
+  {
+    xRatio: 0.55,
+    widthRatio: 0.102,
+    maxHeightRatio: 0.61,
+    startDelay: 0.16,
+    windowCols: 3,
+    windowRows: 10,
+  },
+  {
+    xRatio: 0.67,
+    widthRatio: 0.085,
+    maxHeightRatio: 0.46,
+    startDelay: 0.11,
+    windowCols: 3,
+    windowRows: 8,
+  },
+  {
+    xRatio: 0.77,
+    widthRatio: 0.075,
+    maxHeightRatio: 0.35,
+    startDelay: 0.07,
+    windowCols: 2,
+    windowRows: 6,
+  },
+  {
+    xRatio: 0.87,
+    widthRatio: 0.06,
+    maxHeightRatio: 0.25,
+    startDelay: 0.03,
+    windowCols: 2,
+    windowRows: 4,
+  },
+  {
+    xRatio: 0.94,
+    widthRatio: 0.06,
+    maxHeightRatio: 0.31,
+    startDelay: 0.01,
+    windowCols: 2,
+    windowRows: 5,
+  },
 ]
 
 const BUILDING_COLORS = ['#161412', '#1D1B18', '#23201D', '#2A2724']
@@ -50,17 +120,21 @@ function localProgress(global: number, spec: BuildingSpec): number {
   return Math.max(0, Math.min(1, (global - spec.startDelay) / (1 - spec.startDelay)))
 }
 
-function drawSky(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-  progress: number,
-): void {
+function drawSky(ctx: CanvasRenderingContext2D, W: number, H: number, progress: number): void {
   const b = progress * 0.28
   const grad = ctx.createLinearGradient(0, 0, 0, H)
-  grad.addColorStop(0, `rgb(${Math.round(10 + b * 28)},${Math.round(9 + b * 18)},${Math.round(8 + b * 14)})`)
-  grad.addColorStop(0.72, `rgb(${Math.round(18 + b * 48)},${Math.round(14 + b * 28)},${Math.round(10 + b * 18)})`)
-  grad.addColorStop(1, `rgb(${Math.round(28 + b * 58)},${Math.round(18 + b * 32)},${Math.round(10 + b * 22)})`)
+  grad.addColorStop(
+    0,
+    `rgb(${Math.round(10 + b * 28)},${Math.round(9 + b * 18)},${Math.round(8 + b * 14)})`,
+  )
+  grad.addColorStop(
+    0.72,
+    `rgb(${Math.round(18 + b * 48)},${Math.round(14 + b * 28)},${Math.round(10 + b * 18)})`,
+  )
+  grad.addColorStop(
+    1,
+    `rgb(${Math.round(28 + b * 58)},${Math.round(18 + b * 32)},${Math.round(10 + b * 22)})`,
+  )
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, W, H)
 }
@@ -87,12 +161,7 @@ function drawStars(
   }
 }
 
-function drawGround(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-  progress: number,
-): void {
+function drawGround(ctx: CanvasRenderingContext2D, W: number, H: number, progress: number): void {
   const groundY = H * GROUND_Y_RATIO
   const grad = ctx.createLinearGradient(0, groundY, 0, H)
   grad.addColorStop(0, '#181512')
@@ -183,12 +252,7 @@ function drawBuildings(
   })
 }
 
-function drawCrane(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-  progress: number,
-): void {
+function drawCrane(ctx: CanvasRenderingContext2D, W: number, H: number, progress: number): void {
   if (progress < 0.04 || progress > 0.93) return
 
   const fadeIn = Math.min(1, (progress - 0.04) / 0.14)
@@ -296,11 +360,7 @@ function updateAndDrawSparks(
   if (sparks.length > 220) sparks.splice(0, sparks.length - 220)
 }
 
-function drawVignette(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-): void {
+function drawVignette(ctx: CanvasRenderingContext2D, W: number, H: number): void {
   const grad = ctx.createRadialGradient(W / 2, H * 0.48, H * 0.18, W / 2, H * 0.48, H * 0.9)
   grad.addColorStop(0, 'rgba(0,0,0,0)')
   grad.addColorStop(1, 'rgba(0,0,0,0.68)')

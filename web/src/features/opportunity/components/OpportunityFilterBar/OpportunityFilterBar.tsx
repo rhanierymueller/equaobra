@@ -1,13 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ALL_PROFESSIONS, PROFESSION_COLORS } from '@/src/types/professional.types'
+
 import { LocalityAutocomplete } from '@/src/components/LocalityAutocomplete'
+import { ALL_PROFESSIONS, PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Profession } from '@/src/types/professional.types'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(224,123,42,0.8)' }}>
+    <p
+      className="text-xs font-semibold uppercase tracking-widest mb-3"
+      style={{ color: 'rgba(224,123,42,0.8)' }}
+    >
       {children}
     </p>
   )
@@ -31,17 +35,18 @@ function ProfessionDropdown({
     return () => document.removeEventListener('mousedown', handle)
   }, [])
 
-  const label = selected.length === 0
-    ? 'Todas as profissões'
-    : selected.length === 1
-      ? selected[0]
-      : `${selected.length} profissões`
+  const label =
+    selected.length === 0
+      ? 'Todas as profissões'
+      : selected.length === 1
+        ? selected[0]
+        : `${selected.length} profissões`
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
         type="button"
-        onClick={() => setOpen(prev => !prev)}
+        onClick={() => setOpen((prev) => !prev)}
         className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-150"
         style={{
           background: open ? 'rgba(224,123,42,0.08)' : 'rgba(255,255,255,0.04)',
@@ -52,16 +57,27 @@ function ProfessionDropdown({
         <span className="flex items-center gap-2">
           {selected.length > 0 && (
             <span className="flex gap-1">
-              {selected.slice(0, 3).map(p => (
-                <span key={p} className="w-2 h-2 rounded-full" style={{ background: PROFESSION_COLORS[p] }} />
+              {selected.slice(0, 3).map((p) => (
+                <span
+                  key={p}
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: PROFESSION_COLORS[p] }}
+                />
               ))}
             </span>
           )}
           {label}
         </span>
         <svg
-          width="12" height="12" viewBox="0 0 12 12" fill="none"
-          style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          style={{
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+            flexShrink: 0,
+          }}
         >
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
@@ -78,7 +94,7 @@ function ProfessionDropdown({
             backdropFilter: 'blur(16px)',
           }}
         >
-          {ALL_PROFESSIONS.map(profession => {
+          {ALL_PROFESSIONS.map((profession) => {
             const active = selected.includes(profession)
             const color = PROFESSION_COLORS[profession]
             return (
@@ -93,12 +109,21 @@ function ProfessionDropdown({
                 }}
               >
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                <span className="text-sm flex-1" style={{ color: active ? color : 'rgba(245,240,235,0.65)' }}>
+                <span
+                  className="text-sm flex-1"
+                  style={{ color: active ? color : 'rgba(245,240,235,0.65)' }}
+                >
                   {profession}
                 </span>
                 {active && (
                   <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                    <path d="M2 6.5l3.5 3.5 5.5-6" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M2 6.5l3.5 3.5 5.5-6"
+                      stroke={color}
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </button>
@@ -135,15 +160,17 @@ export function OpportunityFilterBar({
   onToggleProfession,
   onReset,
 }: OpportunityFilterBarProps) {
-  const hasActiveFilters = filters.locality.length > 0 || filters.professions.length > 0 || filters.maxDistanceKm < 50
+  const hasActiveFilters =
+    filters.locality.length > 0 || filters.professions.length > 0 || filters.maxDistanceKm < 50
 
   return (
     <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <p className="font-bold text-white text-sm">Filtros</p>
           <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
-            {resultCount} obra{resultCount !== 1 ? 's' : ''} encontrada{resultCount !== 1 ? 's' : ''}
+            {resultCount} obra{resultCount !== 1 ? 's' : ''} encontrada
+            {resultCount !== 1 ? 's' : ''}
           </p>
         </div>
         {hasActiveFilters && (
@@ -162,7 +189,7 @@ export function OpportunityFilterBar({
         )}
       </div>
 
-            <div>
+      <div>
         <SectionLabel>Localidade</SectionLabel>
         <LocalityAutocomplete
           value={filters.locality}
@@ -174,15 +201,18 @@ export function OpportunityFilterBar({
         />
       </div>
 
-            <div>
+      <div>
         <SectionLabel>Profissão buscada</SectionLabel>
         <ProfessionDropdown selected={filters.professions} onToggle={onToggleProfession} />
       </div>
 
-            <div>
+      <div>
         <div className="flex items-center justify-between mb-3">
           <SectionLabel>Distância máxima</SectionLabel>
-          <span className="text-xs font-semibold" style={{ color: filters.maxDistanceKm >= 50 ? 'rgba(245,240,235,0.4)' : '#E07B2A' }}>
+          <span
+            className="text-xs font-semibold"
+            style={{ color: filters.maxDistanceKm >= 50 ? 'rgba(245,240,235,0.4)' : '#E07B2A' }}
+          >
             {filters.maxDistanceKm >= 50 ? 'Qualquer' : `${filters.maxDistanceKm} km`}
           </span>
         </div>
@@ -191,22 +221,37 @@ export function OpportunityFilterBar({
           min={1}
           max={50}
           value={filters.maxDistanceKm}
-          onChange={e => onSetMaxDistance(Number(e.target.value))}
+          onChange={(e) => onSetMaxDistance(Number(e.target.value))}
           className="w-full"
           style={{ accentColor: '#E07B2A', cursor: 'pointer' }}
         />
         <div className="flex justify-between mt-1">
-          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>1 km</span>
-          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>50 km</span>
+          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+            1 km
+          </span>
+          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+            50 km
+          </span>
         </div>
       </div>
 
-            <div
+      <div
         className="px-3 py-2.5 rounded-xl flex items-start gap-2"
         style={{ background: 'rgba(224,123,42,0.06)', border: '1px solid rgba(224,123,42,0.12)' }}
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E07B2A" strokeWidth="2" strokeLinecap="round" className="shrink-0 mt-0.5">
-          <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#E07B2A"
+          strokeWidth="2"
+          strokeLinecap="round"
+          className="shrink-0 mt-0.5"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
         <p className="text-xs leading-relaxed" style={{ color: 'rgba(245,240,235,0.45)' }}>
           Obras publicadas por contratantes que buscam profissionais

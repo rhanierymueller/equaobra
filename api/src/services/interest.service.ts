@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { InterestInput } from '../models/interest.model'
+import type { InterestInput } from '../models/interest.model'
 
 export async function listInterests(userId: string, asContractor: boolean) {
   return prisma.interest.findMany({

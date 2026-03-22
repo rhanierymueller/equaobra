@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { prisma } from '../lib/prisma'
 import { opportunitySchema, deserializeOpportunity } from '../models/opportunity.model'
 
@@ -12,7 +13,7 @@ export async function listOpportunities(filters: { city?: string; profession?: s
   })
 
   const cityLc = filters.city?.toLowerCase() ?? null
-  const filtered = cityLc ? opps.filter(o => o.obraLocation.toLowerCase().includes(cityLc)) : opps
+  const filtered = cityLc ? opps.filter((o) => o.obraLocation.toLowerCase().includes(cityLc)) : opps
   return filtered.map(deserializeOpportunity)
 }
 
@@ -56,8 +57,12 @@ export async function updateOpportunity(id: string, userId: string, body: unknow
   if (!opp) return { error: 'Oportunidade não encontrada', status: 404 }
   if (opp.contractorId !== userId) return { error: 'Sem permissão', status: 403 }
 
-  const partial = opportunitySchema.partial().extend({ active: z.boolean().optional() }).safeParse(body)
-  if (!partial.success) return { error: 'Dados inválidos', status: 400, details: partial.error.flatten() }
+  const partial = opportunitySchema
+    .partial()
+    .extend({ active: z.boolean().optional() })
+    .safeParse(body)
+  if (!partial.success)
+    return { error: 'Dados inválidos', status: 400, details: partial.error.flatten() }
 
   const updated = await prisma.opportunity.update({
     where: { id },

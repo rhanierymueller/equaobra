@@ -2,20 +2,25 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import { Navbar } from '@/src/components/Navbar'
+
 import { FilterBar } from '../../components/FilterBar'
 import { ProfessionalCard } from '../../components/ProfessionalCard'
 import { useProfessionals } from '../../hooks/useProfessionals'
-import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
-import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
-import { OpportunityFilterBar } from '@/src/features/opportunity/components/OpportunityFilterBar'
+
+import { Navbar } from '@/src/components/Navbar'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
-import type { Professional, Profession } from '@/src/types/professional.types'
+import { OpportunityFilterBar } from '@/src/features/opportunity/components/OpportunityFilterBar'
+import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
+import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
 import type { Opportunity } from '@/src/types/opportunity.types'
+import type { Professional, Profession } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
 import type { User } from '@/src/types/user.types'
 
-type ChatTarget = Pick<TeamMember, 'professionalId' | 'name' | 'avatarInitials' | 'avatarUrl' | 'profession'>
+type ChatTarget = Pick<
+  TeamMember,
+  'professionalId' | 'name' | 'avatarInitials' | 'avatarUrl' | 'profession'
+>
 
 type MapMode = 'profissionais' | 'obras'
 
@@ -23,24 +28,30 @@ const FILTER_WIDTH = 288
 const LIST_WIDTH = 360
 
 const ProfessionalMap = dynamic(
-  () => import('../../components/ProfessionalMap').then(m => m.ProfessionalMap),
+  () => import('../../components/ProfessionalMap').then((m) => m.ProfessionalMap),
   { ssr: false, loading: () => <MapSkeleton /> },
 )
 
 const OpportunityMap = dynamic(
-  () => import('@/src/features/opportunity/components/OpportunityMap').then(m => m.OpportunityMap),
+  () =>
+    import('@/src/features/opportunity/components/OpportunityMap').then((m) => m.OpportunityMap),
   { ssr: false, loading: () => <MapSkeleton /> },
 )
 
 function MapSkeleton() {
   return (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: '#0D0C0B' }}>
+    <div
+      className="w-full h-full flex items-center justify-center"
+      style={{ background: '#0D0C0B' }}
+    >
       <div className="flex flex-col items-center gap-3">
         <div
           className="w-10 h-10 rounded-full animate-spin"
           style={{ border: '3px solid rgba(224,123,42,0.2)', borderTopColor: '#E07B2A' }}
         />
-        <span className="text-sm" style={{ color: 'rgba(245,240,235,0.4)' }}>Carregando mapa...</span>
+        <span className="text-sm" style={{ color: 'rgba(245,240,235,0.4)' }}>
+          Carregando mapa...
+        </span>
       </div>
     </div>
   )
@@ -76,15 +87,21 @@ function PanelToggle({ open, onToggle, side, offset }: PanelToggleProps) {
       aria-label={open ? 'Fechar painel' : 'Abrir painel'}
     >
       <svg
-        width="9" height="9" viewBox="0 0 10 10" fill="none"
+        width="9"
+        height="9"
+        viewBox="0 0 10 10"
+        fill="none"
         style={{
-          transform: isLeft
-            ? (open ? 'rotate(180deg)' : 'none')
-            : (open ? 'none' : 'rotate(180deg)'),
+          transform: isLeft ? (open ? 'rotate(180deg)' : 'none') : open ? 'none' : 'rotate(180deg)',
           transition: 'transform 0.3s',
         }}
       >
-        <path d="M6.5 1L2.5 5L6.5 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path
+          d="M6.5 1L2.5 5L6.5 9"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
       </svg>
     </button>
   )
@@ -112,7 +129,7 @@ function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
         gap: 2,
       }}
     >
-      {(['profissionais', 'obras'] as MapMode[]).map(m => (
+      {(['profissionais', 'obras'] as MapMode[]).map((m) => (
         <button
           key={m}
           type="button"
@@ -182,7 +199,7 @@ export default function HomeSearch() {
     try {
       const raw = localStorage.getItem('equobra_user')
       if (raw) setUser(JSON.parse(raw) as User)
-    } catch {  }
+    } catch {}
   }, [])
 
   useEffect(() => {
@@ -209,9 +226,7 @@ export default function HomeSearch() {
   }
 
   function toggleOppProfession(p: Profession) {
-    setOppProfessions(prev =>
-      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
-    )
+    setOppProfessions((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]))
   }
 
   function resetOppFilters() {
@@ -225,15 +240,22 @@ export default function HomeSearch() {
 
   function haversineKm(a: [number, number], b: [number, number]): number {
     const R = 6371
-    const dLat = (b[0] - a[0]) * Math.PI / 180
-    const dLng = (b[1] - a[1]) * Math.PI / 180
-    const sin2 = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * Math.PI / 180) * Math.cos(b[0] * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+    const dLat = ((b[0] - a[0]) * Math.PI) / 180
+    const dLng = ((b[1] - a[1]) * Math.PI) / 180
+    const sin2 =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((a[0] * Math.PI) / 180) * Math.cos((b[0] * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
     return R * 2 * Math.asin(Math.sqrt(sin2))
   }
 
-  const filteredOpportunities = opportunities.filter(o => {
-    if (oppLocality && !o.obraLocation.toLowerCase().includes(oppLocality.toLowerCase())) return false
-    if (oppProfessions.length > 0 && !oppProfessions.some(p => o.lookingForProfessions.includes(p))) return false
+  const filteredOpportunities = opportunities.filter((o) => {
+    if (oppLocality && !o.obraLocation.toLowerCase().includes(oppLocality.toLowerCase()))
+      return false
+    if (
+      oppProfessions.length > 0 &&
+      !oppProfessions.some((p) => o.lookingForProfessions.includes(p))
+    )
+      return false
     if (effectiveCenter && o.lat && o.lng) {
       if (haversineKm(effectiveCenter, [o.lat, o.lng]) > oppMaxDistance) return false
     }
@@ -245,7 +267,6 @@ export default function HomeSearch() {
       <Navbar searchValue={filters.search} onSearchChange={setSearch} />
 
       <div className="flex flex-1 overflow-hidden relative" style={{ overflowX: 'hidden' }}>
-
         <aside
           className="shrink-0 overflow-hidden transition-all duration-300"
           style={{
@@ -270,10 +291,17 @@ export default function HomeSearch() {
                 />
               ) : (
                 <OpportunityFilterBar
-                  filters={{ locality: oppLocality, professions: oppProfessions, maxDistanceKm: oppMaxDistance }}
+                  filters={{
+                    locality: oppLocality,
+                    professions: oppProfessions,
+                    maxDistanceKm: oppMaxDistance,
+                  }}
                   resultCount={filteredOpportunities.length}
                   onSetLocality={setOppLocality}
-                  onLocationSelect={(lat, lng) => { setMapFlyTo([lat, lng]); setOppCenter([lat, lng]) }}
+                  onLocationSelect={(lat, lng) => {
+                    setMapFlyTo([lat, lng])
+                    setOppCenter([lat, lng])
+                  }}
                   onSetMaxDistance={setOppMaxDistance}
                   onToggleProfession={toggleOppProfession}
                   onReset={resetOppFilters}
@@ -285,13 +313,12 @@ export default function HomeSearch() {
 
         <PanelToggle
           open={filterOpen}
-          onToggle={() => setFilterOpen(v => !v)}
+          onToggle={() => setFilterOpen((v) => !v)}
           side="left"
           offset={FILTER_WIDTH}
         />
 
         <div className="flex-1 relative">
-
           <MapModeToggle mode={mapMode} onChange={handleModeChange} />
 
           {mapMode === 'profissionais' ? (
@@ -299,13 +326,15 @@ export default function HomeSearch() {
               key={mapKey}
               professionals={professionals}
               selected={selected}
-              onSelect={pro => selectProfessional(selected?.id === pro.id ? null : pro)}
+              onSelect={(pro) => selectProfessional(selected?.id === pro.id ? null : pro)}
               onDeselect={() => selectProfessional(null)}
               onAddToTeam={
                 user?.role === 'contratante'
-                  ? pro => setTeamTarget(pro)
+                  ? (pro) => setTeamTarget(pro)
                   : !user
-                    ? () => { window.location.href = '/auth' }
+                    ? () => {
+                        window.location.href = '/auth'
+                      }
                     : undefined
               }
               flyTo={mapFlyTo}
@@ -315,58 +344,81 @@ export default function HomeSearch() {
               key={mapKey}
               opportunities={filteredOpportunities}
               selected={selectedOpp}
-              onSelect={opp => setSelectedOpp(selectedOpp?.id === opp.id ? null : opp)}
+              onSelect={(opp) => setSelectedOpp(selectedOpp?.id === opp.id ? null : opp)}
               onDeselect={() => setSelectedOpp(null)}
-              onInterest={user?.role === 'profissional'
-                ? opp => setChatTarget(oppToChatTarget(opp))
-                : !user
-                  ? () => { window.location.href = '/auth' }
-                  : undefined
+              onInterest={
+                user?.role === 'profissional'
+                  ? (opp) => setChatTarget(oppToChatTarget(opp))
+                  : !user
+                    ? () => {
+                        window.location.href = '/auth'
+                      }
+                    : undefined
               }
               flyTo={mapFlyTo}
             />
           )}
 
-          {mapMode === 'profissionais' && (filters.professions.length > 0 || filters.availableOnly || filters.minRating > 0 || filters.locality) && (
-            <div
-              className="absolute left-3 flex gap-2 flex-wrap pointer-events-none"
-              style={{ top: 56, right: 12, zIndex: 1001 }}
-            >
-              {filters.locality && (
-                <span
-                  className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
-                  style={{ background: 'rgba(116,185,255,0.15)', border: '1px solid rgba(116,185,255,0.35)', color: '#74B9FF' }}
-                >
-                  📍 {filters.locality}
-                </span>
-              )}
-              {filters.availableOnly && (
-                <span
-                  className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
-                  style={{ background: 'rgba(76,175,80,0.15)', border: '1px solid rgba(76,175,80,0.35)', color: '#4CAF50' }}
-                >
-                  ● Disponível agora
-                </span>
-              )}
-              {filters.minRating > 0 && (
-                <span
-                  className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
-                  style={{ background: 'rgba(255,209,102,0.15)', border: '1px solid rgba(255,209,102,0.3)', color: '#FFD166' }}
-                >
-                  ★ {filters.minRating}+
-                </span>
-              )}
-              {filters.professions.map(p => (
-                <span
-                  key={p}
-                  className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
-                  style={{ background: 'rgba(224,123,42,0.15)', border: '1px solid rgba(224,123,42,0.3)', color: '#E07B2A' }}
-                >
-                  {p}
-                </span>
-              ))}
-            </div>
-          )}
+          {mapMode === 'profissionais' &&
+            (filters.professions.length > 0 ||
+              filters.availableOnly ||
+              filters.minRating > 0 ||
+              filters.locality) && (
+              <div
+                className="absolute left-3 flex gap-2 flex-wrap pointer-events-none"
+                style={{ top: 56, right: 12, zIndex: 1001 }}
+              >
+                {filters.locality && (
+                  <span
+                    className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
+                    style={{
+                      background: 'rgba(116,185,255,0.15)',
+                      border: '1px solid rgba(116,185,255,0.35)',
+                      color: '#74B9FF',
+                    }}
+                  >
+                    📍 {filters.locality}
+                  </span>
+                )}
+                {filters.availableOnly && (
+                  <span
+                    className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
+                    style={{
+                      background: 'rgba(76,175,80,0.15)',
+                      border: '1px solid rgba(76,175,80,0.35)',
+                      color: '#4CAF50',
+                    }}
+                  >
+                    ● Disponível agora
+                  </span>
+                )}
+                {filters.minRating > 0 && (
+                  <span
+                    className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
+                    style={{
+                      background: 'rgba(255,209,102,0.15)',
+                      border: '1px solid rgba(255,209,102,0.3)',
+                      color: '#FFD166',
+                    }}
+                  >
+                    ★ {filters.minRating}+
+                  </span>
+                )}
+                {filters.professions.map((p) => (
+                  <span
+                    key={p}
+                    className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
+                    style={{
+                      background: 'rgba(224,123,42,0.15)',
+                      border: '1px solid rgba(224,123,42,0.3)',
+                      color: '#E07B2A',
+                    }}
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+            )}
 
           <div
             className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs px-3 py-2 rounded-xl flex items-center gap-2"
@@ -381,13 +433,20 @@ export default function HomeSearch() {
           >
             {mapMode === 'profissionais' ? (
               <>
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#4CAF50' }} />
-                {professionals.filter(p => p.available).length} disponíveis agora
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ background: '#4CAF50' }}
+                />
+                {professionals.filter((p) => p.available).length} disponíveis agora
               </>
             ) : (
               <>
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#E07B2A' }} />
-                {filteredOpportunities.length} obra{filteredOpportunities.length !== 1 ? 's' : ''} no mapa
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ background: '#E07B2A' }}
+                />
+                {filteredOpportunities.length} obra{filteredOpportunities.length !== 1 ? 's' : ''}{' '}
+                no mapa
               </>
             )}
           </div>
@@ -395,7 +454,7 @@ export default function HomeSearch() {
 
         <PanelToggle
           open={listOpen}
-          onToggle={() => setListOpen(v => !v)}
+          onToggle={() => setListOpen((v) => !v)}
           side="right"
           offset={LIST_WIDTH}
         />
@@ -409,76 +468,92 @@ export default function HomeSearch() {
           }}
         >
           <div className="flex flex-col h-full w-full overflow-x-hidden">
-            <div className="px-4 pt-4 pb-3 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div
+              className="px-4 pt-4 pb-3 shrink-0"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+            >
               <p className="text-sm font-semibold text-white">
                 {mapMode === 'profissionais' ? 'Profissionais' : 'Obras disponíveis'}
               </p>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.3)' }}>
                 {mapMode === 'profissionais'
-                  ? (resultCount > 0
+                  ? resultCount > 0
                     ? `${resultCount} resultado${resultCount !== 1 ? 's' : ''} próximos de você`
-                    : 'Nenhum profissional encontrado')
-                  : `${filteredOpportunities.length} oportunidade${filteredOpportunities.length !== 1 ? 's' : ''} próximas`
-                }
+                    : 'Nenhum profissional encontrado'
+                  : `${filteredOpportunities.length} oportunidade${filteredOpportunities.length !== 1 ? 's' : ''} próximas`}
               </p>
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
               {mapMode === 'profissionais'
-                ? professionals.map(p => (
-                  <ProfessionalCard
-                    key={p.id}
-                    professional={p}
-                    selected={selected?.id === p.id}
-                    onClick={pro => selectProfessional(selected?.id === pro.id ? null : pro)}
-                  />
-                ))
-                : filteredOpportunities.map(opp => (
-                  <button
-                    key={opp.id}
-                    type="button"
-                    onClick={() => setSelectedOpp(selectedOpp?.id === opp.id ? null : opp)}
-                    style={{
-                      textAlign: 'left',
-                      background: selectedOpp?.id === opp.id ? 'rgba(224,123,42,0.1)' : 'rgba(255,255,255,0.03)',
-                      border: `1px solid ${selectedOpp?.id === opp.id ? 'rgba(224,123,42,0.4)' : 'rgba(255,255,255,0.07)'}`,
-                      borderRadius: 12,
-                      padding: '10px 12px',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <p className="text-sm font-semibold text-white truncate">
-                      {opp.companyName ?? opp.contractorName}
-                    </p>
-                    <p className="text-xs mt-0.5 truncate" style={{ color: 'rgba(245,240,235,0.4)' }}>
-                      📍 {opp.obraLocation}
-                    </p>
-                    <p className="text-xs mt-1.5 line-clamp-2 leading-relaxed" style={{ color: 'rgba(245,240,235,0.6)' }}>
-                      {opp.obraDescription}
-                    </p>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {opp.lookingForProfessions.slice(0, 3).map(prof => (
-                        <span
-                          key={prof}
-                          style={{ fontSize: 10, padding: '2px 7px', borderRadius: 99, background: 'rgba(224,123,42,0.1)', color: '#E07B2A', border: '1px solid rgba(224,123,42,0.2)' }}
-                        >
-                          {prof}
-                        </span>
-                      ))}
-                      {opp.lookingForProfessions.length > 3 && (
-                        <span style={{ fontSize: 10, color: 'rgba(245,240,235,0.3)' }}>
-                          +{opp.lookingForProfessions.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                ))
-              }
+                ? professionals.map((p) => (
+                    <ProfessionalCard
+                      key={p.id}
+                      professional={p}
+                      selected={selected?.id === p.id}
+                      onClick={(pro) => selectProfessional(selected?.id === pro.id ? null : pro)}
+                    />
+                  ))
+                : filteredOpportunities.map((opp) => (
+                    <button
+                      key={opp.id}
+                      type="button"
+                      onClick={() => setSelectedOpp(selectedOpp?.id === opp.id ? null : opp)}
+                      style={{
+                        textAlign: 'left',
+                        background:
+                          selectedOpp?.id === opp.id
+                            ? 'rgba(224,123,42,0.1)'
+                            : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${selectedOpp?.id === opp.id ? 'rgba(224,123,42,0.4)' : 'rgba(255,255,255,0.07)'}`,
+                        borderRadius: 12,
+                        padding: '10px 12px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <p className="text-sm font-semibold text-white truncate">
+                        {opp.companyName ?? opp.contractorName}
+                      </p>
+                      <p
+                        className="text-xs mt-0.5 truncate"
+                        style={{ color: 'rgba(245,240,235,0.4)' }}
+                      >
+                        📍 {opp.obraLocation}
+                      </p>
+                      <p
+                        className="text-xs mt-1.5 line-clamp-2 leading-relaxed"
+                        style={{ color: 'rgba(245,240,235,0.6)' }}
+                      >
+                        {opp.obraDescription}
+                      </p>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {opp.lookingForProfessions.slice(0, 3).map((prof) => (
+                          <span
+                            key={prof}
+                            style={{
+                              fontSize: 10,
+                              padding: '2px 7px',
+                              borderRadius: 99,
+                              background: 'rgba(224,123,42,0.1)',
+                              color: '#E07B2A',
+                              border: '1px solid rgba(224,123,42,0.2)',
+                            }}
+                          >
+                            {prof}
+                          </span>
+                        ))}
+                        {opp.lookingForProfessions.length > 3 && (
+                          <span style={{ fontSize: 10, color: 'rgba(245,240,235,0.3)' }}>
+                            +{opp.lookingForProfessions.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
             </div>
           </div>
         </aside>
-
       </div>
 
       {teamTarget && user && (
@@ -491,11 +566,7 @@ export default function HomeSearch() {
       )}
 
       {chatTarget && user && (
-        <ChatModal
-          user={user}
-          professional={chatTarget}
-          onClose={() => setChatTarget(null)}
-        />
+        <ChatModal user={user} professional={chatTarget} onClose={() => setChatTarget(null)} />
       )}
     </div>
   )

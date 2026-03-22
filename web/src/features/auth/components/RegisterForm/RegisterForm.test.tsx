@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { RegisterForm } from './RegisterForm'
+
 import { useRegisterForm } from '../../hooks/useAuthForm'
+
+import { RegisterForm } from './RegisterForm'
 
 function Wrapper() {
   const form = useRegisterForm()

@@ -1,7 +1,9 @@
-import { View, ViewStyle } from 'react-native'
+import type { ViewStyle } from 'react-native'
+import { View } from 'react-native'
+
 import { colors, fonts } from '../../design-system/tokens'
-import { Text } from '../text/Text'
 import { getInitials } from '../../utils/getInitials'
+import { Text } from '../text/Text'
 
 interface AvatarProps {
   name: string
@@ -37,7 +39,9 @@ export function Avatar({
         style,
       ]}
     >
-      <Text weight="extraBold" style={{ fontSize, color }}>{initials}</Text>
+      <Text weight="extraBold" style={{ fontSize, color }}>
+        {initials}
+      </Text>
     </View>
   )
 }

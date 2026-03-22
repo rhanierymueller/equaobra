@@ -1,13 +1,10 @@
 import { prisma } from '../lib/prisma'
-import { TeamInput, MemberInput, UpdateMemberInput } from '../models/team.model'
+import type { TeamInput, MemberInput, UpdateMemberInput } from '../models/team.model'
 
 export async function listTeams(userId: string) {
   return prisma.team.findMany({
     where: {
-      OR: [
-        { ownerId: userId },
-        { members: { some: { professionalId: userId } } },
-      ],
+      OR: [{ ownerId: userId }, { members: { some: { professionalId: userId } } }],
     },
     include: { members: true },
     orderBy: { createdAt: 'desc' },
@@ -28,13 +25,17 @@ export async function getTeamById(id: string, userId: string) {
     include: { members: true },
   })
   if (!team) return { error: 'Equipe não encontrada', status: 404 }
-  if (team.ownerId !== userId && !team.members.some(m => m.professionalId === userId)) {
+  if (team.ownerId !== userId && !team.members.some((m) => m.professionalId === userId)) {
     return { error: 'Sem permissão', status: 403 }
   }
   return { data: team }
 }
 
-export async function updateTeam(id: string, userId: string, data: Partial<Omit<TeamInput, 'members'>>) {
+export async function updateTeam(
+  id: string,
+  userId: string,
+  data: Partial<Omit<TeamInput, 'members'>>,
+) {
   const team = await prisma.team.findUnique({ where: { id } })
   if (!team) return { error: 'Equipe não encontrada', status: 404 }
   if (team.ownerId !== userId) return { error: 'Sem permissão', status: 403 }
@@ -65,7 +66,12 @@ export async function addMember(teamId: string, userId: string, data: MemberInpu
   return { data: member }
 }
 
-export async function updateMember(teamId: string, professionalId: string, userId: string, data: UpdateMemberInput) {
+export async function updateMember(
+  teamId: string,
+  professionalId: string,
+  userId: string,
+  data: UpdateMemberInput,
+) {
   const team = await prisma.team.findUnique({ where: { id: teamId } })
   if (!team) return { error: 'Equipe não encontrada', status: 404 }
   if (team.ownerId !== userId) return { error: 'Sem permissão', status: 403 }

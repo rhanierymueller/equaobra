@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
+
+import { MOCK_PROFESSIONALS } from '../professional.mock'
+
 import { api } from '@/src/services/api'
 import type { Professional, ProfessionalFilters, Profession } from '@/src/types/professional.types'
-import { MOCK_PROFESSIONALS } from '../professional.mock'
 
 const DEFAULT_FILTERS: ProfessionalFilters = {
   search: '',
@@ -47,7 +49,12 @@ function userToProfessional(u: RawUser): Professional {
       city: u.address?.city ?? '',
     },
     completedJobs: 0,
-    avatarInitials: u.name.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase(),
+    avatarInitials: u.name
+      .split(' ')
+      .slice(0, 2)
+      .map((n: string) => n[0])
+      .join('')
+      .toUpperCase(),
     avatarUrl: u.avatarUrl ?? undefined,
     tags: u.tags ?? [],
     hourlyRate: u.hourlyRate ?? undefined,
@@ -69,8 +76,7 @@ function matchesFilters(p: Professional, f: ProfessionalFilters): boolean {
     const city = p.location.city.toLowerCase()
     const hood = p.location.neighborhood.toLowerCase()
     const matches =
-      hood.includes(loc) || loc.includes(hood) ||
-      city.includes(loc) || loc.includes(city)
+      hood.includes(loc) || loc.includes(hood) || city.includes(loc) || loc.includes(city)
     if (!matches) return false
   }
   if (f.professions.length > 0 && !f.professions.includes(p.profession)) return false
@@ -101,29 +107,42 @@ export function useProfessionals(): UseProfessionalsReturn {
   const [selected, setSelected] = useState<Professional | null>(null)
 
   useEffect(() => {
-    api.get<RawUser[]>('/api/users/professionals')
-      .then(data => setAllProfessionals(data.map(userToProfessional)))
+    api
+      .get<RawUser[]>('/api/users/professionals')
+      .then((data) => setAllProfessionals(data.map(userToProfessional)))
       .catch(() => setAllProfessionals(MOCK_PROFESSIONALS))
   }, [])
 
   const professionals = useMemo(
-    () => allProfessionals.filter(p => matchesFilters(p, filters)),
+    () => allProfessionals.filter((p) => matchesFilters(p, filters)),
     [allProfessionals, filters],
   )
 
-  const setSearch = useCallback((search: string) => setFilters(prev => ({ ...prev, search })), [])
-  const setLocality = useCallback((locality: string) => setFilters(prev => ({ ...prev, locality })), [])
+  const setSearch = useCallback((search: string) => setFilters((prev) => ({ ...prev, search })), [])
+  const setLocality = useCallback(
+    (locality: string) => setFilters((prev) => ({ ...prev, locality })),
+    [],
+  )
   const toggleProfession = useCallback((profession: Profession) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       professions: prev.professions.includes(profession)
-        ? prev.professions.filter(p => p !== profession)
+        ? prev.professions.filter((p) => p !== profession)
         : [...prev.professions, profession],
     }))
   }, [])
-  const setMinRating = useCallback((minRating: number) => setFilters(prev => ({ ...prev, minRating })), [])
-  const setMaxDistance = useCallback((maxDistanceKm: number) => setFilters(prev => ({ ...prev, maxDistanceKm })), [])
-  const setAvailableOnly = useCallback((availableOnly: boolean) => setFilters(prev => ({ ...prev, availableOnly })), [])
+  const setMinRating = useCallback(
+    (minRating: number) => setFilters((prev) => ({ ...prev, minRating })),
+    [],
+  )
+  const setMaxDistance = useCallback(
+    (maxDistanceKm: number) => setFilters((prev) => ({ ...prev, maxDistanceKm })),
+    [],
+  )
+  const setAvailableOnly = useCallback(
+    (availableOnly: boolean) => setFilters((prev) => ({ ...prev, availableOnly })),
+    [],
+  )
   const selectProfessional = useCallback((p: Professional | null) => setSelected(p), [])
   const resetFilters = useCallback(() => setFilters(DEFAULT_FILTERS), [])
 

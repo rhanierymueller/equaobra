@@ -42,7 +42,10 @@ export function LocalityAutocomplete({
     setSuggestions([])
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    if (!text.trim() || text.length < 2) { setOpen(false); return }
+    if (!text.trim() || text.length < 2) {
+      setOpen(false)
+      return
+    }
 
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
@@ -76,11 +79,15 @@ export function LocalityAutocomplete({
       <div className="relative">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-          width="13" height="13" viewBox="0 0 13 13" fill="none"
+          width="13"
+          height="13"
+          viewBox="0 0 13 13"
+          fill="none"
         >
           <path
             d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
-            stroke="rgba(245,240,235,0.3)" strokeWidth="1.3"
+            stroke="rgba(245,240,235,0.3)"
+            strokeWidth="1.3"
           />
           <circle cx="6.5" cy="5" r="1.4" stroke="rgba(245,240,235,0.3)" strokeWidth="1.3" />
         </svg>
@@ -96,8 +103,10 @@ export function LocalityAutocomplete({
           type="text"
           placeholder={placeholder}
           value={value}
-          onChange={e => handleChange(e.target.value)}
-          onFocus={() => { if (suggestions.length > 0) setOpen(true) }}
+          onChange={(e) => handleChange(e.target.value)}
+          onFocus={() => {
+            if (suggestions.length > 0) setOpen(true)
+          }}
           className="w-full pl-9 pr-3 py-2.5 rounded-xl text-sm outline-none transition-all duration-200"
           style={{
             background: 'rgba(255,255,255,0.05)',
@@ -105,7 +114,7 @@ export function LocalityAutocomplete({
             color: '#F5F0EB',
             paddingRight: loading ? 32 : 12,
           }}
-          onBlur={e => {
+          onBlur={(e) => {
             if (!value) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
           }}
           autoComplete="off"
@@ -131,18 +140,39 @@ export function LocalityAutocomplete({
               <button
                 key={i}
                 type="button"
-                onMouseDown={e => { e.preventDefault(); handleSelect(r) }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  handleSelect(r)
+                }}
                 className="w-full flex items-start gap-2.5 px-3 py-2.5 text-left hover:bg-white/5 transition-colors"
-                style={{ borderBottom: i < suggestions.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
+                style={{
+                  borderBottom:
+                    i < suggestions.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                }}
               >
-                <svg width="12" height="12" viewBox="0 0 13 13" fill="none" className="shrink-0 mt-0.5">
-                  <path d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
-                    stroke="#E07B2A" strokeWidth="1.3" />
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 13 13"
+                  fill="none"
+                  className="shrink-0 mt-0.5"
+                >
+                  <path
+                    d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
+                    stroke="#E07B2A"
+                    strokeWidth="1.3"
+                  />
                   <circle cx="6.5" cy="5" r="1.4" stroke="#E07B2A" strokeWidth="1.3" />
                 </svg>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: '#F5F0EB' }}>{main}</p>
-                  {sub && <p className="text-xs truncate" style={{ color: 'rgba(245,240,235,0.4)' }}>{sub}</p>}
+                  <p className="text-sm font-medium truncate" style={{ color: '#F5F0EB' }}>
+                    {main}
+                  </p>
+                  {sub && (
+                    <p className="text-xs truncate" style={{ color: 'rgba(245,240,235,0.4)' }}>
+                      {sub}
+                    </p>
+                  )}
                 </div>
               </button>
             )

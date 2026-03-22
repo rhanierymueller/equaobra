@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useState, useCallback } from 'react'
+
 import { LoginForm } from '../../components/LoginForm'
 import { RegisterForm } from '../../components/RegisterForm'
 import { useLoginForm, useRegisterForm } from '../../hooks/useAuthForm'
+
 import { api, setToken } from '@/src/services/api'
-import type { AuthMode } from '@/src/types/auth.types'
-import type { LoginCredentials, RegisterCredentials } from '@/src/types/auth.types'
-import Link from 'next/link'
+import type { AuthMode, LoginCredentials, RegisterCredentials } from '@/src/types/auth.types'
 
 function persistUser(user: Record<string, unknown> | undefined) {
   if (typeof window === 'undefined') return
@@ -72,11 +73,8 @@ interface TabsProps {
 
 function Tabs({ mode, onChange }: TabsProps) {
   return (
-    <div
-      className="flex rounded-xl p-1 mb-8"
-      style={{ background: 'rgba(255,255,255,0.06)' }}
-    >
-      {(['login', 'register'] as AuthMode[]).map(m => (
+    <div className="flex rounded-xl p-1 mb-8" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      {(['login', 'register'] as AuthMode[]).map((m) => (
         <button
           key={m}
           type="button"
@@ -102,67 +100,82 @@ export default function AuthPage() {
   const loginForm = useLoginForm()
   const registerForm = useRegisterForm()
 
-  const handleModeChange = useCallback((next: AuthMode) => {
-    setMode(next)
-    setAuthError('')
-    loginForm.reset()
-    registerForm.reset()
-  }, [loginForm, registerForm])
+  const handleModeChange = useCallback(
+    (next: AuthMode) => {
+      setMode(next)
+      setAuthError('')
+      loginForm.reset()
+      registerForm.reset()
+    },
+    [loginForm, registerForm],
+  )
 
-  const handleLoginSuccess = useCallback(async (creds: LoginCredentials) => {
-    setIsAuthenticating(true)
-    setAuthError('')
-    try {
-      const res = await api.post<{ token: string; user: Record<string, unknown> }>('/api/auth/login', {
-        email: creds.email,
-        password: creds.password,
-      })
-      setToken(res.token)
-      persistUser(res.user)
-      router.push('/home')
-    } catch (e: unknown) {
-      setAuthError(e instanceof Error ? e.message : 'Erro ao entrar. Tente novamente.')
-    } finally {
-      setIsAuthenticating(false)
-    }
-  }, [router])
+  const handleLoginSuccess = useCallback(
+    async (creds: LoginCredentials) => {
+      setIsAuthenticating(true)
+      setAuthError('')
+      try {
+        const res = await api.post<{ token: string; user: Record<string, unknown> }>(
+          '/api/auth/login',
+          {
+            email: creds.email,
+            password: creds.password,
+          },
+        )
+        setToken(res.token)
+        persistUser(res.user)
+        router.push('/home')
+      } catch (e: unknown) {
+        setAuthError(e instanceof Error ? e.message : 'Erro ao entrar. Tente novamente.')
+      } finally {
+        setIsAuthenticating(false)
+      }
+    },
+    [router],
+  )
 
-  const handleRegisterSuccess = useCallback(async (creds: RegisterCredentials) => {
-    setIsAuthenticating(true)
-    setAuthError('')
-    try {
-      const res = await api.post<{ token: string; user: Record<string, unknown> }>('/api/auth/register', {
-        name: creds.name,
-        email: creds.email,
-        password: creds.password,
-        role: creds.roles[0] || creds.role,
-        roles: creds.roles,
-        profession: creds.profession || undefined,
-        professions: creds.profession ? [creds.profession] : undefined,
-        hourlyRate: creds.hourlyRate ? Number(creds.hourlyRate) : undefined,
-        companyName: creds.companyName || undefined,
-        addrCep: creds.cep ? creds.cep.replace(/\D/g, '') : undefined,
-        addrStreet: creds.street || undefined,
-        addrNeighborhood: creds.neighborhood || undefined,
-        addrCity: creds.city || undefined,
-        addrState: creds.state || undefined,
-        addrNumber: creds.addressNumber || undefined,
-        compAddrCep: creds.companyCep ? creds.companyCep.replace(/\D/g, '') : undefined,
-        compAddrStreet: creds.companyStreet || undefined,
-        compAddrNeighborhood: creds.companyNeighborhood || undefined,
-        compAddrCity: creds.companyCity || undefined,
-        compAddrState: creds.companyState || undefined,
-        compAddrNumber: creds.companyAddressNumber || undefined,
-      })
-      setToken(res.token)
-      persistUser(res.user)
-      router.push('/home')
-    } catch (e: unknown) {
-      setAuthError(e instanceof Error ? e.message : 'Erro ao criar conta. Tente novamente.')
-    } finally {
-      setIsAuthenticating(false)
-    }
-  }, [router])
+  const handleRegisterSuccess = useCallback(
+    async (creds: RegisterCredentials) => {
+      setIsAuthenticating(true)
+      setAuthError('')
+      try {
+        const res = await api.post<{ token: string; user: Record<string, unknown> }>(
+          '/api/auth/register',
+          {
+            name: creds.name,
+            email: creds.email,
+            password: creds.password,
+            role: creds.roles[0] || creds.role,
+            roles: creds.roles,
+            profession: creds.profession || undefined,
+            professions: creds.profession ? [creds.profession] : undefined,
+            hourlyRate: creds.hourlyRate ? Number(creds.hourlyRate) : undefined,
+            companyName: creds.companyName || undefined,
+            addrCep: creds.cep ? creds.cep.replace(/\D/g, '') : undefined,
+            addrStreet: creds.street || undefined,
+            addrNeighborhood: creds.neighborhood || undefined,
+            addrCity: creds.city || undefined,
+            addrState: creds.state || undefined,
+            addrNumber: creds.addressNumber || undefined,
+            compAddrCep: creds.companyCep ? creds.companyCep.replace(/\D/g, '') : undefined,
+            compAddrStreet: creds.companyStreet || undefined,
+            compAddrNeighborhood: creds.companyNeighborhood || undefined,
+            compAddrCity: creds.companyCity || undefined,
+            compAddrState: creds.companyState || undefined,
+            compAddrNumber: creds.companyAddressNumber || undefined,
+          },
+        )
+        setToken(res.token)
+        persistUser(res.user)
+        router.push('/home')
+      } catch (e: unknown) {
+        setAuthError(e instanceof Error ? e.message : 'Erro ao criar conta. Tente novamente.')
+      } finally {
+        setIsAuthenticating(false)
+      }
+    },
+    [router],
+  )
 
   return (
     <div
@@ -196,24 +209,35 @@ export default function AuthPage() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-baseline gap-0">
-            <span className="font-black text-3xl tracking-[0.15em] uppercase" style={{ color: '#E07B2A' }}>
+            <span
+              className="font-black text-3xl tracking-[0.15em] uppercase"
+              style={{ color: '#E07B2A' }}
+            >
               Equa
             </span>
-            <span className="font-black text-3xl tracking-[0.15em] uppercase" style={{ color: '#F5F0EB' }}>
+            <span
+              className="font-black text-3xl tracking-[0.15em] uppercase"
+              style={{ color: '#F5F0EB' }}
+            >
               Obra
             </span>
           </Link>
           <p className="text-sm mt-2" style={{ color: 'rgba(245,240,235,0.45)' }}>
-            {mode === 'login'
-              ? 'Bem-vindo de volta'
-              : 'Crie sua conta gratuitamente'}
+            {mode === 'login' ? 'Bem-vindo de volta' : 'Crie sua conta gratuitamente'}
           </p>
         </div>
 
         <Tabs mode={mode} onChange={handleModeChange} />
 
         {authError && (
-          <div className="mb-4 px-3 py-2.5 rounded-xl text-xs" style={{ background: 'rgba(229,57,53,0.1)', border: '1px solid rgba(229,57,53,0.25)', color: '#E53935' }}>
+          <div
+            className="mb-4 px-3 py-2.5 rounded-xl text-xs"
+            style={{
+              background: 'rgba(229,57,53,0.1)',
+              border: '1px solid rgba(229,57,53,0.25)',
+              color: '#E53935',
+            }}
+          >
             {authError}
           </div>
         )}
@@ -226,9 +250,17 @@ export default function AuthPage() {
           }}
         >
           {mode === 'login' ? (
-            <LoginForm form={loginForm} onSuccess={() => handleLoginSuccess(loginForm.values)} isLoading={isAuthenticating} />
+            <LoginForm
+              form={loginForm}
+              onSuccess={() => handleLoginSuccess(loginForm.values)}
+              isLoading={isAuthenticating}
+            />
           ) : (
-            <RegisterForm form={registerForm} onSuccess={() => handleRegisterSuccess(registerForm.values)} isLoading={isAuthenticating} />
+            <RegisterForm
+              form={registerForm}
+              onSuccess={() => handleRegisterSuccess(registerForm.values)}
+              isLoading={isAuthenticating}
+            />
           )}
         </div>
 

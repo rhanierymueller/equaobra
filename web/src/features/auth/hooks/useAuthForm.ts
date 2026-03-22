@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+
 import type {
   LoginCredentials,
   LoginErrors,
@@ -58,33 +59,42 @@ export function useLoginForm(): UseLoginFormReturn {
     return errs
   }, [])
 
-  const handleChange = useCallback((field: keyof LoginCredentials, value: string) => {
-    setValues(prev => ({ ...prev, [field]: value }))
-    if (touched[field]) {
-      const newVals = { ...values, [field]: value }
-      const errs = validate(newVals)
-      setErrors(prev => ({ ...prev, [field]: errs[field] }))
-    }
-  }, [touched, values, validate])
+  const handleChange = useCallback(
+    (field: keyof LoginCredentials, value: string) => {
+      setValues((prev) => ({ ...prev, [field]: value }))
+      if (touched[field]) {
+        const newVals = { ...values, [field]: value }
+        const errs = validate(newVals)
+        setErrors((prev) => ({ ...prev, [field]: errs[field] }))
+      }
+    },
+    [touched, values, validate],
+  )
 
-  const handleBlur = useCallback((field: keyof LoginCredentials) => {
-    setTouched(prev => ({ ...prev, [field]: true }))
-    const errs = validate(values)
-    setErrors(prev => ({ ...prev, [field]: errs[field] }))
-  }, [values, validate])
+  const handleBlur = useCallback(
+    (field: keyof LoginCredentials) => {
+      setTouched((prev) => ({ ...prev, [field]: true }))
+      const errs = validate(values)
+      setErrors((prev) => ({ ...prev, [field]: errs[field] }))
+    },
+    [values, validate],
+  )
 
-  const handleSubmit = useCallback((onSuccess: (creds: LoginCredentials) => void) => {
-    const allTouched = { email: true, password: true }
-    setTouched(allTouched)
-    const errs = validate(values)
-    setErrors(errs)
-    if (Object.keys(errs).length > 0) return
-    setIsSubmitting(true)
-    setTimeout(() => {
-      setIsSubmitting(false)
-      onSuccess(values)
-    }, 800)
-  }, [values, validate])
+  const handleSubmit = useCallback(
+    (onSuccess: (creds: LoginCredentials) => void) => {
+      const allTouched = { email: true, password: true }
+      setTouched(allTouched)
+      const errs = validate(values)
+      setErrors(errs)
+      if (Object.keys(errs).length > 0) return
+      setIsSubmitting(true)
+      setTimeout(() => {
+        setIsSubmitting(false)
+        onSuccess(values)
+      }, 800)
+    },
+    [values, validate],
+  )
 
   const reset = useCallback(() => {
     setValues(LOGIN_INITIAL)
@@ -142,10 +152,9 @@ export function useRegisterForm(): UseRegisterFormReturn {
     const nameErr = validateName(v.name)
     const emailErr = validateEmail(v.email)
     const passErr = validatePassword(v.password)
-    const confirmErr =
-      !v.confirmPassword
-        ? 'Confirmação de senha é obrigatória'
-        : v.confirmPassword !== v.password
+    const confirmErr = !v.confirmPassword
+      ? 'Confirmação de senha é obrigatória'
+      : v.confirmPassword !== v.password
         ? 'As senhas não coincidem'
         : null
 
@@ -158,13 +167,15 @@ export function useRegisterForm(): UseRegisterFormReturn {
     const companyErr = isCont && !v.companyName.trim() ? 'Nome da empresa é obrigatório' : null
 
     const cepDigits = v.cep.replace(/\D/g, '')
-    if (cepDigits.length > 0 && cepDigits.length !== 8) errs.cep = { message: 'CEP deve ter 8 dígitos' }
+    if (cepDigits.length > 0 && cepDigits.length !== 8)
+      errs.cep = { message: 'CEP deve ter 8 dígitos' }
     if (!cepDigits) errs.cep = { message: 'CEP é obrigatório' }
     if (!v.city.trim()) errs.city = { message: 'Cidade é obrigatória' }
 
     if (isCont) {
       const compCepDigits = v.companyCep.replace(/\D/g, '')
-      if (compCepDigits.length > 0 && compCepDigits.length !== 8) errs.companyCep = { message: 'CEP deve ter 8 dígitos' }
+      if (compCepDigits.length > 0 && compCepDigits.length !== 8)
+        errs.companyCep = { message: 'CEP deve ter 8 dígitos' }
       if (!compCepDigits) errs.companyCep = { message: 'CEP da empresa é obrigatório' }
       if (!v.companyCity.trim()) errs.companyCity = { message: 'Cidade da empresa é obrigatória' }
     }
@@ -178,50 +189,67 @@ export function useRegisterForm(): UseRegisterFormReturn {
     return errs
   }, [])
 
-  const handleChange = useCallback((field: keyof RegisterCredentials, value: string) => {
-    setValues(prev => {
-      if (field === 'roles') {
-        try {
-          const parsed = JSON.parse(value)
-          if (Array.isArray(parsed)) return { ...prev, roles: parsed }
-        } catch { }
+  const handleChange = useCallback(
+    (field: keyof RegisterCredentials, value: string) => {
+      setValues((prev) => {
+        if (field === 'roles') {
+          try {
+            const parsed = JSON.parse(value)
+            if (Array.isArray(parsed)) return { ...prev, roles: parsed }
+          } catch {}
+        }
+        return { ...prev, [field]: value }
+      })
+      if (touched[field]) {
+        const newVals = { ...values, [field]: value }
+        const errs = validate(newVals)
+        setErrors((prev) => ({ ...prev, [field]: errs[field] }))
       }
-      return { ...prev, [field]: value }
-    })
-    if (touched[field]) {
-      const newVals = { ...values, [field]: value }
-      const errs = validate(newVals)
-      setErrors(prev => ({ ...prev, [field]: errs[field] }))
-    }
-    if (field === 'password' && touched.confirmPassword) {
-      const newVals = { ...values, [field]: value }
-      const errs = validate(newVals)
-      setErrors(prev => ({ ...prev, confirmPassword: errs.confirmPassword }))
-    }
-  }, [touched, values, validate])
+      if (field === 'password' && touched.confirmPassword) {
+        const newVals = { ...values, [field]: value }
+        const errs = validate(newVals)
+        setErrors((prev) => ({ ...prev, confirmPassword: errs.confirmPassword }))
+      }
+    },
+    [touched, values, validate],
+  )
 
-  const handleBlur = useCallback((field: keyof RegisterCredentials) => {
-    setTouched(prev => ({ ...prev, [field]: true }))
-    const errs = validate(values)
-    setErrors(prev => ({ ...prev, [field]: errs[field] }))
-  }, [values, validate])
+  const handleBlur = useCallback(
+    (field: keyof RegisterCredentials) => {
+      setTouched((prev) => ({ ...prev, [field]: true }))
+      const errs = validate(values)
+      setErrors((prev) => ({ ...prev, [field]: errs[field] }))
+    },
+    [values, validate],
+  )
 
-  const handleSubmit = useCallback((onSuccess: (creds: RegisterCredentials) => void) => {
-    const allTouched: Partial<Record<keyof RegisterCredentials, boolean>> = {
-      name: true, email: true, role: true, profession: true,
-      password: true, confirmPassword: true,
-      cep: true, city: true, companyCep: true, companyCity: true, companyName: true,
-    }
-    setTouched(allTouched)
-    const errs = validate(values)
-    setErrors(errs)
-    if (Object.keys(errs).length > 0) return
-    setIsSubmitting(true)
-    setTimeout(() => {
-      setIsSubmitting(false)
-      onSuccess(values)
-    }, 800)
-  }, [values, validate])
+  const handleSubmit = useCallback(
+    (onSuccess: (creds: RegisterCredentials) => void) => {
+      const allTouched: Partial<Record<keyof RegisterCredentials, boolean>> = {
+        name: true,
+        email: true,
+        role: true,
+        profession: true,
+        password: true,
+        confirmPassword: true,
+        cep: true,
+        city: true,
+        companyCep: true,
+        companyCity: true,
+        companyName: true,
+      }
+      setTouched(allTouched)
+      const errs = validate(values)
+      setErrors(errs)
+      if (Object.keys(errs).length > 0) return
+      setIsSubmitting(true)
+      setTimeout(() => {
+        setIsSubmitting(false)
+        onSuccess(values)
+      }, 800)
+    },
+    [values, validate],
+  )
 
   const reset = useCallback(() => {
     setValues(REGISTER_INITIAL)

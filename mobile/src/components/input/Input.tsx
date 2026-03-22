@@ -1,5 +1,7 @@
-import { View, TextInput, TextInputProps, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import type { TextInputProps } from 'react-native'
+import { View, TextInput, TouchableOpacity } from 'react-native'
+
 import { colors, fonts, radius } from '../../design-system/tokens'
 
 interface InputProps extends TextInputProps {

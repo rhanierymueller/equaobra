@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+
 import { api, setToken, clearToken, getToken } from '../services/api'
 import type { User, AuthResponse } from '../types'
 
@@ -40,21 +41,28 @@ export function useAuth() {
     return res.user
   }, [])
 
-  const register = useCallback(async (
-    name: string,
-    email: string,
-    password: string,
-    role: 'professional' | 'contractor',
-    profession?: string,
-  ) => {
-    const res = await api.post<AuthResponse>('/api/auth/register', {
-      name, email, password, role, profession,
-    })
-    await setToken(res.token)
-    await persistUser(res.user)
-    setUser(res.user)
-    return res.user
-  }, [])
+  const register = useCallback(
+    async (
+      name: string,
+      email: string,
+      password: string,
+      role: 'professional' | 'contractor',
+      profession?: string,
+    ) => {
+      const res = await api.post<AuthResponse>('/api/auth/register', {
+        name,
+        email,
+        password,
+        role,
+        profession,
+      })
+      await setToken(res.token)
+      await persistUser(res.user)
+      setUser(res.user)
+      return res.user
+    },
+    [],
+  )
 
   const logout = useCallback(async () => {
     await clearToken()

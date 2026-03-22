@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+
 import { LandingCanvas } from './LandingCanvas'
 
 interface Feature {
@@ -52,7 +53,7 @@ type PhaseId = 0 | 1 | 2 | 3
 
 function getPhase(progress: number): PhaseId {
   if (progress < 0.22) return 0
-  if (progress < 0.50) return 1
+  if (progress < 0.5) return 1
   if (progress < 0.76) return 2
   return 3
 }
@@ -60,7 +61,7 @@ function getPhase(progress: number): PhaseId {
 function PhaseContent({ phase }: { phase: PhaseId }) {
   return (
     <>
-            <div
+      <div
         className="absolute inset-x-0 flex flex-col items-center transition-all duration-700"
         style={{
           opacity: phase === 0 ? 1 : 0,
@@ -77,7 +78,7 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
         <div className="mt-5 w-14 h-px" style={{ background: '#E07B2A' }} />
       </div>
 
-            <div
+      <div
         className="absolute inset-x-0 flex flex-col items-center transition-all duration-700"
         style={{
           opacity: phase === 1 ? 1 : 0,
@@ -92,7 +93,8 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
           Profissionais
         </span>
         <h2 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
-          Encontre os melhores<br />
+          Encontre os melhores
+          <br />
           <span style={{ color: '#E07B2A' }}>do mercado</span>
         </h2>
         <p className="text-lg max-w-md leading-relaxed" style={{ color: 'rgba(245,240,235,0.62)' }}>
@@ -100,7 +102,7 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
         </p>
       </div>
 
-            <div
+      <div
         className="absolute inset-x-0 flex flex-col items-center transition-all duration-700"
         style={{
           opacity: phase === 2 ? 1 : 0,
@@ -115,7 +117,8 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
           Equipes
         </span>
         <h2 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
-          Monte equipes para<br />
+          Monte equipes para
+          <br />
           <span style={{ color: '#E07B2A' }}>qualquer obra</span>
         </h2>
         <p className="text-lg max-w-md leading-relaxed" style={{ color: 'rgba(245,240,235,0.62)' }}>
@@ -123,7 +126,7 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
         </p>
       </div>
 
-            <div
+      <div
         className="absolute inset-x-0 flex flex-col items-center transition-all duration-700"
         style={{
           opacity: phase === 3 ? 1 : 0,
@@ -132,10 +135,14 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
         }}
       >
         <h2 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight">
-          Sua obra<br />
+          Sua obra
+          <br />
           <span style={{ color: '#E07B2A' }}>começa aqui</span>
         </h2>
-        <p className="text-xl max-w-md leading-relaxed mb-10" style={{ color: 'rgba(245,240,235,0.65)' }}>
+        <p
+          className="text-xl max-w-md leading-relaxed mb-10"
+          style={{ color: 'rgba(245,240,235,0.65)' }}
+        >
           Cadastre-se gratuitamente e monte sua primeira equipe ainda hoje
         </p>
         <div className="flex gap-4 flex-wrap justify-center">
@@ -174,7 +181,7 @@ export default function LandingPage() {
       const p = Math.max(0, Math.min(1, scrolled / total))
       progressRef.current = p
       const next = getPhase(p)
-      setPhase(prev => (prev !== next ? next : prev))
+      setPhase((prev) => (prev !== next ? next : prev))
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -183,15 +190,12 @@ export default function LandingPage() {
 
   return (
     <main style={{ background: '#0D0C0B', color: '#F5F0EB' }}>
-
-            <div ref={containerRef} style={{ height: '600vh' }}>
+      <div ref={containerRef} style={{ height: '600vh' }}>
         <div className="sticky top-0 h-screen overflow-hidden">
+          <LandingCanvas progressRef={progressRef} />
 
-                    <LandingCanvas progressRef={progressRef} />
-
-                    <div className="relative z-10 h-full flex flex-col items-center pointer-events-none select-none px-6">
-
-                        <div
+          <div className="relative z-10 h-full flex flex-col items-center pointer-events-none select-none px-6">
+            <div
               className="mt-[30vh] flex items-baseline gap-0 transition-opacity duration-700"
               style={{ opacity: phase < 3 ? 1 : 0.28 }}
             >
@@ -209,12 +213,12 @@ export default function LandingPage() {
               </span>
             </div>
 
-                        <div className="relative w-full flex justify-center mt-10" style={{ minHeight: 280 }}>
+            <div className="relative w-full flex justify-center mt-10" style={{ minHeight: 280 }}>
               <PhaseContent phase={phase} />
             </div>
           </div>
 
-                    <div
+          <div
             className="absolute bottom-7 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 transition-opacity duration-500"
             style={{ opacity: phase < 3 ? 1 : 0 }}
           >
@@ -230,8 +234,8 @@ export default function LandingPage() {
             </span>
           </div>
 
-                    <div className="absolute right-7 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-3">
-            {([0, 1, 2, 3] as PhaseId[]).map(p => (
+          <div className="absolute right-7 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-3">
+            {([0, 1, 2, 3] as PhaseId[]).map((p) => (
               <div
                 key={p}
                 className="rounded-full transition-all duration-300"
@@ -244,11 +248,10 @@ export default function LandingPage() {
               />
             ))}
           </div>
-
         </div>
       </div>
 
-            <section style={{ background: '#F5F0EB' }} className="py-28 px-6">
+      <section style={{ background: '#F5F0EB' }} className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <p
             className="text-center text-[11px] tracking-[0.45em] uppercase mb-3 font-semibold"
@@ -292,7 +295,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-            <section style={{ background: '#3B3B3B' }} className="py-28 px-6">
+      <section style={{ background: '#3B3B3B' }} className="py-28 px-6">
         <div className="max-w-4xl mx-auto">
           <p
             className="text-center text-[11px] tracking-[0.45em] uppercase mb-3 font-semibold"
@@ -308,12 +311,13 @@ export default function LandingPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
-                        <div
+            <div
               className="hidden md:block absolute top-7 h-px"
               style={{
                 left: '16.66%',
                 right: '16.66%',
-                background: 'linear-gradient(to right, transparent, rgba(224,123,42,0.35), transparent)',
+                background:
+                  'linear-gradient(to right, transparent, rgba(224,123,42,0.35), transparent)',
               }}
             />
             {STEPS.map((step, i) => (
@@ -334,7 +338,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-            <section style={{ background: '#E07B2A' }} className="py-28 px-6 text-center">
+      <section style={{ background: '#E07B2A' }} className="py-28 px-6 text-center">
         <p
           className="text-[11px] tracking-[0.45em] uppercase mb-4 font-semibold"
           style={{ color: 'rgba(255,255,255,0.65)' }}
@@ -342,13 +346,16 @@ export default function LandingPage() {
           Comece hoje
         </p>
         <h2 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
-          Sua próxima obra<br />começa aqui
+          Sua próxima obra
+          <br />
+          começa aqui
         </h2>
         <p
           className="text-xl mb-12 max-w-xl mx-auto leading-relaxed"
           style={{ color: 'rgba(255,255,255,0.72)' }}
         >
-          Junte-se a centenas de contratantes que já usam o EquaObra para montar equipes de excelência
+          Junte-se a centenas de contratantes que já usam o EquaObra para montar equipes de
+          excelência
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
           <Link
@@ -366,7 +373,6 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
-
     </main>
   )
 }

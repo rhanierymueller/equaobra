@@ -1,8 +1,9 @@
-import { Request, Response } from 'express'
-import { AuthRequest } from '../middleware/auth'
+import type { Request, Response } from 'express'
+
+import { isServiceError } from '../lib/errors'
+import type { AuthRequest } from '../middleware/auth'
 import { interestSchema } from '../models/interest.model'
 import * as service from '../services/interest.service'
-import { isServiceError } from '../lib/errors'
 
 export async function list(req: AuthRequest, res: Response): Promise<void> {
   const asContractor = req.query.as === 'contractor'
@@ -30,6 +31,9 @@ export async function create(req: AuthRequest, res: Response): Promise<void> {
 
 export async function remove(req: AuthRequest, res: Response): Promise<void> {
   const result = await service.deleteInterest(String(req.params.id), req.user!.userId)
-  if (isServiceError(result)) { res.status(result.status).json({ error: result.error }); return }
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
   res.status(204).send()
 }

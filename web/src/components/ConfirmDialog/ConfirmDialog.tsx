@@ -4,7 +4,16 @@ import { useEffect, useRef } from 'react'
 
 type Variant = 'danger' | 'warning' | 'info'
 
-const VARIANT_STYLES: Record<Variant, { iconBg: string; iconColor: string; confirmBg: string; confirmColor: string; confirmBorder: string }> = {
+const VARIANT_STYLES: Record<
+  Variant,
+  {
+    iconBg: string
+    iconColor: string
+    confirmBg: string
+    confirmColor: string
+    confirmBorder: string
+  }
+> = {
   danger: {
     iconBg: 'rgba(229,57,53,0.1)',
     iconColor: '#FF6B6B',
@@ -31,12 +40,28 @@ const VARIANT_STYLES: Record<Variant, { iconBg: string; iconColor: string; confi
 function DialogIcon({ variant }: { variant: Variant }) {
   const s = VARIANT_STYLES[variant]
   return (
-    <div style={{
-      width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-      background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
+    <div
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 14,
+        flexShrink: 0,
+        background: s.iconBg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       {variant === 'danger' && (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={s.iconColor} strokeWidth="2" strokeLinecap="round">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={s.iconColor}
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
           <polyline points="3 6 5 6 21 6" />
           <path d="M19 6l-1 14H6L5 6" />
           <path d="M10 11v6M14 11v6" />
@@ -44,14 +69,30 @@ function DialogIcon({ variant }: { variant: Variant }) {
         </svg>
       )}
       {variant === 'warning' && (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={s.iconColor} strokeWidth="2" strokeLinecap="round">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={s.iconColor}
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
           <line x1="12" y1="9" x2="12" y2="13" />
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       )}
       {variant === 'info' && (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={s.iconColor} strokeWidth="2" strokeLinecap="round">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={s.iconColor}
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
           <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -94,10 +135,16 @@ export function ConfirmDialog({
   return (
     <div
       ref={overlayRef}
-      onClick={e => { if (e.target === overlayRef.current) onCancel() }}
+      onClick={(e) => {
+        if (e.target === overlayRef.current) onCancel()
+      }}
       style={{
-        position: 'fixed', inset: 0, zIndex: 1500,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1500,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         background: 'rgba(0,0,0,0.65)',
         backdropFilter: 'blur(4px)',
         padding: 24,
@@ -105,7 +152,8 @@ export function ConfirmDialog({
     >
       <div
         style={{
-          width: '100%', maxWidth: 380,
+          width: '100%',
+          maxWidth: 380,
           background: 'rgba(18,17,15,0.98)',
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: 20,
@@ -121,21 +169,24 @@ export function ConfirmDialog({
           }
         `}</style>
 
-                <div className="flex items-start gap-3 mb-5">
+        <div className="flex items-start gap-3 mb-5">
           <DialogIcon variant={variant} />
           <div className="flex-1 min-w-0 pt-0.5">
             <h3 className="font-bold text-white text-base leading-snug">{title}</h3>
             {description && (
-              <p className="text-sm mt-1.5 leading-relaxed" style={{ color: 'rgba(245,240,235,0.45)' }}>
+              <p
+                className="text-sm mt-1.5 leading-relaxed"
+                style={{ color: 'rgba(245,240,235,0.45)' }}
+              >
                 {description}
               </p>
             )}
           </div>
         </div>
 
-                <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 20 }} />
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 20 }} />
 
-                <div className="flex gap-2">
+        <div className="flex gap-2">
           <button
             onClick={onCancel}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"

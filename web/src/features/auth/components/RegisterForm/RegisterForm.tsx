@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+
 import type { UseRegisterFormReturn } from '../../hooks/useAuthForm'
+
 import type { RegisterCredentials } from '@/src/types/auth.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { UserRole } from '@/src/types/user.types'
@@ -41,11 +43,28 @@ interface FieldProps {
   onBlur: () => void
 }
 
-function Field({ id, label, type = 'text', value, placeholder, error, autoComplete, disabled, optional, onChange, onBlur }: FieldProps) {
+function Field({
+  id,
+  label,
+  type = 'text',
+  value,
+  placeholder,
+  error,
+  autoComplete,
+  disabled,
+  optional,
+  onChange,
+  onBlur,
+}: FieldProps) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.7)' }}>
-        {label}{optional && <span style={{ color: 'rgba(245,240,235,0.3)' }}> (opcional)</span>}
+      <label
+        htmlFor={id}
+        className="text-xs font-medium"
+        style={{ color: 'rgba(245,240,235,0.7)' }}
+      >
+        {label}
+        {optional && <span style={{ color: 'rgba(245,240,235,0.3)' }}> (opcional)</span>}
       </label>
       <input
         id={id}
@@ -54,17 +73,21 @@ function Field({ id, label, type = 'text', value, placeholder, error, autoComple
         placeholder={placeholder}
         autoComplete={autoComplete}
         disabled={disabled}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
         className="px-3 py-2.5 rounded-lg text-white outline-none transition-all duration-200 text-sm"
         style={{
           ...inputStyle(!!error),
           opacity: disabled ? 0.5 : 1,
         }}
-        onFocus={e => focusInput(e, !!error)}
-        onBlurCapture={e => blurInput(e, !!error)}
+        onFocus={(e) => focusInput(e, !!error)}
+        onBlurCapture={(e) => blurInput(e, !!error)}
       />
-      {error && <span className="text-xs" style={{ color: '#FF6B6B' }}>{error}</span>}
+      {error && (
+        <span className="text-xs" style={{ color: '#FF6B6B' }}>
+          {error}
+        </span>
+      )}
     </div>
   )
 }
@@ -72,8 +95,13 @@ function Field({ id, label, type = 'text', value, placeholder, error, autoComple
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 mt-2 mb-1">
-      <div style={{ width: 3, height: 12, borderRadius: 99, background: '#E07B2A', flexShrink: 0 }} />
-      <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(245,240,235,0.5)' }}>
+      <div
+        style={{ width: 3, height: 12, borderRadius: 99, background: '#E07B2A', flexShrink: 0 }}
+      />
+      <span
+        className="text-xs font-bold uppercase tracking-wider"
+        style={{ color: 'rgba(245,240,235,0.5)' }}
+      >
         {children}
       </span>
     </div>
@@ -106,37 +134,51 @@ interface AddressBlockProps {
   handleBlur: (field: keyof RegisterCredentials) => void
 }
 
-function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur }: AddressBlockProps) {
+function AddressBlock({
+  prefix,
+  label,
+  values,
+  errors,
+  handleChange,
+  handleBlur,
+}: AddressBlockProps) {
   const [loading, setLoading] = useState(false)
   const [cepError, setCepError] = useState('')
 
   const cepKey = (prefix ? `${prefix}Cep` : 'cep') as keyof RegisterCredentials
   const streetKey = (prefix ? `${prefix}Street` : 'street') as keyof RegisterCredentials
-  const neighborhoodKey = (prefix ? `${prefix}Neighborhood` : 'neighborhood') as keyof RegisterCredentials
+  const neighborhoodKey = (
+    prefix ? `${prefix}Neighborhood` : 'neighborhood'
+  ) as keyof RegisterCredentials
   const cityKey = (prefix ? `${prefix}City` : 'city') as keyof RegisterCredentials
   const stateKey = (prefix ? `${prefix}State` : 'state') as keyof RegisterCredentials
-  const numberKey = (prefix ? `${prefix}AddressNumber` : 'addressNumber') as keyof RegisterCredentials
+  const numberKey = (
+    prefix ? `${prefix}AddressNumber` : 'addressNumber'
+  ) as keyof RegisterCredentials
 
-  const handleCepChange = useCallback(async (raw: string) => {
-    const formatted = formatCep(raw)
-    handleChange(cepKey, formatted)
-    setCepError('')
+  const handleCepChange = useCallback(
+    async (raw: string) => {
+      const formatted = formatCep(raw)
+      handleChange(cepKey, formatted)
+      setCepError('')
 
-    const digits = raw.replace(/\D/g, '')
-    if (digits.length === 8) {
-      setLoading(true)
-      const result = await lookupCep(digits)
-      setLoading(false)
-      if (result) {
-        handleChange(streetKey, result.street)
-        handleChange(neighborhoodKey, result.neighborhood)
-        handleChange(cityKey, result.city)
-        handleChange(stateKey, result.state)
-      } else {
-        setCepError('CEP não encontrado')
+      const digits = raw.replace(/\D/g, '')
+      if (digits.length === 8) {
+        setLoading(true)
+        const result = await lookupCep(digits)
+        setLoading(false)
+        if (result) {
+          handleChange(streetKey, result.street)
+          handleChange(neighborhoodKey, result.neighborhood)
+          handleChange(cityKey, result.city)
+          handleChange(stateKey, result.state)
+        } else {
+          setCepError('CEP não encontrado')
+        }
       }
-    }
-  }, [cepKey, streetKey, neighborhoodKey, cityKey, stateKey, handleChange])
+    },
+    [cepKey, streetKey, neighborhoodKey, cityKey, stateKey, handleChange],
+  )
 
   return (
     <div className="flex flex-col gap-2">
@@ -144,25 +186,34 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
 
       <div className="flex gap-2">
         <div className="flex flex-col gap-1" style={{ flex: '0 0 140px' }}>
-          <label className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.7)' }}>CEP</label>
+          <label className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.7)' }}>
+            CEP
+          </label>
           <div className="relative">
             <input
               value={values[cepKey] as string}
               placeholder="00000-000"
               maxLength={9}
-              onChange={e => handleCepChange(e.target.value)}
+              onChange={(e) => handleCepChange(e.target.value)}
               onBlur={() => handleBlur(cepKey)}
               className="w-full px-3 py-2.5 rounded-lg text-white outline-none transition-all duration-200 text-sm"
               style={inputStyle(!!(errors[cepKey] || cepError))}
-              onFocus={e => focusInput(e, !!(errors[cepKey] || cepError))}
-              onBlurCapture={e => blurInput(e, !!(errors[cepKey] || cepError))}
+              onFocus={(e) => focusInput(e, !!(errors[cepKey] || cepError))}
+              onBlurCapture={(e) => blurInput(e, !!(errors[cepKey] || cepError))}
             />
             {loading && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: '#E07B2A' }}>...</span>
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
+                style={{ color: '#E07B2A' }}
+              >
+                ...
+              </span>
             )}
           </div>
           {(errors[cepKey] || cepError) && (
-            <span className="text-xs" style={{ color: '#FF6B6B' }}>{errors[cepKey]?.message || cepError}</span>
+            <span className="text-xs" style={{ color: '#FF6B6B' }}>
+              {errors[cepKey]?.message || cepError}
+            </span>
           )}
         </div>
 
@@ -172,7 +223,7 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
           value={values[numberKey] as string}
           placeholder="Nº"
           optional
-          onChange={v => handleChange(numberKey, v)}
+          onChange={(v) => handleChange(numberKey, v)}
           onBlur={() => handleBlur(numberKey)}
         />
       </div>
@@ -184,7 +235,7 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
           value={values[streetKey] as string}
           placeholder="Rua / Av."
           disabled={loading}
-          onChange={v => handleChange(streetKey, v)}
+          onChange={(v) => handleChange(streetKey, v)}
           onBlur={() => handleBlur(streetKey)}
         />
         <Field
@@ -193,7 +244,7 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
           value={values[neighborhoodKey] as string}
           placeholder="Bairro"
           disabled={loading}
-          onChange={v => handleChange(neighborhoodKey, v)}
+          onChange={(v) => handleChange(neighborhoodKey, v)}
           onBlur={() => handleBlur(neighborhoodKey)}
         />
       </div>
@@ -207,7 +258,7 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
             placeholder="Cidade"
             disabled={loading}
             error={errors[cityKey]?.message}
-            onChange={v => handleChange(cityKey, v)}
+            onChange={(v) => handleChange(cityKey, v)}
             onBlur={() => handleBlur(cityKey)}
           />
         </div>
@@ -217,7 +268,7 @@ function AddressBlock({ prefix, label, values, errors, handleChange, handleBlur 
           value={values[stateKey] as string}
           placeholder="UF"
           disabled={loading}
-          onChange={v => handleChange(stateKey, v)}
+          onChange={(v) => handleChange(stateKey, v)}
           onBlur={() => handleBlur(stateKey)}
         />
       </div>
@@ -247,13 +298,18 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
   const totalSteps = 3
   const canGoNext = (() => {
     if (step === 0) {
-      return values.name.trim().length >= 3 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email) && values.roles.length === 1
+      return (
+        values.name.trim().length >= 3 &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email) &&
+        values.roles.length === 1
+      )
     }
     if (step === 1) {
       const cepOk = values.cep.replace(/\D/g, '').length === 8 && values.city.trim().length > 0
       if (!cepOk) return false
       if (isCont) {
-        const compCepOk = values.companyCep.replace(/\D/g, '').length === 8 && values.companyCity.trim().length > 0
+        const compCepOk =
+          values.companyCep.replace(/\D/g, '').length === 8 && values.companyCity.trim().length > 0
         if (!compCepOk) return false
         if (!values.companyName.trim()) return false
       }
@@ -266,10 +322,10 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
   return (
     <form
       noValidate
-      onSubmit={e => {
+      onSubmit={(e) => {
         e.preventDefault()
         if (step < totalSteps - 1) {
-          setStep(s => s + 1)
+          setStep((s) => s + 1)
           return
         }
         handleSubmit(onSuccess)
@@ -278,7 +334,7 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
     >
       <StepIndicator current={step} total={totalSteps} />
 
-            {step === 0 && (
+      {step === 0 && (
         <>
           <Field
             id="reg-name"
@@ -287,7 +343,7 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
             placeholder="Seu nome"
             autoComplete="name"
             error={errors.name?.message}
-            onChange={v => handleChange('name', v)}
+            onChange={(v) => handleChange('name', v)}
             onBlur={() => handleBlur('name')}
           />
 
@@ -299,19 +355,29 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
             placeholder="seu@email.com"
             autoComplete="email"
             error={errors.email?.message}
-            onChange={v => handleChange('email', v)}
+            onChange={(v) => handleChange('email', v)}
             onBlur={() => handleBlur('email')}
           />
 
-                    <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <span className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.7)' }}>
               Tipo de conta
             </span>
             <div className="flex gap-2">
-              {([
-                { value: 'profissional' as UserRole, label: 'Profissional', desc: 'Quero trabalhar em obras', icon: '🪛' },
-                { value: 'contratante' as UserRole, label: 'Contratante', desc: 'Quero montar equipes', icon: '🏗️' },
-              ]).map(r => {
+              {[
+                {
+                  value: 'profissional' as UserRole,
+                  label: 'Profissional',
+                  desc: 'Quero trabalhar em obras',
+                  icon: '🪛',
+                },
+                {
+                  value: 'contratante' as UserRole,
+                  label: 'Contratante',
+                  desc: 'Quero montar equipes',
+                  icon: '🏗️',
+                },
+              ].map((r) => {
                 const selected = values.roles.includes(r.value)
                 return (
                   <button
@@ -324,28 +390,40 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
                       border: `1.5px solid ${selected ? '#E07B2A' : 'rgba(255,255,255,0.1)'}`,
                     }}
                   >
-                                        <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full flex items-center justify-center"
+                    <div
+                      className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full flex items-center justify-center"
                       style={{
                         background: selected ? '#E07B2A' : 'rgba(255,255,255,0.08)',
                         border: `1.5px solid ${selected ? '#E07B2A' : 'rgba(255,255,255,0.15)'}`,
-                      }}>
-                      {selected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'white' }} />}
+                      }}
+                    >
+                      {selected && (
+                        <div
+                          style={{ width: 6, height: 6, borderRadius: '50%', background: 'white' }}
+                        />
+                      )}
                     </div>
                     <p className="text-base mb-1">{r.icon}</p>
                     <p className="font-semibold text-sm text-white">{r.label}</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.5)' }}>{r.desc}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.5)' }}>
+                      {r.desc}
+                    </p>
                   </button>
                 )
               })}
             </div>
-            {errors.role && <span className="text-xs" style={{ color: '#FF6B6B' }}>{errors.role.message}</span>}
+            {errors.role && (
+              <span className="text-xs" style={{ color: '#FF6B6B' }}>
+                {errors.role.message}
+              </span>
+            )}
           </div>
         </>
       )}
 
-            {step === 1 && (
+      {step === 1 && (
         <>
-                    <AddressBlock
+          <AddressBlock
             prefix=""
             label="Seu endereço"
             values={values}
@@ -354,54 +432,80 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
             handleBlur={handleBlur}
           />
 
-                    {isPro && (
+          {isPro && (
             <>
               <SectionTitle>Dados profissionais</SectionTitle>
               <div className="flex flex-col gap-1">
-                <label htmlFor="reg-profession" className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.7)' }}>
+                <label
+                  htmlFor="reg-profession"
+                  className="text-xs font-medium"
+                  style={{ color: 'rgba(245,240,235,0.7)' }}
+                >
                   Profissão
                 </label>
                 <select
                   id="reg-profession"
                   value={values.profession}
-                  onChange={e => handleChange('profession', e.target.value)}
+                  onChange={(e) => handleChange('profession', e.target.value)}
                   onBlur={() => handleBlur('profession')}
                   className="px-3 py-2.5 rounded-lg text-white outline-none transition-all duration-200 text-sm"
                   style={inputStyle(!!errors.profession)}
                 >
-                  <option value="" disabled style={{ background: '#1A1916' }}>Selecione</option>
-                  {ALL_PROFESSIONS.map(p => (
-                    <option key={p} value={p} style={{ background: '#1A1916' }}>{p}</option>
+                  <option value="" disabled style={{ background: '#1A1916' }}>
+                    Selecione
+                  </option>
+                  {ALL_PROFESSIONS.map((p) => (
+                    <option key={p} value={p} style={{ background: '#1A1916' }}>
+                      {p}
+                    </option>
                   ))}
                 </select>
-                {errors.profession && <span className="text-xs" style={{ color: '#FF6B6B' }}>{errors.profession.message}</span>}
+                {errors.profession && (
+                  <span className="text-xs" style={{ color: '#FF6B6B' }}>
+                    {errors.profession.message}
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-1">
-                <label htmlFor="reg-rate" className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.7)' }}>
+                <label
+                  htmlFor="reg-rate"
+                  className="text-xs font-medium"
+                  style={{ color: 'rgba(245,240,235,0.7)' }}
+                >
                   Valor por hora <span style={{ color: 'rgba(245,240,235,0.3)' }}>(opcional)</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold" style={{ color: 'rgba(245,240,235,0.4)' }}>R$</span>
+                  <span
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold"
+                    style={{ color: 'rgba(245,240,235,0.4)' }}
+                  >
+                    R$
+                  </span>
                   <input
                     id="reg-rate"
                     type="number"
                     min={0}
                     value={values.hourlyRate}
                     placeholder="80"
-                    onChange={e => handleChange('hourlyRate', e.target.value)}
+                    onChange={(e) => handleChange('hourlyRate', e.target.value)}
                     className="w-full pl-9 pr-12 py-2.5 rounded-lg text-white outline-none transition-all duration-200 text-sm"
                     style={inputStyle()}
-                    onFocus={e => focusInput(e)}
-                    onBlur={e => blurInput(e)}
+                    onFocus={(e) => focusInput(e)}
+                    onBlur={(e) => blurInput(e)}
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>/hora</span>
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
+                    style={{ color: 'rgba(245,240,235,0.3)' }}
+                  >
+                    /hora
+                  </span>
                 </div>
               </div>
             </>
           )}
 
-                    {isCont && (
+          {isCont && (
             <>
               <SectionTitle>Dados da empresa</SectionTitle>
               <Field
@@ -410,7 +514,7 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
                 value={values.companyName}
                 placeholder="Ex: Construtora Silva Ltda"
                 error={errors.companyName?.message}
-                onChange={v => handleChange('companyName', v)}
+                onChange={(v) => handleChange('companyName', v)}
                 onBlur={() => handleBlur('companyName')}
               />
 
@@ -427,7 +531,7 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
         </>
       )}
 
-            {step === 2 && (
+      {step === 2 && (
         <>
           <SectionTitle>Crie sua senha</SectionTitle>
 
@@ -439,7 +543,7 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
             placeholder="Mínimo 8 caracteres"
             autoComplete="new-password"
             error={errors.password?.message}
-            onChange={v => handleChange('password', v)}
+            onChange={(v) => handleChange('password', v)}
             onBlur={() => handleBlur('password')}
           />
 
@@ -451,17 +555,17 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
             placeholder="Repita a senha"
             autoComplete="new-password"
             error={errors.confirmPassword?.message}
-            onChange={v => handleChange('confirmPassword', v)}
+            onChange={(v) => handleChange('confirmPassword', v)}
             onBlur={() => handleBlur('confirmPassword')}
           />
         </>
       )}
 
-            <div className="flex gap-2 mt-1">
+      <div className="flex gap-2 mt-1">
         {step > 0 && (
           <button
             type="button"
-            onClick={() => setStep(s => s - 1)}
+            onClick={() => setStep((s) => s - 1)}
             className="px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-200"
             style={{
               background: 'rgba(255,255,255,0.06)',
@@ -478,7 +582,9 @@ export function RegisterForm({ form, onSuccess, isLoading }: RegisterFormProps) 
           disabled={step < totalSteps - 1 ? !canGoNext : busy}
           className="flex-1 py-3 rounded-xl font-bold text-white text-sm transition-all duration-200"
           style={{
-            background: (step < totalSteps - 1 ? !canGoNext : busy) ? 'rgba(224,123,42,0.4)' : '#E07B2A',
+            background: (step < totalSteps - 1 ? !canGoNext : busy)
+              ? 'rgba(224,123,42,0.4)'
+              : '#E07B2A',
             cursor: (step < totalSteps - 1 ? !canGoNext : busy) ? 'not-allowed' : 'pointer',
           }}
         >

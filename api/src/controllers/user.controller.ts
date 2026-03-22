@@ -1,11 +1,15 @@
-import { Response } from 'express'
-import { AuthRequest } from '../middleware/auth'
+import type { Response } from 'express'
+
+import type { AuthRequest } from '../middleware/auth'
 import { updateUserSchema } from '../models/user.model'
 import { getUserById, updateUser, listProfessionals } from '../services/user.service'
 
 export async function getMe(req: AuthRequest, res: Response): Promise<void> {
   const user = await getUserById(req.user!.userId)
-  if (!user) { res.status(404).json({ error: 'Usuário não encontrado' }); return }
+  if (!user) {
+    res.status(404).json({ error: 'Usuário não encontrado' })
+    return
+  }
   res.json(user)
 }
 
@@ -34,6 +38,9 @@ export async function getProfessionals(req: AuthRequest, res: Response): Promise
 
 export async function getById(req: AuthRequest, res: Response): Promise<void> {
   const user = await getUserById(String(req.params.id))
-  if (!user) { res.status(404).json({ error: 'Usuário não encontrado' }); return }
+  if (!user) {
+    res.status(404).json({ error: 'Usuário não encontrado' })
+    return
+  }
   res.json(user)
 }

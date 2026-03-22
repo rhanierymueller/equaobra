@@ -1,14 +1,20 @@
+import { Ionicons } from '@expo/vector-icons'
 import { useState, useEffect, useCallback } from 'react'
 import {
-  View, ScrollView, TouchableOpacity,
-  TextInput, ActivityIndicator, Alert, RefreshControl,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Ionicons } from '@expo/vector-icons'
-import { useTeams } from '../../src/hooks/useTeams'
-import { useAuth } from '../../src/hooks/useAuth'
-import { colors, radius } from '../../src/design-system/tokens'
+
 import { Text, Avatar, Button, Badge, ModalSheet, SectionLabel } from '../../src/components'
+import { colors, radius } from '../../src/design-system/tokens'
+import { useAuth } from '../../src/hooks/useAuth'
+import { useTeams } from '../../src/hooks/useTeams'
 import type { Team, TeamMember, WorkLog } from '../../src/types'
 
 function formatDate(iso: string) {
@@ -37,17 +43,30 @@ function LogRow({ log, onDelete }: { log: WorkLog; onDelete: () => void }) {
   return (
     <View
       className="flex-row items-center justify-between px-4 py-3 rounded-xl mb-2"
-      style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: colors.border.default }}
+      style={{
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderWidth: 1,
+        borderColor: colors.border.default,
+      }}
     >
       <View className="flex-1">
-        <Text weight="semiBold" size="sm" color="primary">{log.memberName}</Text>
+        <Text weight="semiBold" size="sm" color="primary">
+          {log.memberName}
+        </Text>
         {log.note ? (
-          <Text size="xs" color="muted" style={{ marginTop: 2 }}>{log.note}</Text>
+          <Text size="xs" color="muted" style={{ marginTop: 2 }}>
+            {log.note}
+          </Text>
         ) : null}
       </View>
       <View className="flex-row items-center gap-3">
-        <View className="items-center px-3 py-1 rounded-lg" style={{ backgroundColor: `${colors.primary}20` }}>
-          <Text weight="bold" size="sm" style={{ color: colors.primary }}>{log.hours}h</Text>
+        <View
+          className="items-center px-3 py-1 rounded-lg"
+          style={{ backgroundColor: `${colors.primary}20` }}
+        >
+          <Text weight="bold" size="sm" style={{ color: colors.primary }}>
+            {log.hours}h
+          </Text>
         </View>
         <TouchableOpacity onPress={onDelete} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="trash-outline" size={16} color="rgba(229,57,53,0.6)" />
@@ -109,29 +128,43 @@ function AddLogModal({ visible, team, onClose, onSave }: AddLogModalProps) {
       title="Registrar Ponto"
       leftAction={
         <TouchableOpacity onPress={onClose}>
-          <Text size="sm" style={{ color: 'rgba(245,240,235,0.5)' }}>Cancelar</Text>
+          <Text size="sm" style={{ color: 'rgba(245,240,235,0.5)' }}>
+            Cancelar
+          </Text>
         </TouchableOpacity>
       }
       rightAction={
-        <TouchableOpacity onPress={step === 'hours' ? handleSave : undefined} disabled={step === 'member'}>
-          {saving
-            ? <ActivityIndicator color={colors.primary} size="small" />
-            : <Text weight="bold" size="sm" style={{ color: step === 'hours' ? colors.primary : 'transparent' }}>
-                Salvar
-              </Text>
-          }
+        <TouchableOpacity
+          onPress={step === 'hours' ? handleSave : undefined}
+          disabled={step === 'member'}
+        >
+          {saving ? (
+            <ActivityIndicator color={colors.primary} size="small" />
+          ) : (
+            <Text
+              weight="bold"
+              size="sm"
+              style={{ color: step === 'hours' ? colors.primary : 'transparent' }}
+            >
+              Salvar
+            </Text>
+          )}
         </TouchableOpacity>
       }
     >
       <ScrollView className="flex-1 px-5" keyboardShouldPersistTaps="handled">
         <View className="flex-row items-center gap-2 py-4">
           <Ionicons name="construct-outline" size={14} color={colors.primary} />
-          <Text weight="semiBold" style={{ color: colors.primary, fontSize: 13 }}>{team.obraName}</Text>
+          <Text weight="semiBold" style={{ color: colors.primary, fontSize: 13 }}>
+            {team.obraName}
+          </Text>
         </View>
 
         {step === 'member' ? (
           <>
-            <Text weight="bold" size="base" color="primary" style={{ marginBottom: 4 }}>Selecione o profissional</Text>
+            <Text weight="bold" size="base" color="primary" style={{ marginBottom: 4 }}>
+              Selecione o profissional
+            </Text>
             <Text size="sm" color="muted" style={{ marginBottom: 20 }}>
               Escolha quem vai registrar o ponto hoje
             </Text>
@@ -145,21 +178,32 @@ function AddLogModal({ visible, team, onClose, onSave }: AddLogModalProps) {
               </View>
             ) : (
               <View className="gap-2">
-                {team.members.map(m => (
+                {team.members.map((m) => (
                   <TouchableOpacity
                     key={m.id}
-                    onPress={() => { setSelectedMember(m); setStep('hours') }}
+                    onPress={() => {
+                      setSelectedMember(m)
+                      setStep('hours')
+                    }}
                     className="flex-row items-center gap-3 p-4 rounded-xl"
                     style={{
-                      backgroundColor: selectedMember?.id === m.id ? `${colors.primary}15` : 'rgba(255,255,255,0.04)',
+                      backgroundColor:
+                        selectedMember?.id === m.id
+                          ? `${colors.primary}15`
+                          : 'rgba(255,255,255,0.04)',
                       borderWidth: 1,
-                      borderColor: selectedMember?.id === m.id ? `${colors.primary}40` : colors.border.default,
+                      borderColor:
+                        selectedMember?.id === m.id ? `${colors.primary}40` : colors.border.default,
                     }}
                   >
                     <Avatar name={m.name} size={44} borderRadius={radius.md} />
                     <View className="flex-1">
-                      <Text weight="semiBold" size="sm" color="primary">{m.name}</Text>
-                      <Text size="xs" color="muted" style={{ marginTop: 2 }}>{m.profession}</Text>
+                      <Text weight="semiBold" size="sm" color="primary">
+                        {m.name}
+                      </Text>
+                      <Text size="xs" color="muted" style={{ marginTop: 2 }}>
+                        {m.profession}
+                      </Text>
                     </View>
                     <Ionicons name="chevron-forward" size={16} color="rgba(245,240,235,0.2)" />
                   </TouchableOpacity>
@@ -174,42 +218,68 @@ function AddLogModal({ visible, team, onClose, onSave }: AddLogModalProps) {
               className="flex-row items-center gap-1 mb-4"
             >
               <Ionicons name="chevron-back" size={16} color="rgba(245,240,235,0.5)" />
-              <Text size="sm" style={{ color: 'rgba(245,240,235,0.5)' }}>Voltar</Text>
+              <Text size="sm" style={{ color: 'rgba(245,240,235,0.5)' }}>
+                Voltar
+              </Text>
             </TouchableOpacity>
 
             {selectedMember && (
-              <View className="flex-row items-center gap-3 p-4 rounded-xl mb-6" style={{ backgroundColor: `${colors.primary}10`, borderWidth: 1, borderColor: `${colors.primary}30` }}>
+              <View
+                className="flex-row items-center gap-3 p-4 rounded-xl mb-6"
+                style={{
+                  backgroundColor: `${colors.primary}10`,
+                  borderWidth: 1,
+                  borderColor: `${colors.primary}30`,
+                }}
+              >
                 <Avatar name={selectedMember.name} size={40} borderRadius={10} />
                 <View>
-                  <Text weight="semiBold" size="sm" color="primary">{selectedMember.name}</Text>
-                  <Text size="xs" style={{ color: colors.primary }}>{selectedMember.profession}</Text>
+                  <Text weight="semiBold" size="sm" color="primary">
+                    {selectedMember.name}
+                  </Text>
+                  <Text size="xs" style={{ color: colors.primary }}>
+                    {selectedMember.profession}
+                  </Text>
                 </View>
               </View>
             )}
 
-            <Text weight="bold" size="base" color="primary" style={{ marginBottom: 4 }}>Horas trabalhadas</Text>
+            <Text weight="bold" size="base" color="primary" style={{ marginBottom: 4 }}>
+              Horas trabalhadas
+            </Text>
             <Text size="sm" color="muted" style={{ marginBottom: 20 }}>
               Quantas horas {selectedMember?.name.split(' ')[0]} trabalhou hoje?
             </Text>
 
             {!useCustom && (
               <View className="flex-row flex-wrap gap-3 mb-5">
-                {HOUR_PRESETS.map(h => (
+                {HOUR_PRESETS.map((h) => (
                   <TouchableOpacity
                     key={h}
                     onPress={() => setHours(h)}
                     style={{
-                      width: 60, height: 60, borderRadius: radius.xl,
+                      width: 60,
+                      height: 60,
+                      borderRadius: radius.xl,
                       backgroundColor: hours === h ? colors.primary : 'rgba(255,255,255,0.06)',
                       borderWidth: 1,
                       borderColor: hours === h ? colors.primary : colors.border.light,
-                      alignItems: 'center', justifyContent: 'center',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
-                    <Text weight="extraBold" style={{ color: hours === h ? 'white' : colors.text.secondary, fontSize: 18 }}>
+                    <Text
+                      weight="extraBold"
+                      style={{ color: hours === h ? 'white' : colors.text.secondary, fontSize: 18 }}
+                    >
                       {h}
                     </Text>
-                    <Text style={{ color: hours === h ? 'rgba(255,255,255,0.8)' : 'rgba(245,240,235,0.35)', fontSize: 10 }}>
+                    <Text
+                      style={{
+                        color: hours === h ? 'rgba(255,255,255,0.8)' : 'rgba(245,240,235,0.35)',
+                        fontSize: 10,
+                      }}
+                    >
                       horas
                     </Text>
                   </TouchableOpacity>
@@ -217,11 +287,15 @@ function AddLogModal({ visible, team, onClose, onSave }: AddLogModalProps) {
                 <TouchableOpacity
                   onPress={() => setUseCustom(true)}
                   style={{
-                    width: 60, height: 60, borderRadius: radius.xl,
+                    width: 60,
+                    height: 60,
+                    borderRadius: radius.xl,
                     backgroundColor: 'rgba(255,255,255,0.06)',
-                    borderWidth: 1, borderColor: colors.border.light,
+                    borderWidth: 1,
+                    borderColor: colors.border.light,
                     borderStyle: 'dashed',
-                    alignItems: 'center', justifyContent: 'center',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
                   <Ionicons name="add" size={22} color={colors.text.muted} />
@@ -241,7 +315,13 @@ function AddLogModal({ visible, team, onClose, onSave }: AddLogModalProps) {
                     placeholderTextColor={colors.text.hint}
                     keyboardType="decimal-pad"
                     className="flex-1 rounded-xl px-4 py-3.5"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: `${colors.primary}50`, color: 'white', fontSize: 18 }}
+                    style={{
+                      backgroundColor: 'rgba(255,255,255,0.06)',
+                      borderWidth: 1,
+                      borderColor: `${colors.primary}50`,
+                      color: 'white',
+                      fontSize: 18,
+                    }}
                   />
                   <TouchableOpacity
                     onPress={() => setUseCustom(false)}
@@ -266,9 +346,12 @@ function AddLogModal({ visible, team, onClose, onSave }: AddLogModalProps) {
                 className="rounded-xl px-4 py-3"
                 style={{
                   backgroundColor: 'rgba(255,255,255,0.06)',
-                  borderWidth: 1, borderColor: colors.border.light,
-                  textAlignVertical: 'top', minHeight: 80,
-                  color: 'white', fontSize: 14,
+                  borderWidth: 1,
+                  borderColor: colors.border.light,
+                  textAlignVertical: 'top',
+                  minHeight: 80,
+                  color: 'white',
+                  fontSize: 14,
                 }}
               />
             </View>
@@ -297,7 +380,7 @@ export default function PontoScreen() {
   const [modalVisible, setModalVisible] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
-  const selectedTeam = teams.find(t => t.id === selectedTeamId) ?? teams[0] ?? null
+  const selectedTeam = teams.find((t) => t.id === selectedTeamId) ?? teams[0] ?? null
 
   useEffect(() => {
     if (!selectedTeamId && teams.length > 0) {
@@ -311,7 +394,12 @@ export default function PontoScreen() {
     setRefreshing(false)
   }, [refresh])
 
-  const handleSaveLog = async (memberId: string, memberName: string, hours: number, note: string) => {
+  const handleSaveLog = async (
+    memberId: string,
+    memberName: string,
+    hours: number,
+    note: string,
+  ) => {
     if (!selectedTeam) return
     await addWorkLog(selectedTeam.id, memberId, {
       memberName,
@@ -328,7 +416,7 @@ export default function PontoScreen() {
     ])
   }
 
-  const todayLogs = (selectedTeam?.workLogs ?? []).filter(l => l.date === todayISO())
+  const todayLogs = (selectedTeam?.workLogs ?? []).filter((l) => l.date === todayISO())
   const totalHoursToday = todayLogs.reduce((s, l) => s + l.hours, 0)
 
   if (loading) {
@@ -345,27 +433,50 @@ export default function PontoScreen() {
 
       <ScrollView
         className="flex-1"
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+          />
+        }
         showsVerticalScrollIndicator={false}
       >
         <View className="px-5 pt-4 pb-3">
           <View className="flex-row items-center justify-between">
             <View>
-              <Text weight="bold" size="2xl" color="primary" letterSpacing={-0.5}>Bater Ponto</Text>
+              <Text weight="bold" size="2xl" color="primary" letterSpacing={-0.5}>
+                Bater Ponto
+              </Text>
               <Text size="sm" color="muted" style={{ marginTop: 2 }}>
-                {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                {new Date().toLocaleDateString('pt-BR', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                })}
               </Text>
             </View>
-            {user && (
-              <Avatar name={user.name} size={40} borderRadius={radius.md} />
-            )}
+            {user && <Avatar name={user.name} size={40} borderRadius={radius.md} />}
           </View>
         </View>
 
         {teams.length === 0 ? (
-          <View className="mx-5 mt-8 py-16 rounded-2xl items-center" style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(255,255,255,0.08)' }}>
+          <View
+            className="mx-5 mt-8 py-16 rounded-2xl items-center"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              borderWidth: 1,
+              borderStyle: 'dashed',
+              borderColor: 'rgba(255,255,255,0.08)',
+            }}
+          >
             <Ionicons name="people-outline" size={48} color={colors.text.disabled} />
-            <Text weight="medium" size="sm" color="muted" style={{ marginTop: 16, marginBottom: 4 }}>
+            <Text
+              weight="medium"
+              size="sm"
+              color="muted"
+              style={{ marginTop: 16, marginBottom: 4 }}
+            >
               Nenhuma equipe criada
             </Text>
             <Text size="xs" style={{ color: 'rgba(245,240,235,0.2)' }}>
@@ -381,21 +492,25 @@ export default function PontoScreen() {
                 className="px-5 mb-4"
                 contentContainerStyle={{ gap: 8, paddingRight: 20 }}
               >
-                {teams.map(t => (
+                {teams.map((t) => (
                   <TouchableOpacity
                     key={t.id}
                     onPress={() => setSelectedTeamId(t.id)}
                     className="px-4 py-2 rounded-xl"
                     style={{
-                      backgroundColor: selectedTeam?.id === t.id ? colors.primary : 'rgba(255,255,255,0.06)',
+                      backgroundColor:
+                        selectedTeam?.id === t.id ? colors.primary : 'rgba(255,255,255,0.06)',
                       borderWidth: 1,
                       borderColor: selectedTeam?.id === t.id ? colors.primary : colors.border.light,
                     }}
                   >
-                    <Text weight="semiBold" style={{
-                      color: selectedTeam?.id === t.id ? 'white' : 'rgba(245,240,235,0.6)',
-                      fontSize: 13,
-                    }}>
+                    <Text
+                      weight="semiBold"
+                      style={{
+                        color: selectedTeam?.id === t.id ? 'white' : 'rgba(245,240,235,0.6)',
+                        fontSize: 13,
+                      }}
+                    >
                       {t.obraName}
                     </Text>
                   </TouchableOpacity>
@@ -405,14 +520,26 @@ export default function PontoScreen() {
 
             {selectedTeam && (
               <>
-                <View className="mx-5 mb-4 p-5 rounded-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: colors.border.default }}>
+                <View
+                  className="mx-5 mb-4 p-5 rounded-2xl"
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.04)',
+                    borderWidth: 1,
+                    borderColor: colors.border.default,
+                  }}
+                >
                   <View className="flex-row items-center justify-between mb-4">
                     <View>
                       <SectionLabel label="HOJE" style={{ marginBottom: 2 }} />
-                      <Text weight="bold" size="lg" color="primary">{selectedTeam.obraName}</Text>
+                      <Text weight="bold" size="lg" color="primary">
+                        {selectedTeam.obraName}
+                      </Text>
                     </View>
                     <View className="items-end">
-                      <Text weight="extraBold" style={{ color: colors.primary, fontSize: 28, lineHeight: 32 }}>
+                      <Text
+                        weight="extraBold"
+                        style={{ color: colors.primary, fontSize: 28, lineHeight: 32 }}
+                      >
                         {totalHoursToday}h
                       </Text>
                       <Text size="xs" style={{ color: 'rgba(245,240,235,0.35)' }}>
@@ -423,7 +550,7 @@ export default function PontoScreen() {
 
                   {todayLogs.length > 0 && (
                     <View className="flex-row flex-wrap gap-2 mb-4">
-                      {todayLogs.map(l => (
+                      {todayLogs.map((l) => (
                         <Badge
                           key={l.id}
                           label={`${l.memberName.split(' ')[0]} ${l.hours}h`}
@@ -444,16 +571,22 @@ export default function PontoScreen() {
 
                 {(selectedTeam.workLogs ?? []).length > 0 && (
                   <View className="mx-5 mb-6">
-                    <Text weight="bold" size="base" color="primary" style={{ marginBottom: 12 }}>Histórico</Text>
+                    <Text weight="bold" size="base" color="primary" style={{ marginBottom: 12 }}>
+                      Histórico
+                    </Text>
                     {groupLogsByDate(selectedTeam.workLogs ?? []).map(([date, logs]) => {
                       const dayTotal = logs.reduce((s, l) => s + l.hours, 0)
                       return (
                         <View key={date} className="mb-4">
                           <View className="flex-row items-center justify-between mb-2">
-                            <SectionLabel label={date === todayISO() ? 'HOJE' : formatDate(date).toUpperCase()} />
-                            <Text weight="bold" size="xs" style={{ color: colors.primary }}>{dayTotal}h total</Text>
+                            <SectionLabel
+                              label={date === todayISO() ? 'HOJE' : formatDate(date).toUpperCase()}
+                            />
+                            <Text weight="bold" size="xs" style={{ color: colors.primary }}>
+                              {dayTotal}h total
+                            </Text>
                           </View>
-                          {logs.map(log => (
+                          {logs.map((log) => (
                             <LogRow
                               key={log.id}
                               log={log}
@@ -467,9 +600,20 @@ export default function PontoScreen() {
                 )}
 
                 {(selectedTeam.workLogs ?? []).length === 0 && (
-                  <View className="mx-5 mb-6 py-12 rounded-2xl items-center" style={{ backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(255,255,255,0.06)' }}>
+                  <View
+                    className="mx-5 mb-6 py-12 rounded-2xl items-center"
+                    style={{
+                      backgroundColor: 'rgba(255,255,255,0.02)',
+                      borderWidth: 1,
+                      borderStyle: 'dashed',
+                      borderColor: 'rgba(255,255,255,0.06)',
+                    }}
+                  >
                     <Ionicons name="time-outline" size={36} color={colors.text.disabled} />
-                    <Text size="sm" style={{ color: 'rgba(245,240,235,0.3)', marginTop: 12, marginBottom: 4 }}>
+                    <Text
+                      size="sm"
+                      style={{ color: 'rgba(245,240,235,0.3)', marginTop: 12, marginBottom: 4 }}
+                    >
                       Nenhum ponto registrado
                     </Text>
                     <Text size="xs" style={{ color: 'rgba(245,240,235,0.18)' }}>

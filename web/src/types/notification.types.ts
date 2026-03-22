@@ -1,7 +1,4 @@
-export type NotificationType =
-  | 'log_delete_request'
-  | 'log_deleted'
-  | 'log_edited'
+export type NotificationType = 'log_delete_request' | 'log_deleted' | 'log_edited'
 
 export interface AppNotification {
   id: string

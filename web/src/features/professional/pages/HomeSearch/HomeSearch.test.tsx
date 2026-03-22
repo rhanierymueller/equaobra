@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+
 import HomeSearch from './HomeSearch'
 
 jest.mock('next/dynamic', () => () => () => <div data-testid="map-placeholder" />)

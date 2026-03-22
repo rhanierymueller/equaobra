@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { NotificationInput } from '../models/notification.model'
+import type { NotificationInput } from '../models/notification.model'
 
 export async function listNotifications(userId: string) {
   return prisma.notification.findMany({
@@ -9,6 +9,17 @@ export async function listNotifications(userId: string) {
 }
 
 export async function createNotification(fromMemberId: string, data: NotificationInput) {
+  const team = await prisma.team.findUnique({
+    where: { id: data.teamId },
+    include: { members: true },
+  })
+  if (!team) return { error: 'Equipe não encontrada', status: 404 }
+
+  const memberIds = [team.ownerId, ...team.members.map((m) => m.professionalId)]
+  if (!memberIds.includes(fromMemberId) || !memberIds.includes(data.toMemberId)) {
+    return { error: 'Sem permissão', status: 403 }
+  }
+
   return prisma.notification.create({
     data: { fromMemberId, ...data },
   })

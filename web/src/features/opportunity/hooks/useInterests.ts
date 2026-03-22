@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+
 import { api } from '@/src/services/api'
 
 export interface Interest {
@@ -20,20 +21,21 @@ export function useInterests(contractorId?: string) {
   const [interests, setInterests] = useState<Interest[]>([])
 
   useEffect(() => {
-    const url = contractorId
-      ? `/api/interests/contractor/${contractorId}`
-      : '/api/interests'
-    api.get<Interest[]>(url)
-      .then(data => setInterests(data))
+    const url = contractorId ? `/api/interests/contractor/${contractorId}` : '/api/interests'
+    api
+      .get<Interest[]>(url)
+      .then((data) => setInterests(data))
       .catch(() => setInterests([]))
   }, [contractorId])
 
   const addInterest = useCallback(async (interest: Omit<Interest, 'id' | 'createdAt'>) => {
     try {
       const created = await api.post<Interest>('/api/interests', interest)
-      setInterests(prev => {
+      setInterests((prev) => {
         const alreadyExists = prev.some(
-          i => i.contractorId === interest.contractorId && i.professionalId === interest.professionalId
+          (i) =>
+            i.contractorId === interest.contractorId &&
+            i.professionalId === interest.professionalId,
         )
         return alreadyExists ? prev : [...prev, created]
       })

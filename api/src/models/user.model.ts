@@ -70,17 +70,41 @@ export type LoginInput = z.infer<typeof loginSchema>
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
 
 export function sanitizeUser(user: {
-  id: string; name: string; email: string; role: string; roles: string
-  profession: string | null; professions: string | null; hourlyRate: number | null
-  showHourlyRate: boolean; avatarUrl: string | null; bio: string | null
-  rating: number; reviewCount: number; available: boolean; phone: string | null
-  tags: string | null; companyName: string | null; cnpj: string | null
-  website: string | null; instagram: string | null; facebook: string | null
-  addrCep: string | null; addrStreet: string | null; addrNeighborhood: string | null
-  addrCity: string | null; addrState: string | null; addrNumber: string | null
-  addrLat: number | null; addrLng: number | null
-  compAddrCep: string | null; compAddrStreet: string | null; compAddrNeighborhood: string | null
-  compAddrCity: string | null; compAddrState: string | null; compAddrNumber: string | null
+  id: string
+  name: string
+  email: string
+  role: string
+  roles: string
+  profession: string | null
+  professions: string | null
+  hourlyRate: number | null
+  showHourlyRate: boolean
+  avatarUrl: string | null
+  bio: string | null
+  rating: number
+  reviewCount: number
+  available: boolean
+  phone: string | null
+  tags: string | null
+  companyName: string | null
+  cnpj: string | null
+  website: string | null
+  instagram: string | null
+  facebook: string | null
+  addrCep: string | null
+  addrStreet: string | null
+  addrNeighborhood: string | null
+  addrCity: string | null
+  addrState: string | null
+  addrNumber: string | null
+  addrLat: number | null
+  addrLng: number | null
+  compAddrCep: string | null
+  compAddrStreet: string | null
+  compAddrNeighborhood: string | null
+  compAddrCity: string | null
+  compAddrState: string | null
+  compAddrNumber: string | null
   createdAt: Date
 }) {
   return {
@@ -105,24 +129,28 @@ export function sanitizeUser(user: {
     website: user.website,
     instagram: user.instagram,
     facebook: user.facebook,
-    address: user.addrCity ? {
-      cep: user.addrCep,
-      street: user.addrStreet,
-      neighborhood: user.addrNeighborhood,
-      city: user.addrCity,
-      state: user.addrState,
-      number: user.addrNumber,
-      lat: user.addrLat,
-      lng: user.addrLng,
-    } : null,
-    companyAddress: user.compAddrCity ? {
-      cep: user.compAddrCep,
-      street: user.compAddrStreet,
-      neighborhood: user.compAddrNeighborhood,
-      city: user.compAddrCity,
-      state: user.compAddrState,
-      number: user.compAddrNumber,
-    } : null,
+    address: user.addrCity
+      ? {
+          cep: user.addrCep,
+          street: user.addrStreet,
+          neighborhood: user.addrNeighborhood,
+          city: user.addrCity,
+          state: user.addrState,
+          number: user.addrNumber,
+          lat: user.addrLat,
+          lng: user.addrLng,
+        }
+      : null,
+    companyAddress: user.compAddrCity
+      ? {
+          cep: user.compAddrCep,
+          street: user.compAddrStreet,
+          neighborhood: user.compAddrNeighborhood,
+          city: user.compAddrCity,
+          state: user.compAddrState,
+          number: user.compAddrNumber,
+        }
+      : null,
     createdAt: user.createdAt,
   }
 }

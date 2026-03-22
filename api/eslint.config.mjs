@@ -1,13 +1,12 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
-import nextVitals from 'eslint-config-next/core-web-vitals'
-import nextTs from 'eslint-config-next/typescript'
+import js from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import importX from 'eslint-plugin-import-x'
 import prettierPlugin from 'eslint-plugin-prettier'
+import tseslint from 'typescript-eslint'
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+export default tseslint.config(
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   prettierConfig,
   {
     plugins: {
@@ -31,13 +30,14 @@ const eslintConfig = defineConfig([
 
       // TypeScript
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
 
       // General
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
-])
-
-export default eslintConfig
+  {
+    ignores: ['dist/**', 'node_modules/**'],
+  },
+)

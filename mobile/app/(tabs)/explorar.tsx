@@ -1,16 +1,25 @@
+import { Ionicons } from '@expo/vector-icons'
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import {
-  View, ScrollView, TouchableOpacity,
-  ActivityIndicator, RefreshControl, Linking,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+  Linking,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Ionicons } from '@expo/vector-icons'
-import { colors, radius } from '../../src/design-system/tokens'
-import { api } from '../../src/services/api'
-import { getLocation } from '../../src/utils/getLocation'
-import { ProfessionalCard, ProfileModal, FilterModal } from '../../src/features/professional/components'
+
 import { Text, Input } from '../../src/components'
+import { colors, radius } from '../../src/design-system/tokens'
+import {
+  ProfessionalCard,
+  ProfileModal,
+  FilterModal,
+} from '../../src/features/professional/components'
+import { api } from '../../src/services/api'
 import type { User } from '../../src/types'
+import { getLocation } from '../../src/utils/getLocation'
 
 function getWebView(): unknown {
   try {
@@ -41,9 +50,12 @@ async function geocodeLocation(location: string): Promise<{ lat: number; lng: nu
   if (geoCache.has(location)) return geoCache.get(location)!
   try {
     const q = encodeURIComponent(location + ', Brasil')
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`, {
-      headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'EquaObra/1.0' },
-    })
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`,
+      {
+        headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'EquaObra/1.0' },
+      },
+    )
     const data = await res.json()
     const result = data?.[0] ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null
     geoCache.set(location, result)
@@ -63,19 +75,29 @@ async function buildMarkers(professionals: User[]): Promise<MapMarker[]> {
       const loc = getLocation(p)
       if (loc) {
         const coords = await geocodeLocation(loc)
-        if (coords) { lat = coords.lat; lng = coords.lng }
+        if (coords) {
+          lat = coords.lat
+          lng = coords.lng
+        }
       }
     }
     if (lat && lng) {
       const profs = p.professions ?? (p.profession ? [p.profession] : [])
       results.push({
-        id: p.id, lat, lng,
+        id: p.id,
+        lat,
+        lng,
         name: p.name,
         profession: profs[0] ?? '',
         professions: profs,
         rating: p.rating ?? 0,
         location: getLocation(p),
-        initials: p.name.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase(),
+        initials: p.name
+          .split(' ')
+          .slice(0, 2)
+          .map((n: string) => n[0])
+          .join('')
+          .toUpperCase(),
         whatsapp: p.whatsapp ?? '',
         phone: p.phone ?? '',
         bio: p.bio ?? '',
@@ -180,7 +202,9 @@ export default function ExplorarScreen() {
     }
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true)
@@ -190,38 +214,54 @@ export default function ExplorarScreen() {
 
   const allProfessions = useMemo(() => {
     const s = new Set<string>()
-    professionals.forEach(p =>
-      (p.professions ?? (p.profession ? [p.profession] : [])).forEach(pr => s.add(pr))
+    professionals.forEach((p) =>
+      (p.professions ?? (p.profession ? [p.profession] : [])).forEach((pr) => s.add(pr)),
     )
     return Array.from(s).sort()
   }, [professionals])
 
-  const filtered = useMemo(() => professionals.filter(p => {
-    const profs = p.professions ?? (p.profession ? [p.profession] : [])
-    const loc = getLocation(p).toLowerCase()
-    const q = search.toLowerCase()
-    return (!q || p.name.toLowerCase().includes(q) || loc.includes(q) || profs.some(pr => pr.toLowerCase().includes(q)))
-      && (!selectedProf || profs.some(pr => pr.toLowerCase() === selectedProf.toLowerCase()))
-      && (!minRating || (p.rating ?? 0) >= minRating)
-  }), [professionals, search, selectedProf, minRating])
+  const filtered = useMemo(
+    () =>
+      professionals.filter((p) => {
+        const profs = p.professions ?? (p.profession ? [p.profession] : [])
+        const loc = getLocation(p).toLowerCase()
+        const q = search.toLowerCase()
+        return (
+          (!q ||
+            p.name.toLowerCase().includes(q) ||
+            loc.includes(q) ||
+            profs.some((pr) => pr.toLowerCase().includes(q))) &&
+          (!selectedProf || profs.some((pr) => pr.toLowerCase() === selectedProf.toLowerCase())) &&
+          (!minRating || (p.rating ?? 0) >= minRating)
+        )
+      }),
+    [professionals, search, selectedProf, minRating],
+  )
 
   useEffect(() => {
     if (viewMode !== 'map' || !WebView) return
-    const key = filtered.map(p => p.id).join(',')
+    const key = filtered.map((p) => p.id).join(',')
     if (key === lastFilterKey.current) return
     lastFilterKey.current = key
     let cancelled = false
     setGeocoding(true)
     setMapHtml(null)
-    buildMarkers(filtered).then(markers => {
-      if (!cancelled) {
-        setMapHtml(buildMapHtml(markers))
-        setGeocoding(false)
-      }
-    }).catch(() => {
-      if (!cancelled) { setMapHtml(buildMapHtml([])); setGeocoding(false) }
-    })
-    return () => { cancelled = true }
+    buildMarkers(filtered)
+      .then((markers) => {
+        if (!cancelled) {
+          setMapHtml(buildMapHtml(markers))
+          setGeocoding(false)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMapHtml(buildMapHtml([]))
+          setGeocoding(false)
+        }
+      })
+    return () => {
+      cancelled = true
+    }
   }, [viewMode, filtered, WebView])
 
   const hasFilters = !!selectedProf || minRating > 0
@@ -236,21 +276,34 @@ export default function ExplorarScreen() {
     setSelectedUser(null)
   }, [])
 
-  const handleMapMessage = useCallback((e: { nativeEvent: { data: string } }) => {
-    try {
-      const data = JSON.parse(e.nativeEvent.data)
-      if (data.action === 'open' && data.id) {
-        const found = professionals.find(p => p.id === data.id)
-        if (found) { setSelectedUser(found); setShowProfile(true) }
-      } else if (data.action === 'whatsapp' && data.phone) {
-        Linking.openURL(`https://wa.me/55${data.phone}`)
-      }
-    } catch {}
-  }, [professionals])
+  const handleMapMessage = useCallback(
+    (e: { nativeEvent: { data: string } }) => {
+      try {
+        const data = JSON.parse(e.nativeEvent.data)
+        if (data.action === 'open' && data.id) {
+          const found = professionals.find((p) => p.id === data.id)
+          if (found) {
+            setSelectedUser(found)
+            setShowProfile(true)
+          }
+        } else if (data.action === 'whatsapp' && data.phone) {
+          Linking.openURL(`https://wa.me/55${data.phone}`)
+        }
+      } catch {}
+    },
+    [professionals],
+  )
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <ActivityIndicator color={colors.primary} size="large" />
       </SafeAreaView>
     )
@@ -269,35 +322,64 @@ export default function ExplorarScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 10 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-          <Text weight="extraBold" size="4xl" letterSpacing={-0.5}>Explorar</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 2,
+          }}
+        >
+          <Text weight="extraBold" size="4xl" letterSpacing={-0.5}>
+            Explorar
+          </Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity
               onPress={() => setShowFilter(true)}
               style={{
-                width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
                 backgroundColor: hasFilters ? `${colors.primary}20` : 'rgba(255,255,255,0.06)',
-                borderWidth: 1, borderColor: hasFilters ? `${colors.primary}50` : colors.border.light,
+                borderWidth: 1,
+                borderColor: hasFilters ? `${colors.primary}50` : colors.border.light,
               }}
             >
-              <Ionicons name="options" size={18} color={hasFilters ? colors.primary : colors.text.muted} />
+              <Ionicons
+                name="options"
+                size={18}
+                color={hasFilters ? colors.primary : colors.text.muted}
+              />
             </TouchableOpacity>
             {!!WebView && (
               <TouchableOpacity
-                onPress={() => setViewMode(v => v === 'list' ? 'map' : 'list')}
+                onPress={() => setViewMode((v) => (v === 'list' ? 'map' : 'list'))}
                 style={{
-                  width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-                  backgroundColor: viewMode === 'map' ? `${colors.primary}20` : 'rgba(255,255,255,0.06)',
-                  borderWidth: 1, borderColor: viewMode === 'map' ? `${colors.primary}50` : colors.border.light,
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor:
+                    viewMode === 'map' ? `${colors.primary}20` : 'rgba(255,255,255,0.06)',
+                  borderWidth: 1,
+                  borderColor: viewMode === 'map' ? `${colors.primary}50` : colors.border.light,
                 }}
               >
-                <Ionicons name={viewMode === 'map' ? 'list' : 'map'} size={18} color={viewMode === 'map' ? colors.primary : colors.text.muted} />
+                <Ionicons
+                  name={viewMode === 'map' ? 'list' : 'map'}
+                  size={18}
+                  color={viewMode === 'map' ? colors.primary : colors.text.muted}
+                />
               </TouchableOpacity>
             )}
           </View>
         </View>
         <Text color="muted" size="md">
-          {filtered.length} profissiona{filtered.length !== 1 ? 'is' : 'l'} disponíve{filtered.length !== 1 ? 'is' : 'l'}
+          {filtered.length} profissiona{filtered.length !== 1 ? 'is' : 'l'} disponíve
+          {filtered.length !== 1 ? 'is' : 'l'}
         </Text>
       </View>
 
@@ -312,17 +394,33 @@ export default function ExplorarScreen() {
       </View>
 
       {hasFilters && (
-        <View style={{ flexDirection: 'row', paddingHorizontal: 20, gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingHorizontal: 20,
+            gap: 6,
+            marginBottom: 8,
+            flexWrap: 'wrap',
+          }}
+        >
           {selectedProf ? (
             <TouchableOpacity
               onPress={() => setSelectedProf('')}
               style={{
-                flexDirection: 'row', alignItems: 'center', gap: 4,
-                paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.xxl,
-                backgroundColor: `${colors.primary}15`, borderWidth: 1, borderColor: `${colors.primary}30`,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: radius.xxl,
+                backgroundColor: `${colors.primary}15`,
+                borderWidth: 1,
+                borderColor: `${colors.primary}30`,
               }}
             >
-              <Text color="accent" size="sm">{selectedProf}</Text>
+              <Text color="accent" size="sm">
+                {selectedProf}
+              </Text>
               <Ionicons name="close" size={11} color={colors.primary} />
             </TouchableOpacity>
           ) : null}
@@ -330,12 +428,20 @@ export default function ExplorarScreen() {
             <TouchableOpacity
               onPress={() => setMinRating(0)}
               style={{
-                flexDirection: 'row', alignItems: 'center', gap: 4,
-                paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.xxl,
-                backgroundColor: `${colors.primary}15`, borderWidth: 1, borderColor: `${colors.primary}30`,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 4,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: radius.xxl,
+                backgroundColor: `${colors.primary}15`,
+                borderWidth: 1,
+                borderColor: `${colors.primary}30`,
               }}
             >
-              <Text color="accent" size="sm">{minRating}★ mín</Text>
+              <Text color="accent" size="sm">
+                {minRating}★ mín
+              </Text>
               <Ionicons name="close" size={11} color={colors.primary} />
             </TouchableOpacity>
           ) : null}
@@ -347,7 +453,9 @@ export default function ExplorarScreen() {
           {geocoding || !mapHtml ? (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
               <ActivityIndicator color={colors.primary} size="large" />
-              <Text color="muted" size="md">Localizando profissionais...</Text>
+              <Text color="muted" size="md">
+                Localizando profissionais...
+              </Text>
             </View>
           ) : (
             <WebViewComponent
@@ -364,19 +472,29 @@ export default function ExplorarScreen() {
       ) : (
         <ScrollView
           style={{ flex: 1, paddingHorizontal: 20 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary}
+            />
+          }
           showsVerticalScrollIndicator={false}
         >
           {filtered.length === 0 ? (
             <View style={{ paddingVertical: 64, alignItems: 'center' }}>
               <Ionicons name="search-outline" size={48} color={colors.text.disabled} />
               <Text color="hint" size="base" style={{ marginTop: 16 }}>
-                {search || hasFilters ? 'Nenhum profissional encontrado' : 'Nenhum profissional disponível'}
+                {search || hasFilters
+                  ? 'Nenhum profissional encontrado'
+                  : 'Nenhum profissional disponível'}
               </Text>
             </View>
-          ) : filtered.map(p => (
-            <ProfessionalCard key={p.id} prof={p} onPress={() => handleOpenProfile(p)} />
-          ))}
+          ) : (
+            filtered.map((p) => (
+              <ProfessionalCard key={p.id} prof={p} onPress={() => handleOpenProfile(p)} />
+            ))
+          )}
           <View style={{ height: 20 }} />
         </ScrollView>
       )}

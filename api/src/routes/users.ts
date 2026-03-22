@@ -1,6 +1,7 @@
 import { Router } from 'express'
-import { requireAuth } from '../middleware/auth'
+
 import { getMe, patchMe, getProfessionals, getById } from '../controllers/user.controller'
+import { requireAuth } from '../middleware/auth'
 
 const router = Router()
 

@@ -1,13 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ALL_PROFESSIONS, PROFESSION_COLORS } from '@/src/types/professional.types'
+
 import { LocalityAutocomplete } from '@/src/components/LocalityAutocomplete'
+import { ALL_PROFESSIONS, PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Profession, ProfessionalFilters } from '@/src/types/professional.types'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(224,123,42,0.8)' }}>
+    <p
+      className="text-xs font-semibold uppercase tracking-widest mb-3"
+      style={{ color: 'rgba(224,123,42,0.8)' }}
+    >
       {children}
     </p>
   )
@@ -21,7 +25,7 @@ interface StarSelectorProps {
 function StarSelector({ value, onChange }: StarSelectorProps) {
   return (
     <div className="flex gap-1" role="group" aria-label="Avaliação mínima">
-      {[0, 3, 4, 4.5].map(rating => (
+      {[0, 3, 4, 4.5].map((rating) => (
         <button
           key={rating}
           type="button"
@@ -58,21 +62,25 @@ function ProfessionDropdown({ selected, onToggle }: ProfessionDropdownProps) {
     return () => document.removeEventListener('mousedown', handle)
   }, [])
 
-  const label = selected.length === 0
-    ? 'Todas as especialidades'
-    : selected.length === 1
-      ? selected[0]
-      : `${selected.length} especialidades`
+  const label =
+    selected.length === 0
+      ? 'Todas as especialidades'
+      : selected.length === 1
+        ? selected[0]
+        : `${selected.length} especialidades`
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
-      <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(224,123,42,0.8)' }}>
+      <p
+        className="text-xs font-semibold uppercase tracking-widest mb-3"
+        style={{ color: 'rgba(224,123,42,0.8)' }}
+      >
         Especialidade
       </p>
 
       <button
         type="button"
-        onClick={() => setOpen(prev => !prev)}
+        onClick={() => setOpen((prev) => !prev)}
         className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-150"
         style={{
           background: open ? 'rgba(224,123,42,0.08)' : 'rgba(255,255,255,0.04)',
@@ -83,7 +91,7 @@ function ProfessionDropdown({ selected, onToggle }: ProfessionDropdownProps) {
         <span className="flex items-center gap-2">
           {selected.length > 0 && (
             <span className="flex gap-1">
-              {selected.slice(0, 3).map(p => (
+              {selected.slice(0, 3).map((p) => (
                 <span
                   key={p}
                   className="w-2 h-2 rounded-full"
@@ -95,8 +103,15 @@ function ProfessionDropdown({ selected, onToggle }: ProfessionDropdownProps) {
           {label}
         </span>
         <svg
-          width="12" height="12" viewBox="0 0 12 12" fill="none"
-          style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          style={{
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+            flexShrink: 0,
+          }}
         >
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
@@ -113,7 +128,7 @@ function ProfessionDropdown({ selected, onToggle }: ProfessionDropdownProps) {
             backdropFilter: 'blur(16px)',
           }}
         >
-          {ALL_PROFESSIONS.map(profession => {
+          {ALL_PROFESSIONS.map((profession) => {
             const active = selected.includes(profession)
             const color = PROFESSION_COLORS[profession]
             return (
@@ -129,12 +144,21 @@ function ProfessionDropdown({ selected, onToggle }: ProfessionDropdownProps) {
                 aria-pressed={active}
               >
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                <span className="text-sm flex-1" style={{ color: active ? color : 'rgba(245,240,235,0.65)' }}>
+                <span
+                  className="text-sm flex-1"
+                  style={{ color: active ? color : 'rgba(245,240,235,0.65)' }}
+                >
                   {profession}
                 </span>
                 {active && (
                   <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                    <path d="M2 6.5l3.5 3.5 5.5-6" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M2 6.5l3.5 3.5 5.5-6"
+                      stroke={color}
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </button>
@@ -178,11 +202,12 @@ export function FilterBar({
 
   return (
     <div className="flex flex-col gap-5">
-            <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <p className="font-bold text-white text-sm">Filtros</p>
           <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
-            {resultCount} profissional{resultCount !== 1 ? 'is' : ''} encontrado{resultCount !== 1 ? 's' : ''}
+            {resultCount} profissional{resultCount !== 1 ? 'is' : ''} encontrado
+            {resultCount !== 1 ? 's' : ''}
           </p>
         </div>
         {hasActiveFilters && (
@@ -201,7 +226,7 @@ export function FilterBar({
         )}
       </div>
 
-            <div>
+      <div>
         <SectionLabel>Localidade</SectionLabel>
         <LocalityAutocomplete
           value={filters.locality}
@@ -213,7 +238,7 @@ export function FilterBar({
         />
       </div>
 
-            <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <span className="text-sm" style={{ color: 'rgba(245,240,235,0.7)' }}>
           Disponível agora
         </span>
@@ -245,12 +270,12 @@ export function FilterBar({
         </button>
       </div>
 
-            <div>
+      <div>
         <SectionLabel>Avaliação mínima</SectionLabel>
         <StarSelector value={filters.minRating} onChange={onSetMinRating} />
       </div>
 
-            <div>
+      <div>
         <div className="flex items-center justify-between mb-2">
           <SectionLabel>Distância máxima</SectionLabel>
           <span className="text-xs font-semibold" style={{ color: '#E07B2A' }}>
@@ -262,7 +287,7 @@ export function FilterBar({
           min={1}
           max={50}
           value={filters.maxDistanceKm}
-          onChange={e => onSetMaxDistance(Number(e.target.value))}
+          onChange={(e) => onSetMaxDistance(Number(e.target.value))}
           className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #E07B2A ${(filters.maxDistanceKm / 50) * 100}%, rgba(255,255,255,0.1) ${(filters.maxDistanceKm / 50) * 100}%)`,
@@ -271,15 +296,16 @@ export function FilterBar({
           aria-label="Distância máxima em quilômetros"
         />
         <div className="flex justify-between mt-1">
-          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>1 km</span>
-          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>50 km</span>
+          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+            1 km
+          </span>
+          <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+            50 km
+          </span>
         </div>
       </div>
 
-            <ProfessionDropdown
-        selected={filters.professions}
-        onToggle={onToggleProfession}
-      />
+      <ProfessionDropdown selected={filters.professions} onToggle={onToggleProfession} />
     </div>
   )
 }

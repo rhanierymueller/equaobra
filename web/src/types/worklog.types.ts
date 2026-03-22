@@ -3,7 +3,7 @@ export interface WorkLog {
   teamId: string
   memberId: string
   memberName: string
-  date: string 
+  date: string
   hours: number
   description?: string
   createdAt: string

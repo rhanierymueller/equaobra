@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { ConversationInput, MessageInput } from '../models/chat.model'
+import type { ConversationInput, MessageInput } from '../models/chat.model'
 
 export async function listConversations(userId: string) {
   return prisma.conversation.findMany({

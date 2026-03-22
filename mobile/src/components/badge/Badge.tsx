@@ -1,4 +1,6 @@
-import { View, ViewStyle } from 'react-native'
+import type { ViewStyle } from 'react-native'
+import { View } from 'react-native'
+
 import { colors, fonts, radius } from '../../design-system/tokens'
 import { Text } from '../text/Text'
 

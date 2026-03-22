@@ -1,8 +1,9 @@
+import { router } from 'expo-router'
+import * as SecureStore from 'expo-secure-store'
 import { useEffect } from 'react'
 import { View, ActivityIndicator, InteractionManager } from 'react-native'
-import { router } from 'expo-router'
+
 import { getToken } from '../src/services/api'
-import * as SecureStore from 'expo-secure-store'
 
 export default function Entry() {
   useEffect(() => {

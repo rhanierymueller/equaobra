@@ -1,15 +1,28 @@
-import { TouchableOpacity, ActivityIndicator, ViewStyle } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import type { ViewStyle } from 'react-native'
+import { TouchableOpacity, ActivityIndicator } from 'react-native'
+
 import { colors, fonts, radius } from '../../design-system/tokens'
 import { Text } from '../text/Text'
 
 type IoniconName = keyof typeof Ionicons.glyphMap
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'whatsapp' | 'success'
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'whatsapp'
+  | 'success'
 
 const variantStyles: Record<ButtonVariant, { bg: string; text: string; border?: string }> = {
   primary: { bg: colors.primary, text: colors.text.primary },
-  secondary: { bg: 'rgba(255,255,255,0.07)', text: colors.text.primary, border: colors.border.medium },
+  secondary: {
+    bg: 'rgba(255,255,255,0.07)',
+    text: colors.text.primary,
+    border: colors.border.medium,
+  },
   outline: { bg: 'transparent', text: colors.primary, border: `${colors.primary}40` },
   ghost: { bg: 'transparent', text: colors.text.muted },
   danger: { bg: 'rgba(229,57,53,0.1)', text: colors.danger, border: 'rgba(229,57,53,0.25)' },

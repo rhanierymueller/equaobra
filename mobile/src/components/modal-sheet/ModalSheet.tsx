@@ -1,5 +1,7 @@
-import { View, Modal, TouchableOpacity, ModalProps } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import type { ModalProps } from 'react-native'
+import { View, Modal, TouchableOpacity } from 'react-native'
+
 import { colors, fonts } from '../../design-system/tokens'
 import { Text } from '../text/Text'
 
@@ -16,7 +18,9 @@ interface ModalSheetProps {
 function HandleBar() {
   return (
     <View style={{ alignItems: 'center', paddingTop: 12 }}>
-      <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.text.disabled }} />
+      <View
+        style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.text.disabled }}
+      />
     </View>
   )
 }
@@ -56,7 +60,9 @@ export function ModalSheet({
                 <Ionicons name="close" size={20} color={colors.text.muted} />
               </TouchableOpacity>
             )}
-            <Text weight="bold" size="xl">{title}</Text>
+            <Text weight="bold" size="xl">
+              {title}
+            </Text>
             {rightAction ?? <View style={{ width: 20 }} />}
           </View>
         )}

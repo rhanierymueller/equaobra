@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { WorkLogInput } from '../models/worklog.model'
+import type { WorkLogInput } from '../models/worklog.model'
 
 export async function listWorkLogs(teamId: string, userId: string) {
   const team = await prisma.team.findUnique({
@@ -7,7 +7,7 @@ export async function listWorkLogs(teamId: string, userId: string) {
     include: { members: true },
   })
   if (!team) return { error: 'Equipe não encontrada', status: 404 }
-  if (team.ownerId !== userId && !team.members.some(m => m.professionalId === userId)) {
+  if (team.ownerId !== userId && !team.members.some((m) => m.professionalId === userId)) {
     return { error: 'Sem permissão', status: 403 }
   }
 
@@ -24,7 +24,7 @@ export async function createWorkLog(teamId: string, userId: string, data: WorkLo
     include: { members: true },
   })
   if (!team) return { error: 'Equipe não encontrada', status: 404 }
-  if (team.ownerId !== userId && !team.members.some(m => m.professionalId === userId)) {
+  if (team.ownerId !== userId && !team.members.some((m) => m.professionalId === userId)) {
     return { error: 'Sem permissão', status: 403 }
   }
 

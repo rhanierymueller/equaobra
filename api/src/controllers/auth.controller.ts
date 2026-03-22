@@ -1,7 +1,8 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+
+import { isServiceError } from '../lib/errors'
 import { registerSchema, loginSchema } from '../models/user.model'
 import { registerUser, loginUser } from '../services/auth.service'
-import { isServiceError } from '../lib/errors'
 
 export async function register(req: Request, res: Response): Promise<void> {
   const parsed = registerSchema.safeParse(req.body)

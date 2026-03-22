@@ -18,11 +18,23 @@ export const opportunitySchema = z.object({
 export type OpportunityInput = z.infer<typeof opportunitySchema>
 
 export function deserializeOpportunity(opp: {
-  id: string; contractorId: string; contractorName: string; companyName: string | null
-  avatarInitials: string; obraDescription: string; obraLocation: string
-  lat: number | null; lng: number | null; obraStart: string | null; obraDuration: string | null
-  lookingForProfessions: string; contactEmail: string; contactPhone: string | null
-  active: boolean; createdAt: Date; updatedAt: Date
+  id: string
+  contractorId: string
+  contractorName: string
+  companyName: string | null
+  avatarInitials: string
+  obraDescription: string
+  obraLocation: string
+  lat: number | null
+  lng: number | null
+  obraStart: string | null
+  obraDuration: string | null
+  lookingForProfessions: string
+  contactEmail: string
+  contactPhone: string | null
+  active: boolean
+  createdAt: Date
+  updatedAt: Date
 }) {
   return { ...opp, lookingForProfessions: JSON.parse(opp.lookingForProfessions) as string[] }
 }

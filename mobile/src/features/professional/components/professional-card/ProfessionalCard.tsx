@@ -1,9 +1,10 @@
-import { View, Linking } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '../../../../design-system/tokens'
+import { View, Linking } from 'react-native'
+
 import { Text, Avatar, Card, Badge, Button, StarRating } from '../../../../components'
-import { getLocation } from '../../../../utils/getLocation'
+import { colors } from '../../../../design-system/tokens'
 import type { User } from '../../../../types'
+import { getLocation } from '../../../../utils/getLocation'
 
 interface ProfessionalCardProps {
   prof: User
@@ -24,13 +25,17 @@ export function ProfessionalCard({ prof, onPress }: ProfessionalCardProps) {
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
         <Avatar name={prof.name} size={48} borderRadius={13} />
         <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text weight="bold" size="sm" color="primary">{prof.name}</Text>
+          <View
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <Text weight="bold" size="sm" color="primary">
+              {prof.name}
+            </Text>
             <Ionicons name="chevron-forward" size={14} color={colors.text.hint} />
           </View>
           {professions.length > 0 && (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
-              {professions.slice(0, 2).map(p => (
+              {professions.slice(0, 2).map((p) => (
                 <Badge key={p} label={p} />
               ))}
             </View>
@@ -38,7 +43,9 @@ export function ProfessionalCard({ prof, onPress }: ProfessionalCardProps) {
           {location ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 }}>
               <Ionicons name="location-outline" size={10} color={colors.text.muted} />
-              <Text weight="regular" size="xs" color="muted">{location}</Text>
+              <Text weight="regular" size="xs" color="muted">
+                {location}
+              </Text>
             </View>
           ) : null}
           {prof.rating && prof.rating > 0 ? (
@@ -50,7 +57,13 @@ export function ProfessionalCard({ prof, onPress }: ProfessionalCardProps) {
       </View>
       {prof.whatsapp && (
         <View style={{ marginTop: 10 }}>
-          <Button variant="whatsapp" icon="logo-whatsapp" label="WhatsApp" onPress={handleWhatsApp} size="sm" />
+          <Button
+            variant="whatsapp"
+            icon="logo-whatsapp"
+            label="WhatsApp"
+            onPress={handleWhatsApp}
+            size="sm"
+          />
         </View>
       )}
     </Card>

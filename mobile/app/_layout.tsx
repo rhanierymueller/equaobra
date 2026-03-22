@@ -1,10 +1,4 @@
 import '../global.css'
-import { useEffect, useCallback } from 'react'
-import { View, Text, TextInput } from 'react-native'
-import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
-import * as SplashScreen from 'expo-splash-screen'
-import { useFonts } from 'expo-font'
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -12,6 +6,13 @@ import {
   Inter_700Bold,
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter'
+import { useFonts } from 'expo-font'
+import { Stack } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
+import { StatusBar } from 'expo-status-bar'
+import { useEffect, useCallback } from 'react'
+import { View, Text, TextInput } from 'react-native'
+
 import { colors, fonts } from '../src/design-system/tokens'
 
 const defaultFontStyle = { fontFamily: fonts.regular }
@@ -46,7 +47,9 @@ export default function RootLayout() {
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutReady}>
       <StatusBar style="light" backgroundColor={colors.background} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+      <Stack
+        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}
+      >
         <Stack.Screen name="index" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />

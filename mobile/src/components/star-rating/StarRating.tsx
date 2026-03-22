@@ -1,5 +1,6 @@
-import { View, Text } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { View, Text } from 'react-native'
+
 import { colors } from '../../design-system/tokens'
 
 interface StarRatingProps {
@@ -10,7 +11,7 @@ interface StarRatingProps {
 export function StarRating({ rating, size = 11 }: StarRatingProps) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-      {[1, 2, 3, 4, 5].map(i => (
+      {[1, 2, 3, 4, 5].map((i) => (
         <Ionicons
           key={i}
           name={i <= Math.round(rating) ? 'star' : 'star-outline'}

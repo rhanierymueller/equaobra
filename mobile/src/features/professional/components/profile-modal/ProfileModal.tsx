@@ -1,12 +1,13 @@
+import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { View, TouchableOpacity, Modal, ScrollView, Linking } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
-import { colors, radius } from '../../../../design-system/tokens'
+
 import { Text, Avatar, Badge, Button, StarRating, SectionLabel } from '../../../../components'
-import { AddToTeamModal } from '../../../team/components'
-import { ChatModal } from '../../../chat/components'
-import { getLocation } from '../../../../utils/getLocation'
+import { colors, radius } from '../../../../design-system/tokens'
 import type { User } from '../../../../types'
+import { getLocation } from '../../../../utils/getLocation'
+import { ChatModal } from '../../../chat/components'
+import { AddToTeamModal } from '../../../team/components'
 
 interface ProfileModalProps {
   prof: User | null
@@ -33,12 +34,32 @@ export function ProfileModal({ prof, visible, onClose }: ProfileModalProps) {
 
   return (
     <>
-      <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+      <Modal
+        visible={visible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={onClose}
+      >
         <View style={{ flex: 1, backgroundColor: colors.backgroundCard }}>
           <View style={{ alignItems: 'center', paddingTop: 12 }}>
-            <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.text.disabled }} />
+            <View
+              style={{
+                width: 40,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: colors.text.disabled,
+              }}
+            />
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              paddingHorizontal: 16,
+              paddingTop: 8,
+              paddingBottom: 4,
+            }}
+          >
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close" size={22} color={colors.text.muted} />
             </TouchableOpacity>
@@ -59,12 +80,22 @@ export function ProfileModal({ prof, visible, onClose }: ProfileModalProps) {
               {location ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
                   <Ionicons name="location-outline" size={12} color={colors.text.muted} />
-                  <Text weight="regular" size="sm" color="muted">{location}</Text>
+                  <Text weight="regular" size="sm" color="muted">
+                    {location}
+                  </Text>
                 </View>
               ) : null}
               {professions.length > 0 && (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12, justifyContent: 'center' }}>
-                  {professions.map(p => (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: 6,
+                    marginTop: 12,
+                    justifyContent: 'center',
+                  }}
+                >
+                  {professions.map((p) => (
                     <Badge key={p} label={p} variant="primary" size="md" />
                   ))}
                 </View>
@@ -102,39 +133,61 @@ export function ProfileModal({ prof, visible, onClose }: ProfileModalProps) {
             </View>
 
             {prof.bio ? (
-              <View style={{
-                marginHorizontal: 16, marginBottom: 12, padding: 14,
-                borderRadius: radius.lg, backgroundColor: 'rgba(255,255,255,0.04)',
-                borderWidth: 1, borderColor: colors.border.default,
-              }}>
+              <View
+                style={{
+                  marginHorizontal: 16,
+                  marginBottom: 12,
+                  padding: 14,
+                  borderRadius: radius.lg,
+                  backgroundColor: 'rgba(255,255,255,0.04)',
+                  borderWidth: 1,
+                  borderColor: colors.border.default,
+                }}
+              >
                 <SectionLabel label="SOBRE" style={{ marginBottom: 6 }} />
-                <Text weight="regular" size="sm" color="secondary" lineHeight={20}>{prof.bio}</Text>
+                <Text weight="regular" size="sm" color="secondary" lineHeight={20}>
+                  {prof.bio}
+                </Text>
               </View>
             ) : null}
 
-            <View style={{
-              marginHorizontal: 16, marginBottom: 12, padding: 14,
-              borderRadius: radius.lg, backgroundColor: 'rgba(255,255,255,0.04)',
-              borderWidth: 1, borderColor: colors.border.default,
-            }}>
+            <View
+              style={{
+                marginHorizontal: 16,
+                marginBottom: 12,
+                padding: 14,
+                borderRadius: radius.lg,
+                backgroundColor: 'rgba(255,255,255,0.04)',
+                borderWidth: 1,
+                borderColor: colors.border.default,
+              }}
+            >
               <SectionLabel label="INFORMAÇÕES" style={{ marginBottom: 10 }} />
               {prof.phone ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}
+                >
                   <Ionicons name="call-outline" size={15} color={colors.primary} />
-                  <Text weight="regular" size="sm" color="secondary">{prof.phone}</Text>
+                  <Text weight="regular" size="sm" color="secondary">
+                    {prof.phone}
+                  </Text>
                 </View>
               ) : null}
               {hourlyRate && showHourlyRate !== false ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}
+                >
                   <Ionicons name="cash-outline" size={15} color={colors.primary} />
-                  <Text weight="regular" size="sm" color="secondary">R$ {hourlyRate}/hora</Text>
+                  <Text weight="regular" size="sm" color="secondary">
+                    R$ {hourlyRate}/hora
+                  </Text>
                 </View>
               ) : null}
               {tags && tags.length > 0 ? (
                 <View style={{ marginTop: 4 }}>
                   <SectionLabel label="ESPECIALIDADES" style={{ marginBottom: 8 }} />
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                    {tags.map(t => (
+                    {tags.map((t) => (
                       <Badge key={t} label={t} variant="muted" />
                     ))}
                   </View>

@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+
 import { FilterBar } from './FilterBar'
+
 import type { ProfessionalFilters } from '@/src/types/professional.types'
 
 const defaultFilters: ProfessionalFilters = {

@@ -1,9 +1,22 @@
-import { Text as RNText, TextProps as RNTextProps, StyleSheet } from 'react-native'
+import type { TextProps as RNTextProps } from 'react-native'
+import { Text as RNText, StyleSheet } from 'react-native'
+
 import { colors, fonts, fontSize as fontSizes } from '../../design-system/tokens'
 
 type FontWeight = 'regular' | 'medium' | 'semiBold' | 'bold' | 'extraBold'
 type FontSize = keyof typeof fontSizes
-type TextColor = 'primary' | 'secondary' | 'muted' | 'hint' | 'disabled' | 'white' | 'accent' | 'success' | 'danger' | 'whatsapp' | 'star'
+type TextColor =
+  | 'primary'
+  | 'secondary'
+  | 'muted'
+  | 'hint'
+  | 'disabled'
+  | 'white'
+  | 'accent'
+  | 'success'
+  | 'danger'
+  | 'whatsapp'
+  | 'star'
 
 const colorMap: Record<TextColor, string> = {
   primary: colors.text.primary,

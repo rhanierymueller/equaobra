@@ -1,7 +1,9 @@
 import bcrypt from 'bcrypt'
-import { prisma } from '../lib/prisma'
+
 import { signToken } from '../lib/jwt'
-import { RegisterInput, LoginInput, sanitizeUser } from '../models/user.model'
+import { prisma } from '../lib/prisma'
+import type { RegisterInput, LoginInput } from '../models/user.model'
+import { sanitizeUser } from '../models/user.model'
 
 export async function registerUser(data: RegisterInput) {
   const existing = await prisma.user.findUnique({ where: { email: data.email } })

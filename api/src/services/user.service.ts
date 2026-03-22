@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma'
-import { UpdateUserInput, sanitizeUser } from '../models/user.model'
+import type { UpdateUserInput } from '../models/user.model'
+import { sanitizeUser } from '../models/user.model'
 
 export async function getUserById(id: string) {
   const user = await prisma.user.findUnique({ where: { id } })
@@ -39,9 +40,19 @@ export async function listProfessionals(filters: {
   const searchLc = filters.search?.toLowerCase() ?? null
   const cityLc = filters.city?.toLowerCase() ?? null
 
-  const filtered = users.filter(u => {
-    if (searchLc && !u.name.toLowerCase().includes(searchLc) && !(u.profession ?? '').toLowerCase().includes(searchLc)) return false
-    if (cityLc && !(u.addrCity ?? '').toLowerCase().includes(cityLc) && !(u.addrNeighborhood ?? '').toLowerCase().includes(cityLc)) return false
+  const filtered = users.filter((u) => {
+    if (
+      searchLc &&
+      !u.name.toLowerCase().includes(searchLc) &&
+      !(u.profession ?? '').toLowerCase().includes(searchLc)
+    )
+      return false
+    if (
+      cityLc &&
+      !(u.addrCity ?? '').toLowerCase().includes(cityLc) &&
+      !(u.addrNeighborhood ?? '').toLowerCase().includes(cityLc)
+    )
+      return false
     return true
   })
 

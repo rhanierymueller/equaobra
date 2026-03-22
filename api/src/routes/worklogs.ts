@@ -1,6 +1,7 @@
 import { Router } from 'express'
-import { requireAuth } from '../middleware/auth'
+
 import * as ctrl from '../controllers/worklog.controller'
+import { requireAuth } from '../middleware/auth'
 
 const router = Router({ mergeParams: true })
 
