@@ -58,7 +58,6 @@ async function main() {
     } as Parameters<typeof prisma.user.upsert>[0])
   }
 
-  // Demo contractor
   await prisma.user.upsert({
     where: { email: 'contratante@equaobra.com' },
     create: {

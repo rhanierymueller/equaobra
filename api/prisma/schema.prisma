@@ -7,17 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── User (profissional e/ou contratante) ─────────────────────────────────────
-
 model User {
   id             String   @id @default(cuid())
   name           String
   email          String   @unique
   passwordHash   String
-  role           String   // primary: 'profissional' | 'contratante'
-  roles          String   // JSON array: ["profissional","contratante"]
-  profession     String?  // primary profession (legacy compat)
-  professions    String?  // JSON array of professions
+  role           String
+  roles          String
+  profession     String?
+  professions    String?
   hourlyRate     Float?
   showHourlyRate Boolean  @default(true)
   avatarUrl      String?
@@ -26,7 +24,7 @@ model User {
   reviewCount    Int      @default(0)
   available      Boolean  @default(true)
   phone          String?
-  tags           String?  // JSON array
+  tags           String?
   companyName    String?
   cnpj           String?
   website        String?
@@ -35,7 +33,6 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  // Professional address
   addrCep          String?
   addrStreet       String?
   addrNeighborhood String?
@@ -45,7 +42,6 @@ model User {
   addrLat          Float?
   addrLng          Float?
 
-  // Company address (contratante)
   compAddrCep          String?
   compAddrStreet       String?
   compAddrNeighborhood String?
@@ -53,7 +49,6 @@ model User {
   compAddrState        String?
   compAddrNumber       String?
 
-  // Relations
   ownedTeams        Team[]         @relation("TeamOwner")
   opportunities     Opportunity[]
   interests         Interest[]     @relation("ProfessionalInterests")
@@ -61,8 +56,6 @@ model User {
   fromNotifications Notification[] @relation("FromMember")
   messages          Message[]
 }
-
-// ── Team ─────────────────────────────────────────────────────────────────────
 
 model Team {
   id             String   @id @default(cuid())
@@ -96,22 +89,18 @@ model TeamMember {
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
-// ── WorkLog ───────────────────────────────────────────────────────────────────
-
 model WorkLog {
   id          String   @id @default(cuid())
   teamId      String
   memberId    String
   memberName  String
-  date        String   // YYYY-MM-DD
+  date        String
   hours       Float
   description String?
   createdAt   DateTime @default(now())
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
-
-// ── Opportunity (vaga/obra publicada pelo contratante) ────────────────────────
 
 model Opportunity {
   id                    String   @id @default(cuid())
@@ -125,7 +114,7 @@ model Opportunity {
   lng                   Float?
   obraStart             String?
   obraDuration          String?
-  lookingForProfessions String   // JSON: string[]
+  lookingForProfessions String
   contactEmail          String
   contactPhone          String?
   active                Boolean  @default(true)
@@ -135,11 +124,9 @@ model Opportunity {
   contractor User @relation(fields: [contractorId], references: [id])
 }
 
-// ── Interest (profissional demonstra interesse em obra/contratante) ───────────
-
 model Interest {
   id                    String   @id @default(cuid())
-  contractorId          String   // User.id do contratante
+  contractorId          String
   professionalId        String
   professionalName      String
   professionalInitials  String
@@ -154,10 +141,8 @@ model Interest {
   @@unique([contractorId, professionalId])
 }
 
-// ── Chat ──────────────────────────────────────────────────────────────────────
-
 model Conversation {
-  id                    String   @id  // {userId}_{professionalId}
+  id                    String   @id
   userId                String
   professionalId        String
   professionalName      String
@@ -180,11 +165,9 @@ model Message {
   sender       User         @relation(fields: [senderId], references: [id])
 }
 
-// ── Notification ──────────────────────────────────────────────────────────────
-
 model Notification {
   id             String   @id @default(cuid())
-  type           String   // 'log_delete_request' | 'log_deleted' | 'log_edited'
+  type           String
   teamId         String
   teamName       String
   fromMemberId   String
