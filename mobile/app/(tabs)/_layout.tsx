@@ -54,10 +54,18 @@ export default function TabsLayout() {
         tabBarShowLabel: false,
       }}
     >
+      {/* MVP: aba Ponto (WorkLog) oculta temporariamente — reativar quando onboarding estiver validado
       <Tabs.Screen
         name="ponto"
         options={{
           tabBarIcon: ({ focused }) => <TabIcon name="time" focused={focused} label="Ponto" />,
+        }}
+      />
+      */}
+      <Tabs.Screen
+        name="ponto"
+        options={{
+          href: null, // oculta do tab bar sem remover a rota
         }}
       />
       <Tabs.Screen

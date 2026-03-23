@@ -11,14 +11,9 @@ import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunit
 import type { Opportunity } from '@/src/types/opportunity.types'
 import type { TeamMember } from '@/src/types/team.types'
 import type { User } from '@/src/types/user.types'
+import { formatDate } from '@/src/utils/date'
 
 const ACCENT = '#E07B2A'
-
-function formatDate(iso: string): string {
-  if (!iso) return ''
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
-}
 
 interface CardProps {
   interest: Interest

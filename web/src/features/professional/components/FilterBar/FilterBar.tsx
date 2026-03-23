@@ -34,7 +34,7 @@ function StarSelector({ value, onChange }: StarSelectorProps) {
           style={{
             background: value === rating ? 'rgba(255,209,102,0.15)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${value === rating ? 'rgba(255,209,102,0.5)' : 'rgba(255,255,255,0.08)'}`,
-            color: value === rating ? '#FFD166' : 'rgba(245,240,235,0.45)',
+            color: value === rating ? 'var(--color-star)' : 'rgba(245,240,235,0.45)',
           }}
           aria-pressed={value === rating}
         >
@@ -85,7 +85,7 @@ function ProfessionDropdown({ selected, onToggle }: ProfessionDropdownProps) {
         style={{
           background: open ? 'rgba(224,123,42,0.08)' : 'rgba(255,255,255,0.04)',
           border: `1.5px solid ${open || selected.length > 0 ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.08)'}`,
-          color: selected.length > 0 ? '#E07B2A' : 'rgba(245,240,235,0.55)',
+          color: selected.length > 0 ? 'var(--color-primary)' : 'rgba(245,240,235,0.55)',
         }}
       >
         <span className="flex items-center gap-2">
@@ -205,9 +205,8 @@ export function FilterBar({
       <div className="flex items-center justify-between">
         <div>
           <p className="font-bold text-white text-sm">Filtros</p>
-          <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
-            {resultCount} profissional{resultCount !== 1 ? 'is' : ''} encontrado
-            {resultCount !== 1 ? 's' : ''}
+          <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+            {resultCount === 1 ? '1 profissional encontrado' : `${resultCount} profissionais encontrados`}
           </p>
         </div>
         {hasActiveFilters && (
@@ -217,7 +216,7 @@ export function FilterBar({
             className="text-xs px-2.5 py-1.5 rounded-lg transition-colors"
             style={{
               background: 'rgba(229,57,53,0.1)',
-              color: '#FF6B6B',
+              color: 'var(--color-danger-light)',
               border: '1px solid rgba(229,57,53,0.2)',
             }}
           >
@@ -252,7 +251,7 @@ export function FilterBar({
             width: 40,
             height: 22,
             borderRadius: 11,
-            background: filters.availableOnly ? '#4CAF50' : 'rgba(255,255,255,0.1)',
+            background: filters.availableOnly ? 'var(--color-success)' : 'rgba(255,255,255,0.1)',
             border: 'none',
             cursor: 'pointer',
           }}
@@ -278,7 +277,7 @@ export function FilterBar({
       <div>
         <div className="flex items-center justify-between mb-2">
           <SectionLabel>Distância máxima</SectionLabel>
-          <span className="text-xs font-semibold" style={{ color: '#E07B2A' }}>
+          <span className="text-xs font-semibold" style={{ color: 'var(--color-primary)' }}>
             {filters.maxDistanceKm < 50 ? `${filters.maxDistanceKm} km` : 'Qualquer'}
           </span>
         </div>
@@ -290,8 +289,8 @@ export function FilterBar({
           onChange={(e) => onSetMaxDistance(Number(e.target.value))}
           className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #E07B2A ${(filters.maxDistanceKm / 50) * 100}%, rgba(255,255,255,0.1) ${(filters.maxDistanceKm / 50) * 100}%)`,
-            accentColor: '#E07B2A',
+            background: `linear-gradient(to right, var(--color-primary) ${(filters.maxDistanceKm / 50) * 100}%, rgba(255,255,255,0.1) ${(filters.maxDistanceKm / 50) * 100}%)`,
+            accentColor: 'var(--color-primary)',
           }}
           aria-label="Distância máxima em quilômetros"
         />

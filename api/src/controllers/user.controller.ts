@@ -2,7 +2,7 @@ import type { Response } from 'express'
 
 import type { AuthRequest } from '../middleware/auth'
 import { updateUserSchema } from '../models/user.model'
-import { getUserById, updateUser, listProfessionals } from '../services/user.service'
+import { getUserById, updateUser, listProfessionals, addReview } from '../services/user.service'
 
 export async function getMe(req: AuthRequest, res: Response): Promise<void> {
   const user = await getUserById(req.user!.userId)
@@ -34,6 +34,23 @@ export async function getProfessionals(req: AuthRequest, res: Response): Promise
     available: available as string | undefined,
   })
   res.json(result)
+}
+
+export async function postReview(req: AuthRequest, res: Response): Promise<void> {
+  const { rating } = req.body as { rating: unknown }
+
+  if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+    res.status(400).json({ error: 'rating deve ser um número entre 1 e 5' })
+    return
+  }
+
+  const updated = await addReview(String(req.params.id), rating)
+  if (!updated) {
+    res.status(404).json({ error: 'Usuário não encontrado' })
+    return
+  }
+
+  res.json(updated)
 }
 
 export async function getById(req: AuthRequest, res: Response): Promise<void> {

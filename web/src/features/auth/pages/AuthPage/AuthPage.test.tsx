@@ -7,12 +7,13 @@ jest.mock('next/navigation', () => ({ useRouter: () => ({ push: jest.fn() }) }))
 describe('AuthPage', () => {
   it('renders login form by default', () => {
     render(<AuthPage />)
-    expect(screen.getByRole('button', { name: /entrar/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/e-mail/i)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/nome completo/i)).not.toBeInTheDocument()
   })
 
   it('switches to register form on tab click', () => {
     render(<AuthPage />)
-    fireEvent.click(screen.getByRole('button', { name: /criar conta/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /criar conta/i })[0])
     expect(screen.getByLabelText(/nome completo/i)).toBeInTheDocument()
   })
 })

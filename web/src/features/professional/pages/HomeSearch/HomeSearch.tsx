@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { FilterBar } from '../../components/FilterBar'
@@ -8,6 +9,7 @@ import { ProfessionalCard } from '../../components/ProfessionalCard'
 import { useProfessionals } from '../../hooks/useProfessionals'
 
 import { Navbar } from '@/src/components/Navbar'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { OpportunityFilterBar } from '@/src/features/opportunity/components/OpportunityFilterBar'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
@@ -15,7 +17,7 @@ import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import type { Professional, Profession } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
-import type { User } from '@/src/types/user.types'
+import { haversineKm } from '@/src/utils/geolocation'
 
 type ChatTarget = Pick<
   TeamMember,
@@ -42,12 +44,12 @@ function MapSkeleton() {
   return (
     <div
       className="w-full h-full flex items-center justify-center"
-      style={{ background: '#0D0C0B' }}
+      style={{ background: 'var(--color-background)' }}
     >
       <div className="flex flex-col items-center gap-3">
         <div
           className="w-10 h-10 rounded-full animate-spin"
-          style={{ border: '3px solid rgba(224,123,42,0.2)', borderTopColor: '#E07B2A' }}
+          style={{ border: '3px solid var(--color-primary-alpha-20)', borderTopColor: 'var(--color-primary)' }}
         />
         <span className="text-sm" style={{ color: 'rgba(245,240,235,0.4)' }}>
           Carregando mapa...
@@ -142,11 +144,27 @@ function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
             border: 'none',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            background: mode === m ? '#E07B2A' : 'transparent',
+            background: mode === m ? 'var(--color-primary)' : 'transparent',
             color: mode === m ? '#fff' : 'rgba(245,240,235,0.45)',
           }}
         >
-          {m === 'profissionais' ? '👷 Profissionais' : '🏗️ Obras'}
+          {m === 'profissionais' ? (
+            <span className="flex items-center gap-1.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Profissionais
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+              </svg>
+              Obras
+            </span>
+          )}
         </button>
       ))}
     </div>
@@ -163,6 +181,7 @@ function oppToChatTarget(opp: Opportunity): ChatTarget {
 }
 
 export default function HomeSearch() {
+  const router = useRouter()
   const {
     professionals,
     filters,
@@ -180,10 +199,10 @@ export default function HomeSearch() {
 
   const { opportunities } = useOpportunities()
 
+  const { user } = useCurrentUser()
   const [filterOpen, setFilterOpen] = useState(true)
   const [listOpen, setListOpen] = useState(true)
   const [teamTarget, setTeamTarget] = useState<Professional | null>(null)
-  const [user, setUser] = useState<User | null>(null)
   const [mapMode, setMapMode] = useState<MapMode>('profissionais')
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null)
   const [chatTarget, setChatTarget] = useState<ChatTarget | null>(null)
@@ -194,13 +213,6 @@ export default function HomeSearch() {
   const [mapFlyTo, setMapFlyTo] = useState<[number, number] | null>(null)
   const [userGeoLoc, setUserGeoLoc] = useState<[number, number] | null>(null)
   const [mapKey] = useState(() => Date.now())
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-  }, [])
 
   useEffect(() => {
     if (!navigator.geolocation) return
@@ -238,16 +250,6 @@ export default function HomeSearch() {
 
   const effectiveCenter = oppCenter ?? userGeoLoc
 
-  function haversineKm(a: [number, number], b: [number, number]): number {
-    const R = 6371
-    const dLat = ((b[0] - a[0]) * Math.PI) / 180
-    const dLng = ((b[1] - a[1]) * Math.PI) / 180
-    const sin2 =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos((a[0] * Math.PI) / 180) * Math.cos((b[0] * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.asin(Math.sqrt(sin2))
-  }
-
   const filteredOpportunities = opportunities.filter((o) => {
     if (oppLocality && !o.obraLocation.toLowerCase().includes(oppLocality.toLowerCase()))
       return false
@@ -263,7 +265,7 @@ export default function HomeSearch() {
   })
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#0D0C0B' }}>
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--color-background)' }}>
       <Navbar searchValue={filters.search} onSearchChange={setSearch} />
 
       <div className="flex flex-1 overflow-hidden relative" style={{ overflowX: 'hidden' }}>
@@ -272,7 +274,7 @@ export default function HomeSearch() {
           style={{
             width: filterOpen ? FILTER_WIDTH : 0,
             borderRight: '1px solid rgba(255,255,255,0.06)',
-            background: '#111009',
+            background: 'var(--color-background-panel)',
           }}
         >
           <div className="h-full overflow-y-auto overflow-x-hidden w-full">
@@ -333,7 +335,7 @@ export default function HomeSearch() {
                   ? (pro) => setTeamTarget(pro)
                   : !user
                     ? () => {
-                        window.location.href = '/auth'
+                        router.push('/auth')
                       }
                     : undefined
               }
@@ -351,7 +353,7 @@ export default function HomeSearch() {
                   ? (opp) => setChatTarget(oppToChatTarget(opp))
                   : !user
                     ? () => {
-                        window.location.href = '/auth'
+                        router.push('/auth')
                       }
                     : undefined
               }
@@ -372,9 +374,9 @@ export default function HomeSearch() {
                   <span
                     className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
                     style={{
-                      background: 'rgba(116,185,255,0.15)',
+                      background: 'var(--color-info-alpha-10)',
                       border: '1px solid rgba(116,185,255,0.35)',
-                      color: '#74B9FF',
+                      color: 'var(--color-info)',
                     }}
                   >
                     📍 {filters.locality}
@@ -384,9 +386,9 @@ export default function HomeSearch() {
                   <span
                     className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
                     style={{
-                      background: 'rgba(76,175,80,0.15)',
+                      background: 'var(--color-success-alpha-10)',
                       border: '1px solid rgba(76,175,80,0.35)',
-                      color: '#4CAF50',
+                      color: 'var(--color-success)',
                     }}
                   >
                     ● Disponível agora
@@ -398,7 +400,7 @@ export default function HomeSearch() {
                     style={{
                       background: 'rgba(255,209,102,0.15)',
                       border: '1px solid rgba(255,209,102,0.3)',
-                      color: '#FFD166',
+                      color: 'var(--color-star)',
                     }}
                   >
                     ★ {filters.minRating}+
@@ -409,9 +411,9 @@ export default function HomeSearch() {
                     key={p}
                     className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
                     style={{
-                      background: 'rgba(224,123,42,0.15)',
-                      border: '1px solid rgba(224,123,42,0.3)',
-                      color: '#E07B2A',
+                      background: 'var(--color-primary-alpha-15)',
+                      border: '1px solid var(--color-primary-alpha-30)',
+                      color: 'var(--color-primary)',
                     }}
                   >
                     {p}
@@ -435,7 +437,7 @@ export default function HomeSearch() {
               <>
                 <span
                   className="w-1.5 h-1.5 rounded-full animate-pulse"
-                  style={{ background: '#4CAF50' }}
+                  style={{ background: 'var(--color-success)' }}
                 />
                 {professionals.filter((p) => p.available).length} disponíveis agora
               </>
@@ -443,7 +445,7 @@ export default function HomeSearch() {
               <>
                 <span
                   className="w-1.5 h-1.5 rounded-full animate-pulse"
-                  style={{ background: '#E07B2A' }}
+                  style={{ background: 'var(--color-primary)' }}
                 />
                 {filteredOpportunities.length} obra{filteredOpportunities.length !== 1 ? 's' : ''}{' '}
                 no mapa
@@ -464,7 +466,7 @@ export default function HomeSearch() {
           style={{
             width: listOpen ? LIST_WIDTH : 0,
             borderLeft: '1px solid rgba(255,255,255,0.06)',
-            background: '#111009',
+            background: 'var(--color-background-panel)',
           }}
         >
           <div className="flex flex-col h-full w-full overflow-x-hidden">
@@ -503,9 +505,9 @@ export default function HomeSearch() {
                         textAlign: 'left',
                         background:
                           selectedOpp?.id === opp.id
-                            ? 'rgba(224,123,42,0.1)'
-                            : 'rgba(255,255,255,0.03)',
-                        border: `1px solid ${selectedOpp?.id === opp.id ? 'rgba(224,123,42,0.4)' : 'rgba(255,255,255,0.07)'}`,
+                            ? 'var(--color-primary-alpha-10)'
+                            : 'var(--color-surface-overlay)',
+                        border: `1px solid ${selectedOpp?.id === opp.id ? 'var(--color-primary-alpha-30)' : 'var(--color-border-faint)'}`,
                         borderRadius: 12,
                         padding: '10px 12px',
                         cursor: 'pointer',
@@ -535,9 +537,9 @@ export default function HomeSearch() {
                               fontSize: 10,
                               padding: '2px 7px',
                               borderRadius: 99,
-                              background: 'rgba(224,123,42,0.1)',
-                              color: '#E07B2A',
-                              border: '1px solid rgba(224,123,42,0.2)',
+                              background: 'var(--color-primary-alpha-10)',
+                              color: 'var(--color-primary)',
+                              border: '1px solid var(--color-primary-alpha-20)',
                             }}
                           >
                             {prof}

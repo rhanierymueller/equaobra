@@ -4,15 +4,46 @@
   --color-primary: #E07B2A;
   --color-secondary: #3B3B3B;
   --color-surface: #F5F0EB;
+  --color-background: #0D0C0B;
+  --color-background-panel: #111009;
+  --color-text: #F5F0EB;
+  --color-text-muted: rgba(245, 240, 235, 0.4);
+  --color-text-faint: rgba(245, 240, 235, 0.25);
+  --color-success: #4CAF50;
+  --color-danger: #E53935;
+  --color-danger-light: #FF6B6B;
+  --color-star: #FFD166;
+  --color-info: #74B9FF;
+  --color-whatsapp: #25D366;
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-faint: rgba(255, 255, 255, 0.07);
+  --color-border-medium: rgba(255, 255, 255, 0.1);
+  --color-surface-overlay: rgba(255, 255, 255, 0.03);
+  --color-surface-elevated: rgba(26, 25, 22, 0.98);
+  --color-primary-alpha-10: rgba(224, 123, 42, 0.1);
+  --color-primary-alpha-15: rgba(224, 123, 42, 0.15);
+  --color-primary-alpha-20: rgba(224, 123, 42, 0.2);
+  --color-primary-alpha-30: rgba(224, 123, 42, 0.3);
+  --color-primary-alpha-50: rgba(224, 123, 42, 0.5);
+  --color-success-alpha-10: rgba(76, 175, 80, 0.1);
+  --color-success-alpha-20: rgba(76, 175, 80, 0.2);
+  --color-danger-alpha-08: rgba(229, 57, 53, 0.08);
+  --color-danger-alpha-15: rgba(229, 57, 53, 0.15);
+  --color-info-alpha-10: rgba(116, 185, 255, 0.1);
+  --color-whatsapp-alpha-10: rgba(37, 211, 102, 0.1);
+  --color-star-alpha-15: rgba(255, 209, 102, 0.15);
+  --color-text-dim: rgba(245, 240, 235, 0.3);
+  --color-text-secondary: rgba(245, 240, 235, 0.5);
+  --color-text-readable: rgba(245, 240, 235, 0.7);
 }
 
 html,
 body {
   margin: 0;
   padding: 0;
-  background: #0D0C0B;
-  color: #F5F0EB;
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-inter), Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -23,12 +54,19 @@ body {
   box-sizing: border-box;
 }
 
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px rgba(30, 28, 25, 1) inset !important;
-  -webkit-text-fill-color: #F5F0EB !important;
-  caret-color: #F5F0EB;
+  -webkit-text-fill-color: var(--color-text) !important;
+  caret-color: var(--color-text);
   transition: background-color 5000s ease-in-out 0s;
 }

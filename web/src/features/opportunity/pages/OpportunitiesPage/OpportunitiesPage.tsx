@@ -1,15 +1,17 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useOpportunities } from '../../hooks/useOpportunities'
 
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
 import type { User } from '@/src/types/user.types'
+import { formatDate } from '@/src/utils/date'
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -18,12 +20,6 @@ function timeAgo(iso: string): string {
   const h = Math.floor(m / 60)
   if (h < 24) return `${h}h atrás`
   return `${Math.floor(h / 24)}d atrás`
-}
-
-function formatDate(iso: string): string {
-  if (!iso) return ''
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
 }
 
 interface CardProps {
@@ -37,9 +33,9 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
   return (
     <div
       className="rounded-2xl overflow-hidden transition-all hover:border-opacity-20"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+      style={{ background: 'var(--color-surface-overlay)', border: '1px solid var(--color-border-medium)' }}
     >
-      <div style={{ height: 2, background: 'linear-gradient(to right, #E07B2A, transparent)' }} />
+      <div style={{ height: 2, background: 'linear-gradient(to right, var(--color-primary), transparent)' }} />
 
       <div className="p-5">
         <div className="flex items-start gap-3 mb-4">
@@ -48,9 +44,9 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
             style={{
               width: 44,
               height: 44,
-              background: 'rgba(224,123,42,0.15)',
-              color: '#E07B2A',
-              border: '1.5px solid rgba(224,123,42,0.3)',
+              background: 'var(--color-primary-alpha-15)',
+              color: 'var(--color-primary)',
+              border: '1.5px solid var(--color-primary-alpha-30)',
             }}
           >
             {initials}
@@ -60,23 +56,23 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
               {opp.companyName ?? opp.contractorName}
             </p>
             {opp.companyName && (
-              <p className="text-xs" style={{ color: 'rgba(245,240,235,0.4)' }}>
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                 {opp.contractorName}
               </p>
             )}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+              <span className="text-xs" style={{ color: 'var(--color-text-dim)' }}>
                 📍 {opp.obraLocation}
               </span>
-              <span style={{ color: 'rgba(255,255,255,0.12)' }}>·</span>
-              <span className="text-xs" style={{ color: 'rgba(245,240,235,0.25)' }}>
+              <span style={{ color: 'var(--color-border-subtle)' }}>·</span>
+              <span className="text-xs" style={{ color: 'var(--color-text-faint)' }}>
                 {timeAgo(opp.createdAt)}
               </span>
             </div>
           </div>
         </div>
 
-        <p className="text-sm mb-4 leading-relaxed" style={{ color: 'rgba(245,240,235,0.7)' }}>
+        <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--color-text-readable)' }}>
           {opp.obraDescription}
         </p>
 
@@ -84,7 +80,7 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
           <div className="flex gap-4 mb-4">
             {opp.obraStart && (
               <div>
-                <p className="text-xs mb-0.5" style={{ color: 'rgba(245,240,235,0.3)' }}>
+                <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-dim)' }}>
                   Início previsto
                 </p>
                 <p className="text-sm font-semibold text-white">{formatDate(opp.obraStart)}</p>
@@ -92,7 +88,7 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
             )}
             {opp.obraDuration && (
               <div>
-                <p className="text-xs mb-0.5" style={{ color: 'rgba(245,240,235,0.3)' }}>
+                <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-dim)' }}>
                   Duração
                 </p>
                 <p className="text-sm font-semibold text-white">{opp.obraDuration}</p>
@@ -105,7 +101,7 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
           <p
             className="text-xs mb-2 font-semibold"
             style={{
-              color: 'rgba(245,240,235,0.35)',
+              color: 'var(--color-text-dim)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -118,9 +114,9 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
                 key={p}
                 className="text-xs px-2.5 py-1 rounded-full font-medium"
                 style={{
-                  background: 'rgba(224,123,42,0.1)',
-                  color: '#E07B2A',
-                  border: '1px solid rgba(224,123,42,0.25)',
+                  background: 'var(--color-primary-alpha-10)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid var(--color-primary-alpha-20)',
                 }}
               >
                 {p}
@@ -134,9 +130,9 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
             href={`/contractor/${opp.contractorId}`}
             className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
             style={{
-              background: 'rgba(255,255,255,0.05)',
-              color: 'rgba(245,240,235,0.7)',
-              border: '1px solid rgba(255,255,255,0.09)',
+              background: 'var(--color-surface-overlay)',
+              color: 'var(--color-text-readable)',
+              border: '1px solid var(--color-border-faint)',
               textDecoration: 'none',
             }}
           >
@@ -146,7 +142,7 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
             <button
               onClick={() => onChat(opp)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90"
-              style={{ background: '#E07B2A', color: 'white', border: 'none', cursor: 'pointer' }}
+              style={{ background: 'var(--color-primary)', color: 'white', border: 'none', cursor: 'pointer' }}
             >
               <svg
                 width="14"
@@ -166,7 +162,7 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
             <a
               href="/auth"
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90"
-              style={{ background: '#E07B2A', color: 'white', textDecoration: 'none' }}
+              style={{ background: 'var(--color-primary)', color: 'white', textDecoration: 'none' }}
             >
               Entrar para demonstrar interesse
             </a>
@@ -179,9 +175,9 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
               className="flex items-center justify-center rounded-xl transition-all hover:opacity-80"
               style={{
                 width: 44,
-                background: 'rgba(37,211,102,0.1)',
-                border: '1px solid rgba(37,211,102,0.2)',
-                color: '#25D366',
+                background: 'var(--color-whatsapp-alpha-10)',
+                border: '1px solid var(--color-success-alpha-20)',
+                color: 'var(--color-whatsapp)',
               }}
               title="WhatsApp"
             >
@@ -199,17 +195,10 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
 
 export function OpportunitiesPage() {
   const router = useRouter()
+  const { user } = useCurrentUser()
   const { opportunities } = useOpportunities()
-  const [user, setUser] = useState<User | null>(null)
   const [filterProfession, setFilterProfession] = useState('')
   const [chatTarget, setChatTarget] = useState<{ opp: Opportunity } | null>(null)
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-  }, [])
 
   const filtered = filterProfession
     ? opportunities.filter((o) => o.lookingForProfessions.includes(filterProfession))
@@ -226,18 +215,20 @@ export function OpportunitiesPage() {
     }
   }
 
+  const isActiveFilter = (p: string) => filterProfession === p
+
   return (
-    <div style={{ background: '#0D0C0B', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
       <div
         style={{
           height: 3,
-          background: 'linear-gradient(to right, #E07B2A, #E07B2A44, transparent)',
+          background: 'linear-gradient(to right, var(--color-primary), transparent)',
         }}
       />
 
       <div
         className="flex items-center justify-between px-5 py-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <button
           onClick={() => router.push('/home')}
@@ -245,7 +236,7 @@ export function OpportunitiesPage() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(245,240,235,0.5)',
+            color: 'var(--color-text-secondary)',
             padding: 0,
             display: 'flex',
             alignItems: 'center',
@@ -258,21 +249,21 @@ export function OpportunitiesPage() {
           </svg>
           Voltar
         </button>
-        <span className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.25)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Oportunidades
         </span>
         <div style={{ width: 52 }} />
       </div>
 
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px 48px' }}>
-        <div className="py-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="py-6" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
           <h1
             className="font-bold text-white text-xl leading-tight"
             style={{ letterSpacing: '-0.02em' }}
           >
             Oportunidades de obra
           </h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(245,240,235,0.4)' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
             {filtered.length} {filtered.length === 1 ? 'obra disponível' : 'obras disponíveis'}
           </p>
 
@@ -280,8 +271,8 @@ export function OpportunitiesPage() {
             <div
               className="mt-4 px-4 py-3 rounded-xl flex items-center gap-3"
               style={{
-                background: 'rgba(224,123,42,0.07)',
-                border: '1px solid rgba(224,123,42,0.15)',
+                background: 'var(--color-primary-alpha-10)',
+                border: '1px solid var(--color-primary-alpha-15)',
               }}
             >
               <svg
@@ -289,7 +280,7 @@ export function OpportunitiesPage() {
                 height="14"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#E07B2A"
+                stroke="var(--color-primary)"
                 strokeWidth="2"
                 strokeLinecap="round"
               >
@@ -297,23 +288,24 @@ export function OpportunitiesPage() {
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
-              <p className="text-xs" style={{ color: 'rgba(245,240,235,0.6)' }}>
-                Clique em <strong style={{ color: '#E07B2A' }}>Demonstrar interesse</strong> para
+              <p className="text-xs" style={{ color: 'var(--color-text-readable)' }}>
+                Clique em{' '}
+                <strong style={{ color: 'var(--color-primary)' }}>Demonstrar interesse</strong> para
                 enviar uma mensagem direta ao contratante.
               </p>
             </div>
           )}
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 pt-4">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setFilterProfession('')}
               className="text-xs px-3 py-1.5 rounded-full font-medium transition-all"
               style={{
-                background: !filterProfession ? '#E07B2A' : 'rgba(255,255,255,0.05)',
-                color: !filterProfession ? 'white' : 'rgba(245,240,235,0.5)',
-                border: `1px solid ${!filterProfession ? '#E07B2A' : 'rgba(255,255,255,0.08)'}`,
+                background: !filterProfession ? 'var(--color-primary)' : 'var(--color-surface-overlay)',
+                color: !filterProfession ? 'white' : 'var(--color-text-secondary)',
+                border: `1px solid ${!filterProfession ? 'var(--color-primary)' : 'var(--color-border-medium)'}`,
                 cursor: 'pointer',
               }}
             >
@@ -324,12 +316,12 @@ export function OpportunitiesPage() {
             ).map((p) => (
               <button
                 key={p}
-                onClick={() => setFilterProfession(filterProfession === p ? '' : p)}
+                onClick={() => setFilterProfession(isActiveFilter(p) ? '' : p)}
                 className="text-xs px-3 py-1.5 rounded-full font-medium transition-all"
                 style={{
-                  background: filterProfession === p ? '#E07B2A' : 'rgba(255,255,255,0.05)',
-                  color: filterProfession === p ? 'white' : 'rgba(245,240,235,0.5)',
-                  border: `1px solid ${filterProfession === p ? '#E07B2A' : 'rgba(255,255,255,0.08)'}`,
+                  background: isActiveFilter(p) ? 'var(--color-primary)' : 'var(--color-surface-overlay)',
+                  color: isActiveFilter(p) ? 'white' : 'var(--color-text-secondary)',
+                  border: `1px solid ${isActiveFilter(p) ? 'var(--color-primary)' : 'var(--color-border-medium)'}`,
                   cursor: 'pointer',
                 }}
               >
@@ -343,12 +335,12 @@ export function OpportunitiesPage() {
           <div
             className="py-16 text-center rounded-2xl"
             style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px dashed rgba(255,255,255,0.07)',
+              background: 'var(--color-surface-overlay)',
+              border: '1px dashed var(--color-border-faint)',
             }}
           >
             <p className="text-sm font-semibold text-white mb-1">Nenhuma oportunidade encontrada</p>
-            <p className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+            <p className="text-xs" style={{ color: 'var(--color-text-dim)' }}>
               {filterProfession
                 ? `Nenhuma obra está buscando ${filterProfession} no momento`
                 : 'Nenhuma obra disponível no momento'}
@@ -358,9 +350,9 @@ export function OpportunitiesPage() {
                 onClick={() => setFilterProfession('')}
                 className="mt-4 text-xs px-4 py-2 rounded-xl"
                 style={{
-                  background: 'rgba(224,123,42,0.1)',
-                  color: '#E07B2A',
-                  border: '1px solid rgba(224,123,42,0.2)',
+                  background: 'var(--color-primary-alpha-10)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid var(--color-primary-alpha-20)',
                   cursor: 'pointer',
                 }}
               >
@@ -385,20 +377,20 @@ export function OpportunitiesPage() {
           <div
             className="mt-8 px-5 py-4 rounded-2xl flex items-center justify-between gap-4"
             style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              background: 'var(--color-surface-overlay)',
+              border: '1px solid var(--color-border-faint)',
             }}
           >
             <div>
               <p className="text-sm font-semibold text-white">Quer atrair profissionais?</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                 Publique sua obra no perfil e apareça aqui
               </p>
             </div>
             <button
               onClick={() => router.push('/profile')}
               className="text-sm font-bold px-4 py-2 rounded-xl shrink-0 transition-all hover:opacity-90"
-              style={{ background: '#E07B2A', color: 'white', border: 'none', cursor: 'pointer' }}
+              style={{ background: 'var(--color-primary)', color: 'white', border: 'none', cursor: 'pointer' }}
             >
               Publicar obra
             </button>

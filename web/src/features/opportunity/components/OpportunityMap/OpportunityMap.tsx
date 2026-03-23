@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 
 import 'leaflet/dist/leaflet.css'
 import type { Opportunity } from '@/src/types/opportunity.types'
+import { formatDate } from '@/src/utils/date'
 
 interface ScreenPos {
   x: number
@@ -142,12 +143,6 @@ function MapController({
   }, [selected, map, onScreenPos])
 
   return null
-}
-
-function formatDate(iso: string): string {
-  if (!iso) return ''
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
 }
 
 interface FloatingCardProps {

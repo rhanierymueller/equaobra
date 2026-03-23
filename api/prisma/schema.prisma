@@ -2,6 +2,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// MIGRAÇÃO PARA PRODUÇÃO — quando pronto para deploy:
+// 1. Altere provider para "postgresql"
+// 2. Atualize DATABASE_URL no .env para a URL do Supabase/Railway/Neon
+//    Exemplo: DATABASE_URL="postgresql://user:pass@host:5432/equaobra?schema=public"
+// 3. Execute: npx prisma migrate dev --name init
+// Obs: SQLite funciona bem para desenvolvimento local e testes
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")

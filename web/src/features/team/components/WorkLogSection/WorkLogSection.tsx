@@ -7,6 +7,7 @@ import { useWorkLogs } from '../../hooks/useWorkLogs'
 import { useNotifications } from '@/src/features/notifications/hooks/useNotifications'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Team } from '@/src/types/team.types'
+import { formatDate } from '@/src/utils/date'
 
 type ConfirmFn = (cfg: {
   title: string
@@ -48,13 +49,9 @@ function getDays(range: DateRange): string[] {
 function shortDay(iso: string) {
   return iso.split('-')[2]
 }
-function formatDate(iso: string) {
+function formatShortDate(iso: string) {
   const [, m, d] = iso.split('-')
   return `${d}/${m}`
-}
-function formatDateFull(iso: string) {
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
 }
 
 const WEEK_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -200,9 +197,9 @@ function BarChart({ days, series }: { days: string[]; series: ChartSeries[] }) {
             return (
               <span style={{ fontSize: 11 }}>
                 <span style={{ color: 'rgba(245,240,235,0.35)' }}>
-                  {formatDateFull(hoverDay)} —{' '}
+                  {formatDate(hoverDay)} —{' '}
                 </span>
-                <strong style={{ color: total > 0 ? '#E07B2A' : 'rgba(245,240,235,0.25)' }}>
+                <strong style={{ color: total > 0 ? 'var(--color-primary)' : 'var(--color-text-faint)' }}>
                   {total > 0 ? `${total}h` : 'sem registro'}
                 </strong>
               </span>
@@ -248,7 +245,7 @@ function StatCard({
               height: '100%',
               borderRadius: 99,
               width: `${Math.min(100, progress)}%`,
-              background: progress >= 100 ? '#4CAF50' : progress > 60 ? '#FFD166' : '#E07B2A',
+              background: progress >= 100 ? 'var(--color-success)' : progress > 60 ? 'var(--color-star)' : 'var(--color-primary)',
               transition: 'width 0.4s ease',
             }}
           />
@@ -324,7 +321,7 @@ export function WorkLogSection({
           team.name,
           currentUser.id,
           currentUser.name,
-          `O líder ${currentUser.name.split(' ')[0]} registrou ${h}h para você em ${formatDate(form.date)}.`,
+          `O líder ${currentUser.name.split(' ')[0]} registrou ${h}h para você em ${formatShortDate(form.date)}.`,
           { logDate: form.date, logHours: h },
         )
       }
@@ -332,7 +329,7 @@ export function WorkLogSection({
     }
     onRequestConfirm({
       title: 'Registrar horas?',
-      description: `${h}h em ${formatDate(form.date)}${form.description ? ` — "${form.description}"` : ''}${isLeader && targetId !== currentUser.id ? ` para ${targetName.split(' ')[0]}` : ''}.`,
+      description: `${h}h em ${formatShortDate(form.date)}${form.description ? ` — "${form.description}"` : ''}${isLeader && targetId !== currentUser.id ? ` para ${targetName.split(' ')[0]}` : ''}.`,
       confirmLabel: 'Registrar',
       variant: 'info',
       onConfirm: doAdd,
@@ -347,7 +344,7 @@ export function WorkLogSection({
   ) {
     onRequestConfirm({
       title: 'Excluir registro?',
-      description: `O registro de ${logHours}h do dia ${formatDate(logDate)} será removido permanentemente${logOwnerId !== currentUser.id ? ' e o membro será notificado' : ''}.`,
+      description: `O registro de ${logHours}h do dia ${formatShortDate(logDate)} será removido permanentemente${logOwnerId !== currentUser.id ? ' e o membro será notificado' : ''}.`,
       confirmLabel: 'Excluir',
       variant: 'danger',
       onConfirm: () => {
@@ -360,7 +357,7 @@ export function WorkLogSection({
             team.name,
             currentUser.id,
             currentUser.name,
-            `O líder removeu seu registro de ${logHours}h do dia ${formatDate(logDate)}.`,
+            `O líder removeu seu registro de ${logHours}h do dia ${formatShortDate(logDate)}.`,
             { logId, logDate, logHours },
           )
         }
@@ -377,7 +374,7 @@ export function WorkLogSection({
       team.name,
       currentUser.id,
       currentUser.name,
-      `${currentUser.name.split(' ')[0]} solicita excluir o registro de ${logHours}h do dia ${formatDate(logDate)}.`,
+      `${currentUser.name.split(' ')[0]} solicita excluir o registro de ${logHours}h do dia ${formatShortDate(logDate)}.`,
       { logId, logDate, logHours },
     )
   }
@@ -390,14 +387,14 @@ export function WorkLogSection({
         PROFESSION_COLORS[
           team.members.find((m) => m.professionalId === currentUser.id)
             ?.profession as keyof typeof PROFESSION_COLORS
-        ] ?? '#E07B2A'
+        ] ?? 'var(--color-primary)'
       return [{ memberId: currentUser.id, color, data }]
     }
     return team.members.map((m) => {
       const data: Record<string, number> = {}
       for (const l of getLogsForMember(m.professionalId))
         data[l.date] = (data[l.date] ?? 0) + l.hours
-      const color = PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? '#E07B2A'
+      const color = PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
       return { memberId: m.professionalId, color, data }
     })
   })()
@@ -422,7 +419,7 @@ export function WorkLogSection({
             height="13"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#E07B2A"
+            stroke="var(--color-primary)"
             strokeWidth="2.2"
             strokeLinecap="round"
           >
@@ -472,7 +469,7 @@ export function WorkLogSection({
                   className="flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all"
                   style={{
                     background: view === v ? 'rgba(255,255,255,0.1)' : 'transparent',
-                    color: view === v ? '#F5F0EB' : 'rgba(245,240,235,0.35)',
+                    color: view === v ? 'var(--color-text)' : 'rgba(245,240,235,0.35)',
                     border: 'none',
                     cursor: 'pointer',
                     boxShadow: view === v ? '0 1px 4px rgba(0,0,0,0.3)' : 'none',
@@ -488,7 +485,7 @@ export function WorkLogSection({
             <div className="flex flex-wrap gap-1.5 mb-3">
               {team.members.map((m) => {
                 const color =
-                  PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? '#E07B2A'
+                  PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
                 const total = getTotalHours(m.professionalId)
                 const sel = selectedMemberId === m.professionalId
                 return (
@@ -527,15 +524,15 @@ export function WorkLogSection({
             <StatCard
               label="Últimos 7 dias"
               value={`${weekHours}h`}
-              color={weekHours > 0 ? '#E07B2A' : undefined}
+              color={weekHours > 0 ? 'var(--color-primary)' : undefined}
             />
             <StatCard
               label="Total registrado"
               value={`${totalHours}h`}
-              color={totalHours > 0 ? '#FFD166' : undefined}
+              color={totalHours > 0 ? 'var(--color-star)' : undefined}
               progress={progressPct}
             />
-            <StatCard label="Meta da obra" value={`${goalHours}h`} color="#4CAF50" />
+            <StatCard label="Meta da obra" value={`${goalHours}h`} color="var(--color-success)" />
           </div>
 
           <div
@@ -567,9 +564,9 @@ export function WorkLogSection({
                       fontSize: 10,
                       padding: '2px 7px',
                       borderRadius: 6,
-                      background: dateRange === r ? '#E07B2A' : 'transparent',
+                      background: dateRange === r ? 'var(--color-primary)' : 'transparent',
                       color: dateRange === r ? 'white' : 'rgba(245,240,235,0.3)',
-                      border: `1px solid ${dateRange === r ? '#E07B2A' : 'rgba(255,255,255,0.08)'}`,
+                      border: `1px solid ${dateRange === r ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)'}`,
                       cursor: 'pointer',
                       fontWeight: dateRange === r ? 700 : 400,
                     }}
@@ -587,7 +584,7 @@ export function WorkLogSection({
               >
                 {team.members.map((m) => {
                   const color =
-                    PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? '#E07B2A'
+                    PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
                   return (
                     <div
                       key={m.professionalId}
@@ -643,7 +640,7 @@ export function WorkLogSection({
                   style={{
                     background: 'rgba(255,255,255,0.06)',
                     border: '1px solid rgba(255,255,255,0.09)',
-                    color: '#F5F0EB',
+                    color: 'var(--color-text)',
                     borderRadius: 8,
                     padding: '5px 8px',
                     fontSize: 11,
@@ -665,7 +662,7 @@ export function WorkLogSection({
                   style={{
                     background: 'rgba(255,255,255,0.06)',
                     border: '1px solid rgba(255,255,255,0.09)',
-                    color: '#F5F0EB',
+                    color: 'var(--color-text)',
                     borderRadius: 8,
                     padding: '5px 8px',
                     fontSize: 11,
@@ -693,7 +690,7 @@ export function WorkLogSection({
               <button
                 onClick={handleAdd}
                 style={{
-                  background: '#E07B2A',
+                  background: 'var(--color-primary)',
                   color: 'white',
                   border: 'none',
                   borderRadius: 8,
@@ -709,7 +706,7 @@ export function WorkLogSection({
               </button>
             </div>
             {formError && (
-              <p style={{ fontSize: 11, color: '#FF6B6B', marginTop: 6 }}>{formError}</p>
+              <p style={{ fontSize: 11, color: 'var(--color-danger-light)', marginTop: 6 }}>{formError}</p>
             )}
           </div>
 
@@ -745,14 +742,14 @@ export function WorkLogSection({
                         }}
                       >
                         <span
-                          style={{ fontSize: 12, fontWeight: 700, color: '#E07B2A', minWidth: 28 }}
+                          style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', minWidth: 28 }}
                         >
                           {log.hours}h
                         </span>
                         <span
                           style={{ fontSize: 10, color: 'rgba(245,240,235,0.3)', minWidth: 42 }}
                         >
-                          {formatDate(log.date)}
+                          {formatShortDate(log.date)}
                         </span>
                         <span
                           className="flex-1 truncate"
@@ -798,7 +795,7 @@ export function WorkLogSection({
                               background: requested
                                 ? 'rgba(76,175,80,0.1)'
                                 : 'rgba(255,255,255,0.05)',
-                              color: requested ? '#4CAF50' : 'rgba(245,240,235,0.3)',
+                              color: requested ? 'var(--color-success)' : 'rgba(245,240,235,0.3)',
                               border: `1px solid ${requested ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.07)'}`,
                               cursor: requested ? 'default' : 'pointer',
                             }}

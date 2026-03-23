@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { LandingCanvas } from './LandingCanvas'
 
 interface Feature {
-  icon: string
+  icon: ReactNode
   title: string
   desc: string
 }
@@ -18,17 +18,34 @@ interface Step {
 
 const FEATURES: Feature[] = [
   {
-    icon: '🛡️',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
     title: 'Profissionais Verificados',
     desc: 'Todos passam por validação de documentos e avaliações de obras anteriores antes de aparecerem na busca.',
   },
   {
-    icon: '💬',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
     title: 'Chat Integrado',
     desc: 'Converse diretamente com os candidatos antes de fechar. Rápido, sem intermediários e com histórico.',
   },
   {
-    icon: '📋',
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="9" y="2" width="6" height="4" rx="1" />
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+        <line x1="12" y1="11" x2="16" y2="11" />
+        <line x1="12" y1="15" x2="16" y2="15" />
+        <line x1="8" y1="11" x2="8.01" y2="11" />
+        <line x1="8" y1="15" x2="8.01" y2="15" />
+      </svg>
+    ),
     title: 'Gestão de Obras',
     desc: 'Organize múltiplas obras, acompanhe equipes ativas e veja o histórico completo de contratações.',
   },

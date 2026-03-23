@@ -4,6 +4,7 @@ jest.mock('react-leaflet', () => ({
   ),
   TileLayer: () => null,
   useMap: () => ({ flyTo: jest.fn(), on: jest.fn(), off: jest.fn() }),
+  useMapEvents: jest.fn(() => null),
 }))
 
 jest.mock('leaflet', () => ({
@@ -26,7 +27,12 @@ import { ProfessionalMap } from './ProfessionalMap'
 describe('ProfessionalMap', () => {
   it('renders the map container', () => {
     render(
-      <ProfessionalMap professionals={MOCK_PROFESSIONALS} selected={null} onSelect={jest.fn()} />,
+      <ProfessionalMap
+        professionals={MOCK_PROFESSIONALS}
+        selected={null}
+        onSelect={jest.fn()}
+        onDeselect={jest.fn()}
+      />,
     )
     expect(screen.getByTestId('map')).toBeInTheDocument()
   })

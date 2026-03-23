@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -8,14 +9,17 @@ import { useTeams } from '../../hooks/useTeams'
 
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Team, TeamMember } from '@/src/types/team.types'
-import type { User } from '@/src/types/user.types'
+import { formatDate } from '@/src/utils/date'
 
-function formatDate(iso: string): string {
-  if (!iso) return '—'
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
+interface DialogConfig {
+  title: string
+  description?: string
+  confirmLabel?: string
+  variant?: 'danger' | 'warning' | 'info'
+  onConfirm: () => void
 }
 
 function teamTotalCost(team: Team): { total: number | null; perMember: (number | null)[] } {
@@ -48,7 +52,7 @@ function MemberRow({
   onEditProfession,
   onChat,
 }: MemberRowProps) {
-  const color = PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? '#E07B2A'
+  const color = PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
   const [editing, setEditing] = useState(false)
   const [profValue, setProfValue] = useState(m.profession)
 
@@ -75,8 +79,8 @@ function MemberRow({
     <div
       className="rounded-xl overflow-hidden"
       style={{
-        background: m.isLeader ? 'rgba(224,123,42,0.06)' : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${m.isLeader ? 'rgba(224,123,42,0.22)' : 'rgba(255,255,255,0.07)'}`,
+        background: m.isLeader ? 'var(--color-primary-alpha-10)' : 'var(--color-surface-overlay)',
+        border: `1px solid ${m.isLeader ? 'rgba(224,123,42,0.22)' : 'var(--color-border-faint)'}`,
       }}
     >
       <div className="flex items-center gap-2.5 px-3 pt-2.5 pb-1">
@@ -87,7 +91,7 @@ function MemberRow({
             borderRadius: '50%',
             overflow: 'hidden',
             flexShrink: 0,
-            border: `2px solid ${m.isLeader ? '#E07B2A' : color + '55'}`,
+            border: `2px solid ${m.isLeader ? 'var(--color-primary)' : color + '55'}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -98,9 +102,11 @@ function MemberRow({
           }}
         >
           {m.avatarUrl ? (
-            <img
+            <Image
               src={m.avatarUrl}
               alt={m.name}
+              width={36}
+              height={36}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
@@ -113,7 +119,7 @@ function MemberRow({
             {m.isLeader && (
               <span
                 className="text-xs px-1.5 py-0.5 rounded font-bold shrink-0"
-                style={{ background: 'rgba(224,123,42,0.18)', color: '#E07B2A' }}
+                style={{ background: 'var(--color-primary-alpha-20)', color: 'var(--color-primary)' }}
               >
                 líder
               </span>
@@ -122,8 +128,8 @@ function MemberRow({
               <span
                 className="text-xs px-1.5 py-0.5 rounded font-medium shrink-0"
                 style={{
-                  background: 'rgba(116,185,255,0.1)',
-                  color: '#74B9FF',
+                  background: 'var(--color-info-alpha-10)',
+                  color: 'var(--color-info)',
                   border: '1px solid rgba(116,185,255,0.2)',
                 }}
               >
@@ -149,8 +155,8 @@ function MemberRow({
                 className="text-xs px-2 py-1 rounded-lg outline-none"
                 style={{
                   background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(224,123,42,0.4)',
-                  color: '#F5F0EB',
+                  border: '1px solid var(--color-primary-alpha-30)',
+                  color: 'var(--color-text)',
                   width: 120,
                 }}
               />
@@ -160,7 +166,7 @@ function MemberRow({
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#4CAF50',
+                  color: 'var(--color-success)',
                   fontSize: 13,
                 }}
               >
@@ -232,7 +238,7 @@ function MemberRow({
               style={{
                 ...BTN,
                 background: 'rgba(37,211,102,0.1)',
-                color: '#25D366',
+                color: 'var(--color-whatsapp)',
                 textDecoration: 'none',
               }}
               title="WhatsApp"
@@ -247,7 +253,7 @@ function MemberRow({
             <button
               onClick={onChat}
               title="Mensagem"
-              style={{ ...BTN, background: 'rgba(116,185,255,0.1)', color: '#74B9FF' }}
+              style={{ ...BTN, background: 'var(--color-info-alpha-10)', color: 'var(--color-info)' }}
             >
               <svg
                 width="15"
@@ -267,7 +273,7 @@ function MemberRow({
             <button
               onClick={onSetLeader}
               title="Definir como líder"
-              style={{ ...BTN, background: 'rgba(224,123,42,0.1)', color: '#E07B2A' }}
+              style={{ ...BTN, background: 'var(--color-primary-alpha-10)', color: 'var(--color-primary)' }}
             >
               <svg
                 width="14"
@@ -285,7 +291,7 @@ function MemberRow({
           <button
             onClick={onRemove}
             title="Remover"
-            style={{ ...BTN, background: 'rgba(229,57,53,0.08)', color: '#FF6B6B' }}
+            style={{ ...BTN, background: 'var(--color-danger-alpha-08)', color: 'var(--color-danger-light)' }}
           >
             <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
               <path
@@ -304,18 +310,11 @@ function MemberRow({
 
 export function TeamDetail({ id }: { id: string }) {
   const router = useRouter()
+  const { user } = useCurrentUser()
   const { teams, removeMember, setLeader, updateMemberProfession, deleteTeam } = useTeams()
   const [team, setTeam] = useState<Team | null>(null)
-  const [user, setUser] = useState<User | null>(null)
   const [chatTarget, setChatTarget] = useState<TeamMember | null>(null)
 
-  type DialogConfig = {
-    title: string
-    description?: string
-    confirmLabel?: string
-    variant?: 'danger' | 'warning' | 'info'
-    onConfirm: () => void
-  }
   const [dialog, setDialog] = useState<DialogConfig | null>(null)
 
   function confirm(cfg: DialogConfig) {
@@ -326,13 +325,6 @@ export function TeamDetail({ id }: { id: string }) {
   }
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-  }, [])
-
-  useEffect(() => {
     const found = teams.find((t) => t.id === id) ?? null
     setTeam(found)
   }, [teams, id])
@@ -341,13 +333,13 @@ export function TeamDetail({ id }: { id: string }) {
     return (
       <div
         className="h-screen flex flex-col items-center justify-center gap-3"
-        style={{ background: '#0D0C0B' }}
+        style={{ background: 'var(--color-background)' }}
       >
         <p className="text-white font-semibold">Equipe não encontrada</p>
         <button
           onClick={() => router.push('/profile')}
           style={{
-            color: '#E07B2A',
+            color: 'var(--color-primary)',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
@@ -379,11 +371,11 @@ export function TeamDetail({ id }: { id: string }) {
   }
 
   return (
-    <div style={{ background: '#0D0C0B', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
       <div
         style={{
           height: 3,
-          background: 'linear-gradient(to right, #E07B2A, #E07B2A44, transparent)',
+          background: 'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
         }}
       />
 
@@ -413,7 +405,7 @@ export function TeamDetail({ id }: { id: string }) {
         <button
           onClick={handleDelete}
           className="text-xs"
-          style={{ color: '#FF6B6B', background: 'none', border: 'none', cursor: 'pointer' }}
+          style={{ color: 'var(--color-danger-light)', background: 'none', border: 'none', cursor: 'pointer' }}
         >
           Excluir equipe
         </button>
@@ -432,8 +424,8 @@ export function TeamDetail({ id }: { id: string }) {
             <div
               className="rounded-2xl p-3"
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: 'var(--color-surface-overlay)',
+                border: '1px solid var(--color-border-faint)',
               }}
             >
               <p className="text-xs mb-1" style={{ color: 'rgba(245,240,235,0.35)' }}>
@@ -444,8 +436,8 @@ export function TeamDetail({ id }: { id: string }) {
             <div
               className="rounded-2xl p-3"
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: 'var(--color-surface-overlay)',
+                border: '1px solid var(--color-border-faint)',
               }}
             >
               <p className="text-xs mb-1" style={{ color: 'rgba(245,240,235,0.35)' }}>
@@ -461,8 +453,8 @@ export function TeamDetail({ id }: { id: string }) {
             <div
               className="rounded-2xl p-3"
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: 'var(--color-surface-overlay)',
+                border: '1px solid var(--color-border-faint)',
               }}
             >
               <p className="text-xs mb-1" style={{ color: 'rgba(245,240,235,0.35)' }}>
@@ -470,7 +462,7 @@ export function TeamDetail({ id }: { id: string }) {
               </p>
               <p
                 className="text-sm font-bold"
-                style={{ color: total != null ? '#FFD166' : 'rgba(245,240,235,0.5)' }}
+                style={{ color: total != null ? 'var(--color-star)' : 'rgba(245,240,235,0.5)' }}
               >
                 {total != null ? `R$ ${total.toLocaleString('pt-BR')}` : 'A combinar'}
               </p>
@@ -497,7 +489,7 @@ export function TeamDetail({ id }: { id: string }) {
                 className="flex items-center gap-1.5 text-xs"
                 style={{ color: 'rgba(245,240,235,0.35)' }}
               >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="#E07B2A" stroke="none">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="none">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
                 {leader.name.split(' ')[0]}

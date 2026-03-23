@@ -48,7 +48,7 @@ function Field({ label, value, placeholder, type = 'text', required, onChange }:
     <div className="flex flex-col gap-1">
       <label className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.55)' }}>
         {label}
-        {required && <span style={{ color: '#E07B2A' }}> *</span>}
+        {required && <span style={{ color: 'var(--color-primary)' }}> *</span>}
       </label>
       <input
         type={type}
@@ -59,7 +59,7 @@ function Field({ label, value, placeholder, type = 'text', required, onChange }:
         style={{
           background: 'rgba(255,255,255,0.05)',
           border: '1.5px solid rgba(255,255,255,0.08)',
-          color: '#F5F0EB',
+          color: 'var(--color-text)',
         }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = 'rgba(224,123,42,0.5)'
@@ -100,7 +100,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
               height="22"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#FF6B6B"
+              stroke="var(--color-danger-light)"
               strokeWidth="2"
               strokeLinecap="round"
             >
@@ -131,7 +131,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
     )
   }
 
-  const color = PROFESSION_COLORS[p.profession as keyof typeof PROFESSION_COLORS] ?? '#E07B2A'
+  const color = PROFESSION_COLORS[p.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
 
   const member = {
     professionalId: p.id,
@@ -154,7 +154,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
     setPendingAdd(null)
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     if (!form.name.trim()) {
       setError('Nome da equipe é obrigatório')
       return
@@ -173,7 +173,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
     }
     setError('')
     setLoading(true)
-    setTimeout(() => {
+    try {
       const ownerMember = {
         professionalId: user.id,
         name: user.name,
@@ -188,7 +188,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
           .toUpperCase(),
         hourlyRate: user.hourlyRate,
       }
-      createTeam(
+      await createTeam(
         {
           name: form.name.trim(),
           obraLocation: form.obraLocation.trim(),
@@ -200,9 +200,12 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
         user.id,
         ownerMember,
       )
-      setLoading(false)
       setSuccessTeam(form.name.trim())
-    }, 400)
+    } catch {
+      setError('Erro ao criar equipe. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -337,7 +340,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#4CAF50',
+                    color: 'var(--color-success)',
                     fontSize: 22,
                   }}
                 >
@@ -415,7 +418,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                           {alreadyIn ? (
                             <span
                               className="text-xs font-medium px-2.5 py-1 rounded-lg"
-                              style={{ color: '#4CAF50', background: 'rgba(76,175,80,0.1)' }}
+                              style={{ color: 'var(--color-success)', background: 'var(--color-success-alpha-10)' }}
                             >
                               Adicionado ✓
                             </span>
@@ -483,7 +486,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                 />
 
                 {error && (
-                  <p className="text-xs" style={{ color: '#FF6B6B' }}>
+                  <p className="text-xs" style={{ color: 'var(--color-danger-light)' }}>
                     {error}
                   </p>
                 )}

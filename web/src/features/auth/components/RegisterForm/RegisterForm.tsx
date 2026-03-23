@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react'
 
 import type { UseRegisterFormReturn } from '../../hooks/useAuthForm'
-
 import type { RegisterCredentials } from '@/src/types/auth.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { UserRole } from '@/src/types/user.types'
@@ -278,7 +277,7 @@ function AddressBlock({
 
 interface RegisterFormProps {
   form: UseRegisterFormReturn
-  onSuccess: () => void
+  onSuccess: (credentials: RegisterCredentials) => void
   isLoading?: boolean
 }
 

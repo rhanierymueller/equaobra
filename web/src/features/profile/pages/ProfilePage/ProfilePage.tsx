@@ -11,12 +11,7 @@ import { api } from '@/src/services/api'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { User, UserRole, Address } from '@/src/types/user.types'
 import { lookupCep, formatCep } from '@/src/utils/cep'
-
-function formatDate(iso: string): string {
-  if (!iso) return '—'
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
-}
+import { formatDate } from '@/src/utils/date'
 
 function saveUser(user: User) {
   localStorage.setItem('equobra_user', JSON.stringify(user))
@@ -204,7 +199,15 @@ export function ProfilePage() {
       )
     : []
 
-  if (!loaded) return null
+  if (!loaded) return (
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px 0' }} className="flex flex-col gap-4">
+        <div className="rounded-2xl animate-pulse" style={{ height: 200, background: 'var(--color-border-subtle)' }} />
+        <div className="rounded animate-pulse" style={{ height: 16, width: '60%', background: 'var(--color-border-subtle)' }} />
+        <div className="rounded animate-pulse" style={{ height: 16, width: '40%', background: 'var(--color-border-subtle)' }} />
+      </div>
+    </div>
+  )
 
   if (!user) {
     return (

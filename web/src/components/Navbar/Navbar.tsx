@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { NotificationPanel } from '@/src/features/notifications/components/NotificationPanel/NotificationPanel'
 import { useNotifications } from '@/src/features/notifications/hooks/useNotifications'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { User } from '@/src/types/user.types'
 
 function BellButton({ userId }: { userId: string }) {
@@ -38,7 +39,7 @@ function BellButton({ userId }: { userId: string }) {
           height="16"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={open ? '#E07B2A' : 'rgba(245,240,235,0.6)'}
+          stroke={open ? 'var(--color-primary)' : 'rgba(245,240,235,0.6)'}
           strokeWidth="1.8"
           strokeLinecap="round"
         >
@@ -51,7 +52,7 @@ function BellButton({ userId }: { userId: string }) {
               position: 'absolute',
               top: -4,
               right: -4,
-              background: '#E07B2A',
+              background: 'var(--color-primary)',
               color: 'white',
               borderRadius: '50%',
               width: 18,
@@ -61,7 +62,7 @@ function BellButton({ userId }: { userId: string }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '2px solid #0D0C0B',
+              border: '2px solid var(--color-background)',
             }}
           >
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -113,7 +114,7 @@ function UserAvatar({ user }: { user: User }) {
           className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
           style={{
             background: 'rgba(224,123,42,0.2)',
-            color: '#E07B2A',
+            color: 'var(--color-primary)',
             border: '1.5px solid rgba(224,123,42,0.4)',
           }}
         >
@@ -253,7 +254,7 @@ function UserAvatar({ user }: { user: User }) {
             onClick={handleLogout}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-all hover:opacity-80"
             style={{
-              color: '#FF6B6B',
+              color: 'var(--color-danger-light)',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
@@ -313,7 +314,7 @@ function SearchBar({ value, onChange }: SearchBarProps) {
         style={{
           background: 'rgba(255,255,255,0.06)',
           border: '1px solid rgba(255,255,255,0.08)',
-          color: '#F5F0EB',
+          color: 'var(--color-text)',
         }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = 'rgba(224,123,42,0.5)'
@@ -334,14 +335,8 @@ interface NavbarProps {
 }
 
 export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-  }, [])
+  const { user } = useCurrentUser()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <header
@@ -351,6 +346,7 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         height: 60,
+        position: 'relative',
       }}
     >
       <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -364,13 +360,13 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
         <span className="flex items-baseline gap-0">
           <span
             className="font-black text-xl tracking-[0.15em] uppercase"
-            style={{ color: '#E07B2A' }}
+            style={{ color: 'var(--color-primary)' }}
           >
             Equa
           </span>
           <span
             className="font-black text-xl tracking-[0.15em] uppercase"
-            style={{ color: '#F5F0EB' }}
+            style={{ color: 'var(--color-text)' }}
           >
             Obra
           </span>
@@ -404,6 +400,21 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
           </Link>
         )}
 
+        {user?.role === 'profissional' && (
+          <Link
+            href="/oportunidades"
+            className="hidden md:flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl transition-all duration-150"
+            style={{ color: 'rgba(245,240,235,0.6)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" />
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+              <circle cx="12" cy="14" r="2" />
+            </svg>
+            Oportunidades
+          </Link>
+        )}
+
         {user?.role === 'contratante' && (
           <Link
             href="/my-contractor"
@@ -426,21 +437,14 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
           </Link>
         )}
 
+        {/* MVP: "Minhas vagas" oculto da nav superior — ainda acessível via menu do avatar
         {user?.role === 'profissional' && (
           <Link
             href="/my-applications"
             className="hidden md:flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl transition-all duration-150"
             style={{ color: 'rgba(245,240,235,0.6)' }}
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
               <line x1="16" y1="13" x2="8" y2="13" />
@@ -449,8 +453,36 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
             Minhas vagas
           </Link>
         )}
+        */}
 
+        {user && (
+          <button
+            type="button"
+            className="md:hidden flex items-center justify-center rounded-xl"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            style={{ width: 38, height: 38, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+            aria-label="Menu"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,235,0.6)" strokeWidth="2" strokeLinecap="round">
+              {mobileMenuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
+        )}
+
+        {/* MVP: notificações ocultas temporariamente — reativar após validação do ciclo principal
         {user && <BellButton userId={user.id} />}
+        */}
 
         {user ? (
           <UserAvatar user={user} />
@@ -458,12 +490,33 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
           <Link
             href="/auth"
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-150"
-            style={{ background: '#E07B2A', color: 'white' }}
+            style={{ background: 'var(--color-primary)', color: 'white' }}
           >
             Entrar
           </Link>
         )}
       </div>
+      {/* Menu mobile */}
+      {user && mobileMenuOpen && (
+        <div
+          className="md:hidden absolute top-full left-0 right-0 z-50 py-2"
+          style={{
+            background: 'rgba(13,12,11,0.98)',
+            backdropFilter: 'blur(16px)',
+            borderBottom: '1px solid rgba(255,255,255,0.07)',
+          }}
+        >
+          <Link href="/home" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Buscar profissionais</Link>
+          <Link href="/my-teams" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Minhas equipes</Link>
+          {user.role === 'profissional' && (
+            <Link href="/oportunidades" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Oportunidades</Link>
+          )}
+          {user.role === 'contratante' && (
+            <Link href="/my-contractor" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Minha construtora</Link>
+          )}
+          <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Meu perfil</Link>
+        </div>
+      )}
     </header>
   )
 }

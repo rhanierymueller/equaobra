@@ -4,8 +4,15 @@ import { FilterBar } from './FilterBar'
 
 import type { ProfessionalFilters } from '@/src/types/professional.types'
 
+jest.mock('@/src/components/LocalityAutocomplete', () => ({
+  LocalityAutocomplete: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <input aria-label="Localidade" value={value} onChange={(e) => onChange(e.target.value)} />
+  ),
+}))
+
 const defaultFilters: ProfessionalFilters = {
   search: '',
+  locality: '',
   professions: [],
   minRating: 0,
   maxDistanceKm: 50,
@@ -24,11 +31,12 @@ describe('FilterBar', () => {
         onSetMinRating={noop}
         onSetMaxDistance={noop}
         onSetAvailableOnly={noop}
+        onSetLocality={noop}
         onReset={noop}
       />,
     )
     expect(screen.getByText(/avaliação mínima/i)).toBeInTheDocument()
-    expect(screen.getByText(/especialidade/i)).toBeInTheDocument()
+    expect(screen.getByText('Especialidade')).toBeInTheDocument()
     expect(screen.getByText(/distância máxima/i)).toBeInTheDocument()
   })
 
@@ -41,6 +49,7 @@ describe('FilterBar', () => {
         onSetMinRating={noop}
         onSetMaxDistance={noop}
         onSetAvailableOnly={noop}
+        onSetLocality={noop}
         onReset={noop}
       />,
     )
@@ -57,6 +66,7 @@ describe('FilterBar', () => {
         onSetMinRating={noop}
         onSetMaxDistance={noop}
         onSetAvailableOnly={handler}
+        onSetLocality={noop}
         onReset={noop}
       />,
     )

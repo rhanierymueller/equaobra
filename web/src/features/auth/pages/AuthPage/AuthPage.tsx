@@ -24,7 +24,7 @@ function BackgroundGrid() {
     >
       <defs>
         <pattern id="auth-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(224,123,42,0.06)" strokeWidth="1" />
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--color-primary-alpha-10)" strokeWidth="1" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#auth-grid)" />
@@ -46,7 +46,7 @@ function CitylineSilhouette() {
              L1000,30 L1000,55 L1040,55 L1040,75 L1080,75 L1080,40 L1120,40
              L1120,25 L1160,25 L1160,45 L1200,45 L1200,65 L1240,65 L1240,55
              L1280,55 L1280,80 L1320,80 L1320,60 L1360,60 L1360,80 L1440,80 L1440,120 Z"
-          fill="rgba(224,123,42,0.07)"
+          fill="var(--color-primary-alpha-10)"
         />
         <path
           d="M0,120 L0,90 L80,90 L80,70 L120,70 L120,55 L150,55 L150,70
@@ -59,7 +59,7 @@ function CitylineSilhouette() {
              L1100,70 L1140,70 L1140,55 L1180,55 L1180,70 L1220,70 L1220,80
              L1260,80 L1260,90 L1300,90 L1300,80 L1360,80 L1360,90 L1440,90
              L1440,120 Z"
-          fill="rgba(224,123,42,0.04)"
+          fill="var(--color-surface-overlay)"
         />
       </svg>
     </div>
@@ -81,8 +81,8 @@ function Tabs({ mode, onChange }: TabsProps) {
           onClick={() => onChange(m)}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
           style={{
-            background: mode === m ? '#E07B2A' : 'transparent',
-            color: mode === m ? '#ffffff' : 'rgba(245,240,235,0.5)',
+            background: mode === m ? 'var(--color-primary)' : 'transparent',
+            color: mode === m ? 'white' : 'var(--color-text-secondary)',
           }}
         >
           {m === 'login' ? 'Entrar' : 'Criar conta'}
@@ -180,7 +180,7 @@ export default function AuthPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ background: '#0D0C0B' }}
+      style={{ background: 'var(--color-background)' }}
     >
       <BackgroundGrid />
       <CitylineSilhouette />
@@ -191,7 +191,7 @@ export default function AuthPage() {
           width: 600,
           height: 600,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(224,123,42,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, var(--color-primary-alpha-10) 0%, transparent 70%)',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -60%)',
@@ -201,23 +201,23 @@ export default function AuthPage() {
       <div
         className="relative z-10 w-full max-w-md mx-4 rounded-2xl p-8"
         style={{
-          background: 'rgba(26,25,22,0.95)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--color-surface-elevated)',
+          border: '1px solid var(--color-border-medium)',
           backdropFilter: 'blur(20px)',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(224,123,42,0.1)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px var(--color-primary-alpha-10)',
         }}
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-baseline gap-0">
             <span
               className="font-black text-3xl tracking-[0.15em] uppercase"
-              style={{ color: '#E07B2A' }}
+              style={{ color: 'var(--color-primary)' }}
             >
               Equa
             </span>
             <span
               className="font-black text-3xl tracking-[0.15em] uppercase"
-              style={{ color: '#F5F0EB' }}
+              style={{ color: 'var(--color-text)' }}
             >
               Obra
             </span>
@@ -233,9 +233,9 @@ export default function AuthPage() {
           <div
             className="mb-4 px-3 py-2.5 rounded-xl text-xs"
             style={{
-              background: 'rgba(229,57,53,0.1)',
-              border: '1px solid rgba(229,57,53,0.25)',
-              color: '#E53935',
+              background: 'var(--color-danger-alpha-08)',
+              border: '1px solid var(--color-danger-alpha-15)',
+              color: 'var(--color-danger)',
             }}
           >
             {authError}
@@ -252,13 +252,13 @@ export default function AuthPage() {
           {mode === 'login' ? (
             <LoginForm
               form={loginForm}
-              onSuccess={() => handleLoginSuccess(loginForm.values)}
+              onSuccess={handleLoginSuccess}
               isLoading={isAuthenticating}
             />
           ) : (
             <RegisterForm
               form={registerForm}
-              onSuccess={() => handleRegisterSuccess(registerForm.values)}
+              onSuccess={handleRegisterSuccess}
               isLoading={isAuthenticating}
             />
           )}
@@ -270,7 +270,7 @@ export default function AuthPage() {
             type="button"
             onClick={() => handleModeChange(mode === 'login' ? 'register' : 'login')}
             className="font-semibold transition-colors"
-            style={{ color: '#E07B2A' }}
+            style={{ color: 'var(--color-primary)' }}
           >
             {mode === 'login' ? 'Criar conta' : 'Entrar'}
           </button>

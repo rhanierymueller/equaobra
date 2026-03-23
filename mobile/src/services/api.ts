@@ -1,6 +1,8 @@
 import * as SecureStore from 'expo-secure-store'
 
-export const API_BASE = 'http://192.168.1.4:3001'
+// TODO: set EXPO_PUBLIC_API_URL in .env for production deploy
+// Example: EXPO_PUBLIC_API_URL=https://api.equaobra.com.br
+export const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001'
 
 const TOKEN_KEY = 'equobra_token'
 

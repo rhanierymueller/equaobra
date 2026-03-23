@@ -20,6 +20,23 @@ export async function updateUser(id: string, data: UpdateUserInput) {
   return sanitizeUser(updated)
 }
 
+export async function addReview(targetId: string, rating: number) {
+  const user = await prisma.user.findUnique({ where: { id: targetId } })
+  if (!user) return null
+
+  // Média ponderada incremental: (ratingAtual * total + novoRating) / (total + 1)
+  const newCount = user.reviewCount + 1
+  const newRating = parseFloat(
+    ((user.rating * user.reviewCount + rating) / newCount).toFixed(2),
+  )
+
+  const updated = await prisma.user.update({
+    where: { id: targetId },
+    data: { rating: newRating, reviewCount: newCount },
+  })
+  return sanitizeUser(updated)
+}
+
 export async function listProfessionals(filters: {
   search?: string
   city?: string

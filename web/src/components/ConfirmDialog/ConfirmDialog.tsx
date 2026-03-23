@@ -15,24 +15,24 @@ const VARIANT_STYLES: Record<
   }
 > = {
   danger: {
-    iconBg: 'rgba(229,57,53,0.1)',
-    iconColor: '#FF6B6B',
-    confirmBg: 'rgba(229,57,53,0.15)',
-    confirmColor: '#FF6B6B',
+    iconBg: 'var(--color-danger-alpha-08)',
+    iconColor: 'var(--color-danger-light)',
+    confirmBg: 'var(--color-danger-alpha-15)',
+    confirmColor: 'var(--color-danger-light)',
     confirmBorder: 'rgba(229,57,53,0.3)',
   },
   warning: {
     iconBg: 'rgba(255,209,102,0.1)',
-    iconColor: '#FFD166',
-    confirmBg: 'rgba(224,123,42,0.15)',
-    confirmColor: '#E07B2A',
-    confirmBorder: 'rgba(224,123,42,0.35)',
+    iconColor: 'var(--color-star)',
+    confirmBg: 'var(--color-primary-alpha-15)',
+    confirmColor: 'var(--color-primary)',
+    confirmBorder: 'var(--color-primary-alpha-30)',
   },
   info: {
-    iconBg: 'rgba(116,185,255,0.1)',
-    iconColor: '#74B9FF',
+    iconBg: 'var(--color-info-alpha-10)',
+    iconColor: 'var(--color-info)',
     confirmBg: 'rgba(116,185,255,0.12)',
-    confirmColor: '#74B9FF',
+    confirmColor: 'var(--color-info)',
     confirmBorder: 'rgba(116,185,255,0.3)',
   },
 }

@@ -26,7 +26,7 @@ function NotifIcon({ type }: { type: AppNotification['type'] }) {
           height="15"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#FFD166"
+          stroke="var(--color-star)"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -57,7 +57,7 @@ function NotifIcon({ type }: { type: AppNotification['type'] }) {
           height="15"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#FF6B6B"
+          stroke="var(--color-danger-light)"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -86,7 +86,7 @@ function NotifIcon({ type }: { type: AppNotification['type'] }) {
         height="15"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#74B9FF"
+        stroke="var(--color-info)"
         strokeWidth="2"
         strokeLinecap="round"
       >
@@ -152,7 +152,7 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
           {unreadCount > 0 && (
             <span
               className="text-xs px-1.5 py-0.5 rounded-full font-bold"
-              style={{ background: '#E07B2A', color: 'white' }}
+              style={{ background: 'var(--color-primary)', color: 'white' }}
             >
               {unreadCount}
             </span>
@@ -222,7 +222,7 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
                         width: 6,
                         height: 6,
                         borderRadius: '50%',
-                        background: '#E07B2A',
+                        background: 'var(--color-primary)',
                         flexShrink: 0,
                       }}
                     />

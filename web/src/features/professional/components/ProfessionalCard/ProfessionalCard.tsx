@@ -7,10 +7,10 @@ import { PROFESSION_COLORS } from '@/src/types/professional.types'
 function StarRating({ rating }: { rating: number }) {
   return (
     <span className="flex items-center gap-1">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="#FFD166">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="var(--color-star)">
         <polygon points="6,0.5 7.5,4.5 11.5,4.5 8.5,7 9.5,11 6,8.5 2.5,11 3.5,7 0.5,4.5 4.5,4.5" />
       </svg>
-      <span className="text-xs font-semibold" style={{ color: '#FFD166' }}>
+      <span className="text-xs font-semibold" style={{ color: 'var(--color-star)' }}>
         {rating.toFixed(1)}
       </span>
     </span>
@@ -31,8 +31,8 @@ export function ProfessionalCard({
       onClick={() => onClick?.(p)}
       className="w-full text-left transition-all duration-200"
       style={{
-        background: selected ? 'rgba(224,123,42,0.1)' : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${selected ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.07)'}`,
+        background: selected ? 'var(--color-primary-alpha-10)' : 'var(--color-surface-overlay)',
+        border: `1px solid ${selected ? 'var(--color-primary-alpha-50)' : 'var(--color-border-faint)'}`,
         borderRadius: 16,
         padding: compact ? '12px 14px' : '16px',
         cursor: 'pointer',
@@ -77,13 +77,13 @@ export function ProfessionalCard({
                 </span>
                 {p.available ? (
                   <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-xs" style={{ color: '#4CAF50' }}>
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--color-success)' }} />
+                    <span className="text-xs" style={{ color: 'var(--color-success)' }}>
                       Disponível
                     </span>
                   </span>
                 ) : (
-                  <span className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
+                  <span className="text-xs" style={{ color: 'var(--color-text-dim)' }}>
                     Ocupado
                   </span>
                 )}
@@ -91,7 +91,7 @@ export function ProfessionalCard({
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
               <StarRating rating={p.rating} />
-              <span className="text-xs" style={{ color: 'rgba(245,240,235,0.4)' }}>
+              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                 {p.reviewCount} avaliações
               </span>
             </div>
@@ -101,7 +101,7 @@ export function ProfessionalCard({
             <>
               <p
                 className="text-xs mt-2 leading-relaxed line-clamp-2"
-                style={{ color: 'rgba(245,240,235,0.5)' }}
+                style={{ color: 'var(--color-text-secondary)' }}
               >
                 {p.bio}
               </p>
@@ -109,7 +109,7 @@ export function ProfessionalCard({
                 <div className="flex items-center gap-3">
                   <span
                     className="flex items-center gap-1 text-xs"
-                    style={{ color: 'rgba(245,240,235,0.45)' }}
+                    style={{ color: 'var(--color-text-secondary)' }}
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                       <path
@@ -121,7 +121,7 @@ export function ProfessionalCard({
                     </svg>
                     {p.distanceKm} km · {p.location.neighborhood}
                   </span>
-                  <span className="text-xs" style={{ color: 'rgba(245,240,235,0.35)' }}>
+                  <span className="text-xs" style={{ color: 'var(--color-text-dim)' }}>
                     {p.completedJobs} obras
                   </span>
                 </div>
@@ -132,8 +132,8 @@ export function ProfessionalCard({
                       key={tag}
                       className="text-xs px-1.5 py-0.5 rounded"
                       style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        color: 'rgba(245,240,235,0.4)',
+                        background: 'var(--color-border-subtle)',
+                        color: 'var(--color-text-muted)',
                       }}
                     >
                       {tag}

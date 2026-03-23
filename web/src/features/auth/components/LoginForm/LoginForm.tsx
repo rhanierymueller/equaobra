@@ -1,6 +1,7 @@
 'use client'
 
 import type { UseLoginFormReturn } from '../../hooks/useAuthForm'
+import type { LoginCredentials } from '@/src/types/auth.types'
 
 interface FieldProps {
   id: string
@@ -70,7 +71,7 @@ function Field({
 
 interface LoginFormProps {
   form: UseLoginFormReturn
-  onSuccess: () => void
+  onSuccess: (credentials: LoginCredentials) => void
   isLoading?: boolean
 }
 
