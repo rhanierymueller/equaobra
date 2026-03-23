@@ -10,7 +10,13 @@ interface ContractorHeaderProps {
   onChat: () => void
 }
 
-export function ContractorHeader({ displayName, avatarInitials, isMe, opp, onChat }: ContractorHeaderProps) {
+export function ContractorHeader({
+  displayName,
+  avatarInitials,
+  isMe,
+  opp,
+  onChat,
+}: ContractorHeaderProps) {
   return (
     <div className="py-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="flex items-start gap-4">
@@ -35,7 +41,10 @@ export function ContractorHeader({ displayName, avatarInitials, isMe, opp, onCha
         </div>
 
         <div className="flex-1 min-w-0 pt-0.5">
-          <h1 className="font-bold text-white text-xl leading-tight mb-1" style={{ letterSpacing: '-0.02em' }}>
+          <h1
+            className="font-bold text-white text-xl leading-tight mb-1"
+            style={{ letterSpacing: '-0.02em' }}
+          >
             {displayName}
           </h1>
           {opp?.companyName && (
@@ -55,7 +64,10 @@ export function ContractorHeader({ displayName, avatarInitials, isMe, opp, onCha
               Contratante
             </span>
             {opp?.obraLocation && (
-              <span className="text-xs flex items-center gap-1" style={{ color: 'var(--color-text-muted)' }}>
+              <span
+                className="text-xs flex items-center gap-1"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
                 <svg width="10" height="10" viewBox="0 0 13 13" fill="none">
                   <path
                     d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
@@ -87,9 +99,23 @@ export function ContractorHeader({ displayName, avatarInitials, isMe, opp, onCha
           <button
             onClick={onChat}
             className="flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm flex-1 transition-opacity hover:opacity-85"
-            style={{ background: 'var(--color-primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+            style={{
+              background: 'var(--color-primary)',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             Demonstrar interesse

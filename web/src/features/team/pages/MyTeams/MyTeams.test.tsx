@@ -26,9 +26,11 @@ describe('MyTeams', () => {
   })
 
   it('renders empty state when user has no teams', () => {
-    jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(
-      JSON.stringify({ id: 'u1', name: 'Test', email: 't@t.com', role: 'contratante' }),
-    )
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockReturnValue(
+        JSON.stringify({ id: 'u1', name: 'Test', email: 't@t.com', role: 'contratante' }),
+      )
     render(<MyTeams />)
     expect(screen.getByText(/nenhuma equipe criada/i)).toBeInTheDocument()
   })

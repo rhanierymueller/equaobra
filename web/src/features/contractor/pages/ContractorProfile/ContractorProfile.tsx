@@ -13,7 +13,6 @@ export function ContractorProfile({ id }: { id: string }) {
   const router = useRouter()
   const {
     user,
-    loaded,
     isMe,
     opp,
     displayName,
@@ -26,30 +25,23 @@ export function ContractorProfile({ id }: { id: string }) {
     openChatWithCandidate,
   } = useContractorProfile(id)
 
-  if (!loaded) return (
-    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
-      <div style={{ height: 3, background: 'var(--color-primary-alpha-20)' }} />
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '20px 20px 0' }}>
-        <div className="py-6 flex items-start gap-4">
-          <div className="rounded-xl animate-pulse shrink-0" style={{ width: 72, height: 72, background: 'var(--color-border-subtle)' }} />
-          <div className="flex-1 flex flex-col gap-2 pt-1">
-            <div className="rounded animate-pulse" style={{ height: 20, width: '55%', background: 'var(--color-border-subtle)' }} />
-            <div className="rounded animate-pulse" style={{ height: 14, width: '35%', background: 'var(--color-border-subtle)' }} />
-            <div className="rounded-full animate-pulse" style={{ height: 20, width: 90, background: 'var(--color-border-subtle)' }} />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
   if (!opp && !isMe) {
     return (
-      <div className="h-screen flex items-center justify-center" style={{ background: 'var(--color-background)' }}>
+      <div
+        className="h-screen flex items-center justify-center"
+        style={{ background: 'var(--color-background)' }}
+      >
         <div className="text-center">
           <p className="text-white font-semibold mb-3">Contratante não encontrado</p>
           <button
             onClick={() => router.back()}
-            style={{ color: 'var(--color-primary)', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{
+              color: 'var(--color-primary)',
+              fontSize: 14,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+            }}
           >
             ← Voltar
           </button>
@@ -60,13 +52,28 @@ export function ContractorProfile({ id }: { id: string }) {
 
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
-      <div style={{ height: 3, background: 'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)' }} />
+      <div
+        style={{
+          height: 3,
+          background:
+            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
+        }}
+      />
 
-      <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div
+        className="flex items-center justify-between px-5 py-3"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+      >
         <button
           onClick={() => router.back()}
           className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-60"
-          style={{ color: 'var(--color-text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          style={{
+            color: 'var(--color-text-secondary)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -89,7 +96,10 @@ export function ContractorProfile({ id }: { id: string }) {
         />
 
         {opp && (
-          <div className="flex items-center py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 0 }}>
+          <div
+            className="flex items-center py-4"
+            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 0 }}
+          >
             {[
               { value: opp.lookingForProfessions.length, label: 'vagas abertas' },
               { value: opp.obraStart ? formatDate(opp.obraStart) : '—', label: 'início previsto' },
@@ -98,10 +108,14 @@ export function ContractorProfile({ id }: { id: string }) {
               <div
                 key={stat.label}
                 className="flex flex-col items-center flex-1"
-                style={{ borderRight: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}
+                style={{
+                  borderRight: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                }}
               >
                 <span className="font-bold text-base text-white">{stat.value}</span>
-                <span className="text-xs mt-0.5" style={{ color: 'var(--color-text-dim)' }}>{stat.label}</span>
+                <span className="text-xs mt-0.5" style={{ color: 'var(--color-text-dim)' }}>
+                  {stat.label}
+                </span>
               </div>
             ))}
           </div>
@@ -136,25 +150,51 @@ export function ContractorProfile({ id }: { id: string }) {
             <div className="py-5 pb-12">
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center gap-2.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,235,0.25)" strokeWidth="1.8" strokeLinecap="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="rgba(245,240,235,0.25)"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  >
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                     <polyline points="22,6 12,13 2,6" />
                   </svg>
-                  <span className="text-sm" style={{ color: 'rgba(245,240,235,0.45)' }}>{opp.contactEmail}</span>
+                  <span className="text-sm" style={{ color: 'rgba(245,240,235,0.45)' }}>
+                    {opp.contactEmail}
+                  </span>
                 </div>
                 {opp.contactPhone && (
                   <div className="flex items-center gap-2.5">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,235,0.25)" strokeWidth="1.8" strokeLinecap="round">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="rgba(245,240,235,0.25)"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    >
                       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                     </svg>
-                    <span className="text-sm" style={{ color: 'rgba(245,240,235,0.45)' }}>{opp.contactPhone}</span>
+                    <span className="text-sm" style={{ color: 'rgba(245,240,235,0.45)' }}>
+                      {opp.contactPhone}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center gap-2.5">
                   <svg width="14" height="14" viewBox="0 0 13 13" fill="none">
-                    <path d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z" stroke="rgba(245,240,235,0.25)" strokeWidth="1.3" />
+                    <path
+                      d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
+                      stroke="rgba(245,240,235,0.25)"
+                      strokeWidth="1.3"
+                    />
                   </svg>
-                  <span className="text-sm" style={{ color: 'rgba(245,240,235,0.45)' }}>{opp.obraLocation}</span>
+                  <span className="text-sm" style={{ color: 'rgba(245,240,235,0.45)' }}>
+                    {opp.obraLocation}
+                  </span>
                 </div>
               </div>
             </div>

@@ -20,7 +20,9 @@ describe('MyApplications', () => {
   it('renders empty state when user has no applications', () => {
     jest
       .spyOn(Storage.prototype, 'getItem')
-      .mockReturnValue(JSON.stringify({ id: 'u1', name: 'Test', email: 't@t.com', role: 'profissional' }))
+      .mockReturnValue(
+        JSON.stringify({ id: 'u1', name: 'Test', email: 't@t.com', role: 'profissional' }),
+      )
     render(<MyApplications />)
     expect(screen.getByText(/nenhuma candidatura ainda/i)).toBeInTheDocument()
   })

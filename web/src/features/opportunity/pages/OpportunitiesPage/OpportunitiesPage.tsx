@@ -33,9 +33,17 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
   return (
     <div
       className="rounded-2xl overflow-hidden transition-all hover:border-opacity-20"
-      style={{ background: 'var(--color-surface-overlay)', border: '1px solid var(--color-border-medium)' }}
+      style={{
+        background: 'var(--color-surface-overlay)',
+        border: '1px solid var(--color-border-medium)',
+      }}
     >
-      <div style={{ height: 2, background: 'linear-gradient(to right, var(--color-primary), transparent)' }} />
+      <div
+        style={{
+          height: 2,
+          background: 'linear-gradient(to right, var(--color-primary), transparent)',
+        }}
+      />
 
       <div className="p-5">
         <div className="flex items-start gap-3 mb-4">
@@ -142,7 +150,12 @@ function OpportunityCard({ opp, currentUser, onChat }: CardProps) {
             <button
               onClick={() => onChat(opp)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90"
-              style={{ background: 'var(--color-primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+              style={{
+                background: 'var(--color-primary)',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer',
+              }}
             >
               <svg
                 width="14"
@@ -255,15 +268,29 @@ export function OpportunitiesPage() {
         <div style={{ width: 52 }} />
       </div>
 
-      <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px 48px' }}>
-        <div className="py-6" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
-          <h1
-            className="font-bold text-white text-xl leading-tight"
-            style={{ letterSpacing: '-0.02em' }}
+      <div
+        style={{
+          background: 'linear-gradient(180deg, var(--color-primary-alpha-10) 0%, transparent 100%)',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: '32px 24px 28px',
+        }}
+      >
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: 'var(--color-primary)' }}
           >
-            Oportunidades de obra
+            Para profissionais
+          </p>
+          <h1
+            className="font-bold text-white"
+            style={{ fontSize: 36, lineHeight: 1, letterSpacing: '-0.03em', marginBottom: 10 }}
+          >
+            Oportunidades
+            <br />
+            de obra
           </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             {filtered.length} {filtered.length === 1 ? 'obra disponível' : 'obras disponíveis'}
           </p>
 
@@ -296,14 +323,18 @@ export function OpportunitiesPage() {
             </div>
           )}
         </div>
+      </div>
 
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px 48px' }}>
         <div className="mb-6 pt-4">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setFilterProfession('')}
               className="text-xs px-3 py-1.5 rounded-full font-medium transition-all"
               style={{
-                background: !filterProfession ? 'var(--color-primary)' : 'var(--color-surface-overlay)',
+                background: !filterProfession
+                  ? 'var(--color-primary)'
+                  : 'var(--color-surface-overlay)',
                 color: !filterProfession ? 'white' : 'var(--color-text-secondary)',
                 border: `1px solid ${!filterProfession ? 'var(--color-primary)' : 'var(--color-border-medium)'}`,
                 cursor: 'pointer',
@@ -319,7 +350,9 @@ export function OpportunitiesPage() {
                 onClick={() => setFilterProfession(isActiveFilter(p) ? '' : p)}
                 className="text-xs px-3 py-1.5 rounded-full font-medium transition-all"
                 style={{
-                  background: isActiveFilter(p) ? 'var(--color-primary)' : 'var(--color-surface-overlay)',
+                  background: isActiveFilter(p)
+                    ? 'var(--color-primary)'
+                    : 'var(--color-surface-overlay)',
                   color: isActiveFilter(p) ? 'white' : 'var(--color-text-secondary)',
                   border: `1px solid ${isActiveFilter(p) ? 'var(--color-primary)' : 'var(--color-border-medium)'}`,
                   cursor: 'pointer',
@@ -390,7 +423,12 @@ export function OpportunitiesPage() {
             <button
               onClick={() => router.push('/profile')}
               className="text-sm font-bold px-4 py-2 rounded-xl shrink-0 transition-all hover:opacity-90"
-              style={{ background: 'var(--color-primary)', color: 'white', border: 'none', cursor: 'pointer' }}
+              style={{
+                background: 'var(--color-primary)',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer',
+              }}
             >
               Publicar obra
             </button>

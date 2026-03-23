@@ -77,7 +77,10 @@ export function ProfessionalCard({
                 </span>
                 {p.available ? (
                   <span className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'var(--color-success)' }} />
+                    <span
+                      className="w-1.5 h-1.5 rounded-full animate-pulse"
+                      style={{ background: 'var(--color-success)' }}
+                    />
                     <span className="text-xs" style={{ color: 'var(--color-success)' }}>
                       Disponível
                     </span>

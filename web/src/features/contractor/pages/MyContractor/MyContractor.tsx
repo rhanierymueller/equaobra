@@ -9,10 +9,10 @@ import { LocalityAutocomplete } from '@/src/components/LocalityAutocomplete/Loca
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
-import type { User } from '@/src/types/user.types'
 
 const ACCENT = '#E07B2A'
 
@@ -20,16 +20,27 @@ function SectionCard({ title, children }: { title: string; children: React.React
   return (
     <div
       className="rounded-2xl overflow-hidden mb-4"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+      style={{
+        background: 'var(--color-surface-overlay)',
+        border: '1px solid var(--color-border-faint)',
+      }}
     >
       <div
-        className="px-5 py-3 flex items-center gap-2.5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        className="px-5 py-4 flex items-center gap-3"
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <div
-          style={{ width: 3, height: 14, borderRadius: 99, background: ACCENT, flexShrink: 0 }}
+          style={{
+            width: 3,
+            height: 16,
+            borderRadius: 99,
+            background: 'var(--color-primary)',
+            flexShrink: 0,
+          }}
         />
-        <h3 className="text-sm font-bold text-white">{title}</h3>
+        <h3 className="font-bold text-white" style={{ fontSize: 15 }}>
+          {title}
+        </h3>
       </div>
       <div className="px-5 py-4">{children}</div>
     </div>
@@ -38,7 +49,10 @@ function SectionCard({ title, children }: { title: string; children: React.React
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block text-xs font-medium mb-1.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
+    <label
+      className="block text-xs font-medium mb-1.5"
+      style={{ color: 'var(--color-text-muted)' }}
+    >
       {children}
     </label>
   )
@@ -50,9 +64,9 @@ function InputEl({ style, ...props }: React.InputHTMLAttributes<HTMLInputElement
       {...props}
       style={{
         width: '100%',
-        background: 'rgba(255,255,255,0.06)',
-        border: '1px solid rgba(255,255,255,0.09)',
-        color: '#F5F0EB',
+        background: 'var(--color-surface-input)',
+        border: '1px solid var(--color-border-faint)',
+        color: 'var(--color-text)',
         borderRadius: 10,
         padding: '9px 12px',
         fontSize: 13,
@@ -238,7 +252,7 @@ function OppForm({
             resize: 'none',
             background: 'rgba(255,255,255,0.06)',
             border: '1px solid rgba(255,255,255,0.09)',
-            color: '#F5F0EB',
+            color: 'var(--color-text)',
             borderRadius: 10,
             padding: '9px 12px',
             fontSize: 13,
@@ -832,8 +846,7 @@ export function MyContractor() {
   const router = useRouter()
   const { publish, updateOpportunity, deleteOpportunity, getContractorOpportunities } =
     useOpportunities()
-  const [user, setUser] = useState<User | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const { user } = useCurrentUser()
   const [myVagas, setMyVagas] = useState<Opportunity[]>([])
   const [editingOpp, setEditingOpp] = useState<Opportunity | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
@@ -843,14 +856,6 @@ export function MyContractor() {
     'professionalId' | 'name' | 'avatarInitials' | 'avatarUrl' | 'profession'
   > | null>(null)
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-    setLoaded(true)
-  }, [])
-
   function refreshVagas(userId: string) {
     setMyVagas(getContractorOpportunities(userId))
   }
@@ -859,19 +864,17 @@ export function MyContractor() {
     if (user) refreshVagas(user.id)
   }, [user])
 
-  if (!loaded) return null
-
   if (!user || (user.role !== 'contratante' && !user.roles?.includes('contratante'))) {
     return (
       <div
         className="h-screen flex flex-col items-center justify-center gap-4"
-        style={{ background: '#0D0C0B' }}
+        style={{ background: 'var(--color-background)' }}
       >
         <p className="text-white font-semibold">Área exclusiva para contratantes</p>
         <Link
           href="/auth"
           className="px-5 py-2.5 rounded-xl text-sm font-bold text-white"
-          style={{ background: ACCENT }}
+          style={{ background: 'var(--color-primary)' }}
         >
           Entrar
         </Link>
@@ -922,17 +925,18 @@ export function MyContractor() {
   }
 
   return (
-    <div style={{ background: '#0D0C0B', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
       <div
         style={{
           height: 3,
-          background: `linear-gradient(to right, ${ACCENT}, ${ACCENT}44, transparent)`,
+          background:
+            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
         }}
       />
 
       <div
         className="flex items-center justify-between px-5 py-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <button
           onClick={() => router.push('/home')}
@@ -940,7 +944,7 @@ export function MyContractor() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(245,240,235,0.5)',
+            color: 'var(--color-text-secondary)',
             padding: 0,
             display: 'flex',
             alignItems: 'center',
@@ -953,74 +957,68 @@ export function MyContractor() {
           </svg>
           Voltar
         </button>
-        <span className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.25)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Minha construtora
         </span>
         <div style={{ width: 40 }} />
       </div>
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
-        <div
-          className="py-6 flex items-center gap-4"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-        >
-          <div
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: 16,
-              flexShrink: 0,
-              background: `${ACCENT}22`,
-              color: ACCENT,
-              fontWeight: 800,
-              fontSize: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: `2px solid ${ACCENT}55`,
-            }}
+      {/* Hero header */}
+      <div
+        style={{
+          background: 'linear-gradient(180deg, var(--color-primary-alpha-10) 0%, transparent 100%)',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: '32px 24px 28px',
+        }}
+      >
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: 'var(--color-primary)' }}
           >
-            {initials}
-          </div>
-          <div className="min-w-0">
-            <h1
-              className="font-bold text-white text-xl leading-tight truncate"
-              style={{ letterSpacing: '-0.02em' }}
+            Minha construtora
+          </p>
+          <h1
+            className="font-bold text-white"
+            style={{ fontSize: 36, lineHeight: 1, letterSpacing: '-0.03em', marginBottom: 10 }}
+          >
+            {displayName}
+          </h1>
+          {user.companyName && (
+            <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+              {user.name}
+            </p>
+          )}
+          <div className="flex items-center gap-2 mt-1.5">
+            <span
+              className="text-xs font-semibold px-2.5 py-1 rounded-lg"
+              style={{
+                background: 'var(--color-primary-alpha-15)',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary-alpha-30)',
+              }}
             >
-              {displayName}
-            </h1>
-            {user.companyName && (
-              <p className="text-sm mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
-                {user.name}
-              </p>
-            )}
-            <div className="flex items-center gap-2 mt-1.5">
-              <span
-                className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                style={{
-                  background: `${ACCENT}1a`,
-                  color: ACCENT,
-                  border: `1px solid ${ACCENT}33`,
-                }}
-              >
-                Contratante
-              </span>
-              <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium"
-                style={{
-                  background: hasActiveVaga ? 'rgba(76,175,80,0.1)' : 'rgba(255,255,255,0.04)',
-                  color: hasActiveVaga ? '#4CAF50' : 'rgba(245,240,235,0.3)',
-                  border: `1px solid ${hasActiveVaga ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.07)'}`,
-                }}
-              >
-                {myVagas.length > 0
-                  ? `${myVagas.filter((v) => v.active).length} vaga${myVagas.filter((v) => v.active).length !== 1 ? 's' : ''} ativa${myVagas.filter((v) => v.active).length !== 1 ? 's' : ''}`
-                  : 'Sem vagas'}
-              </span>
-            </div>
+              Contratante
+            </span>
+            <span
+              className="text-xs px-2 py-1 rounded-lg font-medium"
+              style={{
+                background: hasActiveVaga
+                  ? 'var(--color-success-alpha-10)'
+                  : 'var(--color-surface-overlay)',
+                color: hasActiveVaga ? 'var(--color-success)' : 'var(--color-text-faint)',
+                border: `1px solid ${hasActiveVaga ? 'var(--color-success-alpha-20)' : 'var(--color-border-medium)'}`,
+              }}
+            >
+              {myVagas.length > 0
+                ? `${myVagas.filter((v) => v.active).length} vaga${myVagas.filter((v) => v.active).length !== 1 ? 's' : ''} ativa${myVagas.filter((v) => v.active).length !== 1 ? 's' : ''}`
+                : 'Sem vagas'}
+            </span>
           </div>
         </div>
+      </div>
 
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
         <div className="pt-5">
           {savedMsg && (
             <div

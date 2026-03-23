@@ -21,18 +21,29 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div
       className="rounded-2xl overflow-hidden mb-4"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+      style={{
+        background: 'var(--color-surface-overlay)',
+        border: '1px solid var(--color-border-faint)',
+      }}
     >
       <div
-        className="px-5 py-3 flex items-center gap-2.5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        className="px-5 py-4 flex items-center gap-3"
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <div
-          style={{ width: 3, height: 14, borderRadius: 99, background: '#E07B2A', flexShrink: 0 }}
+          style={{
+            width: 3,
+            height: 16,
+            borderRadius: 99,
+            background: 'var(--color-primary)',
+            flexShrink: 0,
+          }}
         />
-        <h3 className="text-sm font-bold text-white">{title}</h3>
+        <h3 className="font-bold text-white" style={{ fontSize: 15 }}>
+          {title}
+        </h3>
       </div>
-      <div className="px-5 py-4">{children}</div>
+      <div className="px-5 py-5">{children}</div>
     </div>
   )
 }
@@ -42,7 +53,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="mb-4 last:mb-0">
       <label
         className="block text-xs font-medium mb-1.5"
-        style={{ color: 'rgba(245,240,235,0.4)' }}
+        style={{ color: 'var(--color-text-muted)' }}
       >
         {label}
       </label>
@@ -65,7 +76,7 @@ function InputField({
         width: '100%',
         background: isFocused ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
         border: `1px solid ${isFocused ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.09)'}`,
-        color: '#F5F0EB',
+        color: 'var(--color-text)',
         borderRadius: 10,
         padding: '9px 12px',
         fontSize: 13,
@@ -199,27 +210,40 @@ export function ProfilePage() {
       )
     : []
 
-  if (!loaded) return (
-    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px 0' }} className="flex flex-col gap-4">
-        <div className="rounded-2xl animate-pulse" style={{ height: 200, background: 'var(--color-border-subtle)' }} />
-        <div className="rounded animate-pulse" style={{ height: 16, width: '60%', background: 'var(--color-border-subtle)' }} />
-        <div className="rounded animate-pulse" style={{ height: 16, width: '40%', background: 'var(--color-border-subtle)' }} />
+  if (!loaded)
+    return (
+      <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
+        <div
+          style={{ maxWidth: 640, margin: '0 auto', padding: '40px 20px 0' }}
+          className="flex flex-col gap-4"
+        >
+          <div
+            className="rounded-2xl animate-pulse"
+            style={{ height: 200, background: 'var(--color-border-subtle)' }}
+          />
+          <div
+            className="rounded animate-pulse"
+            style={{ height: 16, width: '60%', background: 'var(--color-border-subtle)' }}
+          />
+          <div
+            className="rounded animate-pulse"
+            style={{ height: 16, width: '40%', background: 'var(--color-border-subtle)' }}
+          />
+        </div>
       </div>
-    </div>
-  )
+    )
 
   if (!user) {
     return (
       <div
         className="h-screen flex flex-col items-center justify-center gap-4"
-        style={{ background: '#0D0C0B' }}
+        style={{ background: 'var(--color-background)' }}
       >
         <p className="text-white font-semibold">Você precisa estar logado</p>
         <Link
           href="/auth"
           className="px-5 py-2.5 rounded-xl text-sm font-bold text-white"
-          style={{ background: '#E07B2A' }}
+          style={{ background: 'var(--color-primary)' }}
         >
           Entrar
         </Link>
@@ -485,17 +509,18 @@ export function ProfilePage() {
   }
 
   return (
-    <div style={{ background: '#0D0C0B', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
       <div
         style={{
           height: 3,
-          background: 'linear-gradient(to right, #E07B2A, #E07B2A44, transparent)',
+          background:
+            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
         }}
       />
 
       <div
         className="flex items-center justify-between px-5 py-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <button
           onClick={() => router.push('/home')}
@@ -503,7 +528,7 @@ export function ProfilePage() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(245,240,235,0.5)',
+            color: 'var(--color-text-secondary)',
             padding: 0,
             display: 'flex',
             alignItems: 'center',
@@ -516,104 +541,111 @@ export function ProfilePage() {
           </svg>
           Voltar
         </button>
-        <span className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.25)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Meu perfil
         </span>
         <div style={{ width: 40 }} />
       </div>
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
-        <div
-          className="py-6 flex items-center gap-4"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-        >
-          <div
-            className="rounded-full flex items-center justify-center font-bold text-xl shrink-0"
-            style={{
-              width: 64,
-              height: 64,
-              background: 'rgba(224,123,42,0.15)',
-              color: '#E07B2A',
-              border: '2px solid rgba(224,123,42,0.45)',
-              boxShadow: '0 0 0 4px rgba(224,123,42,0.08), 0 4px 20px rgba(224,123,42,0.12)',
-            }}
+      {/* Hero header */}
+      <div
+        style={{
+          background: 'linear-gradient(180deg, var(--color-primary-alpha-10) 0%, transparent 100%)',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: '32px 24px 28px',
+        }}
+      >
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: 'var(--color-primary)' }}
           >
-            {initials}
+            Meu perfil
+          </p>
+          <h1
+            className="font-bold text-white"
+            style={{ fontSize: 36, lineHeight: 1, letterSpacing: '-0.03em', marginBottom: 10 }}
+          >
+            {displayName}
+          </h1>
+          <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+            {user.email}
+          </p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {isPro && (
+              <span
+                className="text-xs font-semibold px-2.5 py-1 rounded-lg"
+                style={{
+                  background: 'var(--color-primary-alpha-15)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid var(--color-primary-alpha-30)',
+                }}
+              >
+                Profissional
+              </span>
+            )}
+            {isCont && (
+              <span
+                className="text-xs font-semibold px-2.5 py-1 rounded-lg"
+                style={{
+                  background: 'var(--color-success-alpha-10)',
+                  color: 'var(--color-success)',
+                  border: '1px solid var(--color-success-alpha-20)',
+                }}
+              >
+                Contratante
+              </span>
+            )}
+            {isPro && user.showHourlyRate !== false && user.hourlyRate && (
+              <span
+                className="text-xs px-2.5 py-1 rounded-lg font-semibold"
+                style={{
+                  background: 'var(--color-star-alpha-15)',
+                  color: 'var(--color-star)',
+                  border: '1px solid rgba(255,209,102,0.2)',
+                }}
+              >
+                R$ {user.hourlyRate}/h
+              </span>
+            )}
+            {user.address?.city && (
+              <span
+                className="text-xs px-2.5 py-1 rounded-lg font-medium"
+                style={{
+                  background: 'var(--color-surface-overlay)',
+                  color: 'var(--color-text-secondary)',
+                  border: '1px solid var(--color-border-medium)',
+                }}
+              >
+                {user.address.city}, {user.address.state}
+              </span>
+            )}
           </div>
-          <div className="flex-1 min-w-0">
-            <h1
-              className="font-bold text-white text-xl leading-tight"
-              style={{ letterSpacing: '-0.02em' }}
-            >
-              {displayName}
-            </h1>
-            <p className="text-sm mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
-              {user.email}
-            </p>
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              {isPro && (
-                <span
-                  className="text-xs px-2.5 py-0.5 rounded-full font-medium"
-                  style={{
-                    background: 'rgba(224,123,42,0.12)',
-                    color: '#E07B2A',
-                    border: '1px solid rgba(224,123,42,0.25)',
-                  }}
-                >
-                  Profissional
-                </span>
-              )}
-              {isCont && (
-                <span
-                  className="text-xs px-2.5 py-0.5 rounded-full font-medium"
-                  style={{
-                    background: 'rgba(76,175,80,0.12)',
-                    color: '#66BB6A',
-                    border: '1px solid rgba(76,175,80,0.25)',
-                  }}
-                >
-                  Contratante
-                </span>
-              )}
-              {isPro && user.showHourlyRate !== false && user.hourlyRate && (
-                <span
-                  className="text-xs px-2.5 py-0.5 rounded-full font-medium"
-                  style={{
-                    background: 'rgba(255,209,102,0.1)',
-                    color: '#FFD166',
-                    border: '1px solid rgba(255,209,102,0.2)',
-                  }}
-                >
-                  R$ {user.hourlyRate}/h
-                </span>
-              )}
-              {user.address?.city && (
-                <span
-                  className="text-xs px-2.5 py-0.5 rounded-full font-medium"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    color: 'rgba(245,240,235,0.5)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  {user.address.city}, {user.address.state}
-                </span>
-              )}
+          <div className="flex items-center gap-6 mt-5">
+            <div>
+              <p
+                className="font-bold text-white"
+                style={{ fontSize: 20, lineHeight: 1, letterSpacing: '-0.02em' }}
+              >
+                {myTeams.length}
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                equipe{myTeams.length !== 1 ? 's' : ''}
+              </p>
             </div>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="text-xs" style={{ color: 'rgba(245,240,235,0.28)' }}>
+            <div style={{ width: 1, height: 28, background: 'var(--color-border-medium)' }} />
+            <div>
+              <p className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
                 {user.createdAt
-                  ? `Desde ${formatDate(user.createdAt.slice(0, 10))}`
+                  ? `Membro desde ${formatDate(user.createdAt.slice(0, 10))}`
                   : 'Novo membro'}
-              </span>
-              <span style={{ color: 'rgba(245,240,235,0.12)' }}>·</span>
-              <span className="text-xs" style={{ color: 'rgba(245,240,235,0.28)' }}>
-                {myTeams.length} {myTeams.length === 1 ? 'equipe' : 'equipes'}
-              </span>
+              </p>
             </div>
           </div>
         </div>
+      </div>
 
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
         <div className="pt-5">
           <Section title="Dados pessoais">
             <Field label="Nome completo">
@@ -645,7 +677,7 @@ export function ProfilePage() {
                       className="flex-1 p-3 rounded-xl text-left transition-all relative"
                       style={{
                         background: sel ? 'rgba(224,123,42,0.15)' : 'rgba(255,255,255,0.04)',
-                        color: sel ? '#E07B2A' : 'rgba(245,240,235,0.4)',
+                        color: sel ? 'var(--color-primary)' : 'rgba(245,240,235,0.4)',
                         border: `1px solid ${sel ? 'rgba(224,123,42,0.4)' : 'rgba(255,255,255,0.07)'}`,
                         cursor: 'pointer',
                       }}
@@ -659,8 +691,8 @@ export function ProfilePage() {
                           height: 14,
                           borderRadius: '50%',
                           flexShrink: 0,
-                          background: sel ? '#E07B2A' : 'rgba(255,255,255,0.08)',
-                          border: `1.5px solid ${sel ? '#E07B2A' : 'rgba(255,255,255,0.15)'}`,
+                          background: sel ? 'var(--color-primary)' : 'rgba(255,255,255,0.08)',
+                          border: `1.5px solid ${sel ? 'var(--color-primary)' : 'rgba(255,255,255,0.15)'}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -771,7 +803,7 @@ export function ProfilePage() {
                       className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full"
                       style={{
                         background: 'rgba(224,123,42,0.12)',
-                        color: '#E07B2A',
+                        color: 'var(--color-primary)',
                         border: '1px solid rgba(224,123,42,0.25)',
                       }}
                     >
@@ -819,7 +851,7 @@ export function ProfilePage() {
                       padding: '9px 14px',
                       borderRadius: 10,
                       background: 'rgba(224,123,42,0.15)',
-                      color: '#E07B2A',
+                      color: 'var(--color-primary)',
                       border: '1px solid rgba(224,123,42,0.3)',
                       cursor: 'pointer',
                       fontSize: 13,
@@ -849,7 +881,7 @@ export function ProfilePage() {
                       cursor: 'pointer',
                       position: 'relative',
                       flexShrink: 0,
-                      background: showRate ? '#E07B2A' : 'rgba(255,255,255,0.1)',
+                      background: showRate ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)',
                       transition: 'background 0.2s',
                     }}
                   >
@@ -900,7 +932,7 @@ export function ProfilePage() {
                     width: 3,
                     height: 12,
                     borderRadius: 99,
-                    background: '#E07B2A',
+                    background: 'var(--color-primary)',
                     flexShrink: 0,
                   }}
                 />
@@ -929,14 +961,14 @@ export function ProfilePage() {
                     {cepLoading && (
                       <span
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                        style={{ color: '#E07B2A' }}
+                        style={{ color: 'var(--color-primary)' }}
                       >
                         ...
                       </span>
                     )}
                   </div>
                   {cepError && (
-                    <p className="text-xs mt-0.5" style={{ color: '#FF6B6B' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-danger-light)' }}>
                       {cepError}
                     </p>
                   )}
@@ -1025,7 +1057,7 @@ export function ProfilePage() {
                       width: 3,
                       height: 12,
                       borderRadius: 99,
-                      background: '#66BB6A',
+                      background: 'var(--color-success)',
                       flexShrink: 0,
                     }}
                   />
@@ -1054,14 +1086,14 @@ export function ProfilePage() {
                       {companyCepLoading && (
                         <span
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                          style={{ color: '#E07B2A' }}
+                          style={{ color: 'var(--color-primary)' }}
                         >
                           ...
                         </span>
                       )}
                     </div>
                     {companyCepError && (
-                      <p className="text-xs mt-0.5" style={{ color: '#FF6B6B' }}>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--color-danger-light)' }}>
                         {companyCepError}
                       </p>
                     )}
@@ -1144,18 +1176,19 @@ export function ProfilePage() {
             )}
 
             {saveError && (
-              <p className="text-xs mb-3" style={{ color: '#FF6B6B' }}>
+              <p className="text-xs mb-3" style={{ color: 'var(--color-danger-light)' }}>
                 {saveError}
               </p>
             )}
             <button
               onClick={() => setShowSaveConfirm(true)}
-              className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
+              className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90"
               style={{
-                background: 'rgba(224,123,42,0.1)',
-                color: '#E07B2A',
-                border: '1px solid rgba(224,123,42,0.25)',
+                background: 'var(--color-primary)',
+                color: '#fff',
+                border: 'none',
                 cursor: 'pointer',
+                letterSpacing: '-0.01em',
               }}
             >
               {saveMsg || 'Salvar alterações'}
@@ -1191,12 +1224,12 @@ export function ProfilePage() {
               />
             </Field>
             {pwError && (
-              <p className="text-xs mb-3" style={{ color: '#FF6B6B' }}>
+              <p className="text-xs mb-3" style={{ color: 'var(--color-danger-light)' }}>
                 {pwError}
               </p>
             )}
             {pwSuccess && (
-              <p className="text-xs mb-3" style={{ color: '#4CAF50' }}>
+              <p className="text-xs mb-3" style={{ color: 'var(--color-success)' }}>
                 Senha alterada com sucesso!
               </p>
             )}
@@ -1204,9 +1237,9 @@ export function ProfilePage() {
               onClick={handleChangePassword}
               className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
               style={{
-                background: 'rgba(224,123,42,0.1)',
-                color: '#E07B2A',
-                border: '1px solid rgba(224,123,42,0.25)',
+                background: 'var(--color-primary-alpha-15)',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary-alpha-30)',
                 cursor: 'pointer',
               }}
             >
@@ -1237,7 +1270,7 @@ export function ProfilePage() {
                     cursor: 'pointer',
                     position: 'relative',
                     flexShrink: 0,
-                    background: oppActive ? '#E07B2A' : 'rgba(255,255,255,0.1)',
+                    background: oppActive ? 'var(--color-primary)' : 'rgba(255,255,255,0.1)',
                     transition: 'background 0.2s',
                   }}
                 >
@@ -1269,7 +1302,7 @@ export function ProfilePage() {
                       resize: 'none',
                       background: 'rgba(255,255,255,0.06)',
                       border: '1px solid rgba(255,255,255,0.09)',
-                      color: '#F5F0EB',
+                      color: 'var(--color-text)',
                       borderRadius: 10,
                       padding: '9px 12px',
                       fontSize: 13,
@@ -1317,7 +1350,7 @@ export function ProfilePage() {
                         className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full"
                         style={{
                           background: 'rgba(224,123,42,0.12)',
-                          color: '#E07B2A',
+                          color: 'var(--color-primary)',
                           border: '1px solid rgba(224,123,42,0.25)',
                         }}
                       >
@@ -1381,7 +1414,7 @@ export function ProfilePage() {
                         padding: '9px 14px',
                         borderRadius: 10,
                         background: 'rgba(224,123,42,0.15)',
-                        color: '#E07B2A',
+                        color: 'var(--color-primary)',
                         border: '1px solid rgba(224,123,42,0.3)',
                         cursor: 'pointer',
                         fontSize: 13,
@@ -1401,7 +1434,9 @@ export function ProfilePage() {
                       background: oppSaveMsg.startsWith('Publicado')
                         ? 'rgba(76,175,80,0.1)'
                         : 'rgba(229,57,53,0.1)',
-                      color: oppSaveMsg.startsWith('Publicado') ? '#4CAF50' : '#FF6B6B',
+                      color: oppSaveMsg.startsWith('Publicado')
+                        ? 'var(--color-success)'
+                        : 'var(--color-danger-light)',
                       border: `1px solid ${oppSaveMsg.startsWith('Publicado') ? 'rgba(76,175,80,0.2)' : 'rgba(229,57,53,0.2)'}`,
                     }}
                   >
@@ -1413,7 +1448,7 @@ export function ProfilePage() {
                   onClick={handleSaveOpportunity}
                   className="w-full py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90"
                   style={{
-                    background: '#E07B2A',
+                    background: 'var(--color-primary)',
                     color: 'white',
                     border: 'none',
                     cursor: 'pointer',
@@ -1427,23 +1462,30 @@ export function ProfilePage() {
 
           <Link
             href="/my-teams"
-            className="flex items-center justify-between w-full px-5 py-4 rounded-2xl transition-all hover:opacity-80"
+            className="flex items-center justify-between w-full rounded-2xl transition-all hover:opacity-90"
             style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.07)',
+              background:
+                'linear-gradient(135deg, var(--color-primary-alpha-15) 0%, var(--color-primary-alpha-10) 100%)',
+              border: '1px solid var(--color-primary-alpha-30)',
+              padding: '18px 20px',
             }}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(224,123,42,0.1)' }}
+                className="rounded-xl flex items-center justify-center shrink-0"
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: 'var(--color-primary-alpha-20)',
+                  border: '1px solid var(--color-primary-alpha-30)',
+                }}
               >
                 <svg
-                  width="16"
-                  height="16"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#E07B2A"
+                  stroke="var(--color-primary)"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                 >
@@ -1454,17 +1496,20 @@ export function ProfilePage() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Minhas equipes</p>
-                <p className="text-xs" style={{ color: 'rgba(245,240,235,0.35)' }}>
-                  {myTeams.length} equipe{myTeams.length !== 1 ? 's' : ''}
+                <p className="font-bold text-white" style={{ fontSize: 15 }}>
+                  Minhas equipes
+                </p>
+                <p className="text-sm mt-0.5" style={{ color: 'var(--color-primary)' }}>
+                  {myTeams.length} equipe{myTeams.length !== 1 ? 's' : ''} ativa
+                  {myTeams.length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
                 d="M5 2l5 5-5 5"
-                stroke="rgba(245,240,235,0.3)"
-                strokeWidth="1.5"
+                stroke="var(--color-primary)"
+                strokeWidth="1.8"
                 strokeLinecap="round"
               />
             </svg>

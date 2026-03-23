@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { WorkLogSection } from '../../components/WorkLogSection/WorkLogSection'
 import { useTeams } from '../../hooks/useTeams'
@@ -52,7 +52,8 @@ function MemberRow({
   onEditProfession,
   onChat,
 }: MemberRowProps) {
-  const color = PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
+  const color =
+    PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
   const [editing, setEditing] = useState(false)
   const [profValue, setProfValue] = useState(m.profession)
 
@@ -64,8 +65,8 @@ function MemberRow({
   }
 
   const BTN = {
-    width: 34,
-    height: 34,
+    width: 36,
+    height: 36,
     borderRadius: 10,
     border: 'none',
     cursor: 'pointer',
@@ -77,56 +78,72 @@ function MemberRow({
 
   return (
     <div
-      className="rounded-xl overflow-hidden"
+      className="rounded-2xl overflow-hidden"
       style={{
         background: m.isLeader ? 'var(--color-primary-alpha-10)' : 'var(--color-surface-overlay)',
-        border: `1px solid ${m.isLeader ? 'rgba(224,123,42,0.22)' : 'var(--color-border-faint)'}`,
+        border: `1px solid ${m.isLeader ? 'var(--color-primary-alpha-30)' : 'var(--color-border-faint)'}`,
       }}
     >
-      <div className="flex items-center gap-2.5 px-3 pt-2.5 pb-1">
+      {m.isLeader && (
         <div
           style={{
-            width: 36,
-            height: 36,
+            height: 2,
+            background:
+              'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
+          }}
+        />
+      )}
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div
+          style={{
+            width: 44,
+            height: 44,
             borderRadius: '50%',
             overflow: 'hidden',
             flexShrink: 0,
-            border: `2px solid ${m.isLeader ? 'var(--color-primary)' : color + '55'}`,
+            border: `2.5px solid ${m.isLeader ? 'var(--color-primary)' : color + '55'}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             background: `${color}18`,
             color,
             fontWeight: 700,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {m.avatarUrl ? (
             <Image
               src={m.avatarUrl}
               alt={m.name}
-              width={36}
-              height={36}
+              width={44}
+              height={44}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
             m.avatarInitials
           )}
         </div>
+
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 overflow-hidden">
-            <span className="text-sm font-semibold text-white truncate">{m.name}</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-white" style={{ fontSize: 15 }}>
+              {m.name}
+            </span>
             {m.isLeader && (
               <span
-                className="text-xs px-1.5 py-0.5 rounded font-bold shrink-0"
-                style={{ background: 'var(--color-primary-alpha-20)', color: 'var(--color-primary)' }}
+                className="text-xs px-2 py-0.5 rounded-lg font-bold"
+                style={{
+                  background: 'var(--color-primary-alpha-20)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid var(--color-primary-alpha-30)',
+                }}
               >
                 líder
               </span>
             )}
             {isOwner && (
               <span
-                className="text-xs px-1.5 py-0.5 rounded font-medium shrink-0"
+                className="text-xs px-2 py-0.5 rounded-lg font-medium"
                 style={{
                   background: 'var(--color-info-alpha-10)',
                   color: 'var(--color-info)',
@@ -137,13 +154,9 @@ function MemberRow({
               </span>
             )}
           </div>
-        </div>
-      </div>
 
-      <div className="flex items-center gap-2 px-3 pb-2.5">
-        <div className="flex-1 min-w-0">
           {editing ? (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5 mt-1">
               <input
                 autoFocus
                 value={profValue}
@@ -157,7 +170,7 @@ function MemberRow({
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid var(--color-primary-alpha-30)',
                   color: 'var(--color-text)',
-                  width: 120,
+                  width: 140,
                 }}
               />
               <button
@@ -167,7 +180,7 @@ function MemberRow({
                   border: 'none',
                   cursor: 'pointer',
                   color: 'var(--color-success)',
-                  fontSize: 13,
+                  fontSize: 14,
                 }}
               >
                 ✓
@@ -178,19 +191,16 @@ function MemberRow({
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: 'rgba(245,240,235,0.4)',
-                  fontSize: 13,
+                  color: 'var(--color-text-muted)',
+                  fontSize: 14,
                 }}
               >
                 ✕
               </button>
             </div>
           ) : (
-            <div
-              className="flex items-center gap-1 text-xs overflow-hidden"
-              style={{ color: 'rgba(245,240,235,0.4)' }}
-            >
-              <span className="truncate" style={{ color }}>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="text-sm font-medium" style={{ color }}>
                 {m.profession}
               </span>
               <button
@@ -203,14 +213,14 @@ function MemberRow({
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: 'rgba(245,240,235,0.2)',
+                  color: 'var(--color-text-faint)',
                   padding: 0,
                   flexShrink: 0,
                 }}
               >
                 <svg
-                  width="9"
-                  height="9"
+                  width="10"
+                  height="10"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -221,9 +231,16 @@ function MemberRow({
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
-              {m.hourlyRate && <span className="shrink-0 ml-1">· R$ {m.hourlyRate}/h</span>}
-              {memberCost && (
-                <span className="shrink-0">· R$ {memberCost.toLocaleString('pt-BR')}</span>
+              {m.hourlyRate != null && (
+                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  R$ {m.hourlyRate}/h
+                  {memberCost != null && (
+                    <span style={{ color: 'var(--color-text-faint)' }}>
+                      {' '}
+                      · R$ {memberCost.toLocaleString('pt-BR')} total
+                    </span>
+                  )}
+                </span>
               )}
             </div>
           )}
@@ -237,13 +254,13 @@ function MemberRow({
               rel="noopener noreferrer"
               style={{
                 ...BTN,
-                background: 'rgba(37,211,102,0.1)',
+                background: 'var(--color-whatsapp-alpha-10)',
                 color: 'var(--color-whatsapp)',
                 textDecoration: 'none',
               }}
               title="WhatsApp"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.845L.057 23.25a.75.75 0 0 0 .92.92l5.405-1.471A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.892 0-3.667-.5-5.207-1.376l-.374-.215-3.873 1.053 1.053-3.873-.215-.374A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
               </svg>
@@ -253,11 +270,15 @@ function MemberRow({
             <button
               onClick={onChat}
               title="Mensagem"
-              style={{ ...BTN, background: 'var(--color-info-alpha-10)', color: 'var(--color-info)' }}
+              style={{
+                ...BTN,
+                background: 'var(--color-info-alpha-10)',
+                color: 'var(--color-info)',
+              }}
             >
               <svg
-                width="15"
-                height="15"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -273,11 +294,15 @@ function MemberRow({
             <button
               onClick={onSetLeader}
               title="Definir como líder"
-              style={{ ...BTN, background: 'var(--color-primary-alpha-10)', color: 'var(--color-primary)' }}
+              style={{
+                ...BTN,
+                background: 'var(--color-primary-alpha-10)',
+                color: 'var(--color-primary)',
+              }}
             >
               <svg
-                width="14"
-                height="14"
+                width="15"
+                height="15"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -291,7 +316,12 @@ function MemberRow({
           <button
             onClick={onRemove}
             title="Remover"
-            style={{ ...BTN, background: 'var(--color-danger-alpha-08)', color: 'var(--color-danger-light)' }}
+            style={{
+              ...BTN,
+              background: 'var(--color-danger-alpha-08)',
+              color: 'var(--color-danger-light)',
+              border: '1px solid var(--color-danger-alpha-15)',
+            }}
           >
             <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
               <path
@@ -312,9 +342,8 @@ export function TeamDetail({ id }: { id: string }) {
   const router = useRouter()
   const { user } = useCurrentUser()
   const { teams, removeMember, setLeader, updateMemberProfession, deleteTeam } = useTeams()
-  const [team, setTeam] = useState<Team | null>(null)
+  const team = teams.find((t) => t.id === id) ?? null
   const [chatTarget, setChatTarget] = useState<TeamMember | null>(null)
-
   const [dialog, setDialog] = useState<DialogConfig | null>(null)
 
   function confirm(cfg: DialogConfig) {
@@ -323,11 +352,6 @@ export function TeamDetail({ id }: { id: string }) {
   function closeDialog() {
     setDialog(null)
   }
-
-  useEffect(() => {
-    const found = teams.find((t) => t.id === id) ?? null
-    setTeam(found)
-  }, [teams, id])
 
   if (!team) {
     return (
@@ -372,16 +396,19 @@ export function TeamDetail({ id }: { id: string }) {
 
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
+      {/* Accent bar */}
       <div
         style={{
           height: 3,
-          background: 'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
+          background:
+            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
         }}
       />
 
+      {/* Nav */}
       <div
         className="flex items-center justify-between px-5 py-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <button
           onClick={() => router.push('/profile')}
@@ -389,7 +416,7 @@ export function TeamDetail({ id }: { id: string }) {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(245,240,235,0.5)',
+            color: 'var(--color-text-secondary)',
             padding: 0,
             display: 'flex',
             alignItems: 'center',
@@ -404,100 +431,173 @@ export function TeamDetail({ id }: { id: string }) {
         </button>
         <button
           onClick={handleDelete}
-          className="text-xs"
-          style={{ color: 'var(--color-danger-light)', background: 'none', border: 'none', cursor: 'pointer' }}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+          style={{
+            color: 'var(--color-danger-light)',
+            background: 'var(--color-danger-alpha-08)',
+            border: '1px solid var(--color-danger-alpha-15)',
+            cursor: 'pointer',
+          }}
         >
           Excluir equipe
         </button>
       </div>
 
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 24px' }}>
-        <div className="py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <h1 className="font-bold text-white text-2xl mb-1" style={{ letterSpacing: '-0.02em' }}>
+      {/* Hero header */}
+      <div
+        style={{
+          background: 'linear-gradient(180deg, var(--color-primary-alpha-10) 0%, transparent 100%)',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: '32px 24px 28px',
+        }}
+      >
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            Detalhes da equipe
+          </p>
+          <h1
+            className="font-bold text-white"
+            style={{ fontSize: 40, lineHeight: 1, letterSpacing: '-0.04em', marginBottom: 10 }}
+          >
             {team.name}
           </h1>
-          <p className="text-sm mb-5" style={{ color: 'rgba(245,240,235,0.4)' }}>
-            📍 {team.obraLocation}
-          </p>
-
-          <div className="grid grid-cols-3 gap-3" style={{ maxWidth: 480 }}>
-            <div
-              className="rounded-2xl p-3"
-              style={{
-                background: 'var(--color-surface-overlay)',
-                border: '1px solid var(--color-border-faint)',
-              }}
+          <div className="flex items-center gap-2">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 13 13"
+              fill="none"
+              style={{ color: 'var(--color-primary)', flexShrink: 0 }}
             >
-              <p className="text-xs mb-1" style={{ color: 'rgba(245,240,235,0.35)' }}>
-                Início
-              </p>
-              <p className="text-sm font-bold text-white">{formatDate(team.scheduledStart)}</p>
-            </div>
-            <div
-              className="rounded-2xl p-3"
-              style={{
-                background: 'var(--color-surface-overlay)',
-                border: '1px solid var(--color-border-faint)',
-              }}
-            >
-              <p className="text-xs mb-1" style={{ color: 'rgba(245,240,235,0.35)' }}>
-                Duração
-              </p>
-              <p className="text-sm font-bold text-white">
-                {team.estimatedDays}{' '}
-                <span className="font-normal text-xs" style={{ color: 'rgba(245,240,235,0.5)' }}>
-                  dias
-                </span>
-              </p>
-            </div>
-            <div
-              className="rounded-2xl p-3"
-              style={{
-                background: 'var(--color-surface-overlay)',
-                border: '1px solid var(--color-border-faint)',
-              }}
-            >
-              <p className="text-xs mb-1" style={{ color: 'rgba(245,240,235,0.35)' }}>
-                Custo total
-              </p>
-              <p
-                className="text-sm font-bold"
-                style={{ color: total != null ? 'var(--color-star)' : 'rgba(245,240,235,0.5)' }}
-              >
-                {total != null ? `R$ ${total.toLocaleString('pt-BR')}` : 'A combinar'}
-              </p>
-            </div>
+              <path
+                d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
+                stroke="currentColor"
+                strokeWidth="1.3"
+              />
+            </svg>
+            <span className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
+              {team.obraLocation}
+            </span>
           </div>
-
-          {team.observations && (
-            <p className="text-sm mt-4" style={{ color: 'rgba(245,240,235,0.45)' }}>
-              {team.observations}
-            </p>
-          )}
         </div>
+      </div>
 
-        <div className="py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-white text-base">
-              Membros{' '}
-              <span className="text-sm font-normal" style={{ color: 'rgba(245,240,235,0.3)' }}>
-                ({team.members.length})
-              </span>
-            </h2>
-            {leader && (
-              <div
-                className="flex items-center gap-1.5 text-xs"
-                style={{ color: 'rgba(245,240,235,0.35)' }}
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 80px' }}>
+        {/* Stats grid — full width */}
+        <div
+          className="grid grid-cols-2 gap-3 py-6"
+          style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+        >
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: 'var(--color-surface-overlay)',
+              border: '1px solid var(--color-border-faint)',
+            }}
+          >
+            <p
+              className="text-xs mb-2 uppercase tracking-wider"
+              style={{ color: 'var(--color-text-faint)' }}
+            >
+              Início previsto
+            </p>
+            <p className="font-bold text-white" style={{ fontSize: 22, letterSpacing: '-0.02em' }}>
+              {formatDate(team.scheduledStart)}
+            </p>
+          </div>
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: 'var(--color-surface-overlay)',
+              border: '1px solid var(--color-border-faint)',
+            }}
+          >
+            <p
+              className="text-xs mb-2 uppercase tracking-wider"
+              style={{ color: 'var(--color-text-faint)' }}
+            >
+              Duração estimada
+            </p>
+            <p className="font-bold text-white" style={{ fontSize: 22, letterSpacing: '-0.02em' }}>
+              {team.estimatedDays}
+              <span
+                className="text-sm font-normal ml-1"
+                style={{ color: 'var(--color-text-muted)' }}
               >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--color-primary)" stroke="none">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                {leader.name.split(' ')[0]}
-              </div>
+                dias
+              </span>
+            </p>
+          </div>
+          <div
+            className="rounded-2xl p-5 col-span-2"
+            style={{
+              background:
+                total != null ? 'rgba(255, 209, 102, 0.07)' : 'var(--color-surface-overlay)',
+              border: `1px solid ${total != null ? 'rgba(255, 209, 102, 0.15)' : 'var(--color-border-faint)'}`,
+            }}
+          >
+            <p
+              className="text-xs mb-2 uppercase tracking-wider"
+              style={{ color: 'var(--color-text-faint)' }}
+            >
+              Custo total estimado
+            </p>
+            <p
+              className="font-bold"
+              style={{
+                fontSize: 28,
+                letterSpacing: '-0.03em',
+                color: total != null ? 'var(--color-star)' : 'var(--color-text-muted)',
+              }}
+            >
+              {total != null ? `R$ ${total.toLocaleString('pt-BR')}` : 'A combinar'}
+            </p>
+            {total != null && (
+              <p className="text-xs mt-1" style={{ color: 'var(--color-text-faint)' }}>
+                Baseado em {team.estimatedDays} dias × 8h/dia por membro
+              </p>
             )}
           </div>
+        </div>
 
-          <div className="flex flex-col gap-2">
+        {/* Observations */}
+        {team.observations && (
+          <div className="py-5" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+              {team.observations}
+            </p>
+          </div>
+        )}
+
+        {/* Members section */}
+        <div className="pt-7 pb-6" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2
+                className="font-bold text-white"
+                style={{ fontSize: 20, letterSpacing: '-0.02em' }}
+              >
+                Membros
+              </h2>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                {team.members.length} {team.members.length === 1 ? 'profissional' : 'profissionais'}
+                {leader && (
+                  <span>
+                    {' '}
+                    · líder:{' '}
+                    <span style={{ color: 'var(--color-primary)' }}>
+                      {leader.name.split(' ')[0]}
+                    </span>
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
             {team.members.map((member, i) => (
               <MemberRow
                 key={member.professionalId}
@@ -533,7 +633,8 @@ export function TeamDetail({ id }: { id: string }) {
           </div>
         </div>
 
-        <div className="py-5 pb-10">
+        {/* Work log section */}
+        <div className="pt-7">
           {user && userInTeam ? (
             <WorkLogSection
               team={team}
@@ -544,13 +645,13 @@ export function TeamDetail({ id }: { id: string }) {
             />
           ) : (
             <div
-              className="rounded-2xl p-6 text-center"
+              className="rounded-2xl p-8 text-center"
               style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px dashed rgba(255,255,255,0.08)',
+                background: 'var(--color-surface-overlay)',
+                border: '1px dashed var(--color-border-medium)',
               }}
             >
-              <p className="text-sm" style={{ color: 'rgba(245,240,235,0.3)' }}>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 Apenas membros da equipe podem ver o registro de horas
               </p>
             </div>

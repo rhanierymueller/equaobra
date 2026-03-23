@@ -2,6 +2,9 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { HiShieldCheck } from 'react-icons/hi2'
+import { IoChatbubblesSharp } from 'react-icons/io5'
+import { MdConstruction } from 'react-icons/md'
 
 import { LandingCanvas } from './LandingCanvas'
 
@@ -18,34 +21,17 @@ interface Step {
 
 const FEATURES: Feature[] = [
   {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      </svg>
-    ),
+    icon: <HiShieldCheck size={26} color="#E07B2A" />,
     title: 'Profissionais Verificados',
     desc: 'Todos passam por validação de documentos e avaliações de obras anteriores antes de aparecerem na busca.',
   },
   {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
+    icon: <IoChatbubblesSharp size={26} color="#E07B2A" />,
     title: 'Chat Integrado',
     desc: 'Converse diretamente com os candidatos antes de fechar. Rápido, sem intermediários e com histórico.',
   },
   {
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="9" y="2" width="6" height="4" rx="1" />
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-        <line x1="12" y1="11" x2="16" y2="11" />
-        <line x1="12" y1="15" x2="16" y2="15" />
-        <line x1="8" y1="11" x2="8.01" y2="11" />
-        <line x1="8" y1="15" x2="8.01" y2="15" />
-      </svg>
-    ),
+    icon: <MdConstruction size={26} color="#E07B2A" />,
     title: 'Gestão de Obras',
     desc: 'Organize múltiplas obras, acompanhe equipes ativas e veja o histórico completo de contratações.',
   },
@@ -206,15 +192,23 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <main style={{ background: '#0D0C0B', color: '#F5F0EB' }}>
+    <main style={{ background: 'var(--color-background)', color: 'var(--color-text)' }}>
       <div ref={containerRef} style={{ height: '600vh' }}>
         <div className="sticky top-0 h-screen overflow-hidden">
           <LandingCanvas progressRef={progressRef} />
 
+          <div
+            className="absolute inset-0 z-1 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(13,12,11,0.82) 0%, rgba(13,12,11,0.45) 55%, transparent 100%)',
+            }}
+          />
+
           <div className="relative z-10 h-full flex flex-col items-center pointer-events-none select-none px-6">
             <div
               className="mt-[30vh] flex items-baseline gap-0 transition-opacity duration-700"
-              style={{ opacity: phase < 3 ? 1 : 0.28 }}
+              style={{ opacity: phase < 3 ? 1 : 0.55 }}
             >
               <span
                 className="font-black text-6xl md:text-7xl tracking-[0.18em] uppercase"
@@ -224,7 +218,7 @@ export default function LandingPage() {
               </span>
               <span
                 className="font-black text-6xl md:text-7xl tracking-[0.18em] uppercase"
-                style={{ color: '#F5F0EB' }}
+                style={{ color: 'var(--color-text)' }}
               >
                 Obra
               </span>

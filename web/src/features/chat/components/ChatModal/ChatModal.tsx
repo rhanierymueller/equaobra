@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
+import Image from 'next/image'
 
 import { useChat } from '../../hooks/useChat'
 
@@ -143,9 +144,12 @@ export function ChatModal({ user, professional, onClose }: ChatModalProps) {
             }}
           >
             {professional.avatarUrl ? (
-              <img
+              <Image
                 src={professional.avatarUrl}
                 alt={professional.name}
+                width={40}
+                height={40}
+                unoptimized
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
@@ -311,7 +315,7 @@ export function ChatModal({ user, professional, onClose }: ChatModalProps) {
               style={{
                 background: 'rgba(255,255,255,0.06)',
                 border: '1.5px solid rgba(255,255,255,0.09)',
-                color: '#F5F0EB',
+                color: 'var(--color-text)',
               }}
               onFocus={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(224,123,42,0.5)'

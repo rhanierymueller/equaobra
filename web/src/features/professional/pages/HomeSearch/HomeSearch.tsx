@@ -9,11 +9,11 @@ import { ProfessionalCard } from '../../components/ProfessionalCard'
 import { useProfessionals } from '../../hooks/useProfessionals'
 
 import { Navbar } from '@/src/components/Navbar'
-import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { OpportunityFilterBar } from '@/src/features/opportunity/components/OpportunityFilterBar'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import type { Professional, Profession } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
@@ -49,7 +49,10 @@ function MapSkeleton() {
       <div className="flex flex-col items-center gap-3">
         <div
           className="w-10 h-10 rounded-full animate-spin"
-          style={{ border: '3px solid var(--color-primary-alpha-20)', borderTopColor: 'var(--color-primary)' }}
+          style={{
+            border: '3px solid var(--color-primary-alpha-20)',
+            borderTopColor: 'var(--color-primary)',
+          }}
         />
         <span className="text-sm" style={{ color: 'rgba(245,240,235,0.4)' }}>
           Carregando mapa...
@@ -150,7 +153,15 @@ function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
         >
           {m === 'profissionais' ? (
             <span className="flex items-center gap-1.5">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
@@ -158,7 +169,15 @@ function MapModeToggle({ mode, onChange }: MapModeToggleProps) {
             </span>
           ) : (
             <span className="flex items-center gap-1.5">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <rect x="2" y="7" width="20" height="14" rx="2" />
                 <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
               </svg>
@@ -265,7 +284,10 @@ export default function HomeSearch() {
   })
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--color-background)' }}>
+    <div
+      className="flex flex-col h-screen overflow-hidden"
+      style={{ background: 'var(--color-background)' }}
+    >
       <Navbar searchValue={filters.search} onSearchChange={setSearch} />
 
       <div className="flex flex-1 overflow-hidden relative" style={{ overflowX: 'hidden' }}>

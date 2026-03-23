@@ -236,7 +236,7 @@ function FloatingCard({
               >
                 <p
                   style={{
-                    color: '#F5F0EB',
+                    color: 'var(--color-text)',
                     fontWeight: 700,
                     fontSize: 14,
                     margin: 0,

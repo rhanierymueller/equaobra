@@ -406,7 +406,15 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
             className="hidden md:flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl transition-all duration-150"
             style={{ color: 'rgba(245,240,235,0.6)' }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            >
               <rect x="2" y="7" width="20" height="14" rx="2" />
               <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
               <circle cx="12" cy="14" r="2" />
@@ -460,10 +468,24 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
             type="button"
             className="md:hidden flex items-center justify-center rounded-xl"
             onClick={() => setMobileMenuOpen((v) => !v)}
-            style={{ width: 38, height: 38, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
+            style={{
+              width: 38,
+              height: 38,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer',
+            }}
             aria-label="Menu"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,235,0.6)" strokeWidth="2" strokeLinecap="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(245,240,235,0.6)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
               {mobileMenuOpen ? (
                 <>
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -506,15 +528,50 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
             borderBottom: '1px solid rgba(255,255,255,0.07)',
           }}
         >
-          <Link href="/home" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Buscar profissionais</Link>
-          <Link href="/my-teams" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Minhas equipes</Link>
+          <Link
+            href="/home"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 px-5 py-3 text-sm"
+            style={{ color: 'rgba(245,240,235,0.75)' }}
+          >
+            Buscar profissionais
+          </Link>
+          <Link
+            href="/my-teams"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 px-5 py-3 text-sm"
+            style={{ color: 'rgba(245,240,235,0.75)' }}
+          >
+            Minhas equipes
+          </Link>
           {user.role === 'profissional' && (
-            <Link href="/oportunidades" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Oportunidades</Link>
+            <Link
+              href="/oportunidades"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-5 py-3 text-sm"
+              style={{ color: 'rgba(245,240,235,0.75)' }}
+            >
+              Oportunidades
+            </Link>
           )}
           {user.role === 'contratante' && (
-            <Link href="/my-contractor" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Minha construtora</Link>
+            <Link
+              href="/my-contractor"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-5 py-3 text-sm"
+              style={{ color: 'rgba(245,240,235,0.75)' }}
+            >
+              Minha construtora
+            </Link>
           )}
-          <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm" style={{ color: 'rgba(245,240,235,0.75)' }}>Meu perfil</Link>
+          <Link
+            href="/profile"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 px-5 py-3 text-sm"
+            style={{ color: 'rgba(245,240,235,0.75)' }}
+          >
+            Meu perfil
+          </Link>
         </div>
       )}
     </header>

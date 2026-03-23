@@ -111,7 +111,7 @@ export function LocalityAutocomplete({
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: `1.5px solid ${value ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.08)'}`,
-            color: '#F5F0EB',
+            color: 'var(--color-text)',
             paddingRight: loading ? 32 : 12,
           }}
           onBlur={(e) => {
@@ -165,7 +165,10 @@ export function LocalityAutocomplete({
                   <circle cx="6.5" cy="5" r="1.4" stroke="#E07B2A" strokeWidth="1.3" />
                 </svg>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: '#F5F0EB' }}>
+                  <p
+                    className="text-sm font-medium truncate"
+                    style={{ color: 'var(--color-text)' }}
+                  >
                     {main}
                   </p>
                   {sub && (

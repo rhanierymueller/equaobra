@@ -206,7 +206,9 @@ export function FilterBar({
         <div>
           <p className="font-bold text-white text-sm">Filtros</p>
           <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-            {resultCount === 1 ? '1 profissional encontrado' : `${resultCount} profissionais encontrados`}
+            {resultCount === 1
+              ? '1 profissional encontrado'
+              : `${resultCount} profissionais encontrados`}
           </p>
         </div>
         {hasActiveFilters && (

@@ -6,7 +6,10 @@ import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-dim)' }}>
+    <p
+      className="text-xs font-semibold uppercase tracking-widest mb-3"
+      style={{ color: 'var(--color-text-dim)' }}
+    >
       {children}
     </p>
   )
@@ -50,7 +53,8 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
 
   const filtered = interests.filter((i) => {
     if (filterProfession && i.profession !== filterProfession) return false
-    if (filterLocation && !i.location?.toLowerCase().includes(filterLocation.toLowerCase())) return false
+    if (filterLocation && !i.location?.toLowerCase().includes(filterLocation.toLowerCase()))
+      return false
     if (filterRating > 0 && (i.rating ?? 0) < filterRating) return false
     return true
   })
@@ -72,7 +76,10 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
       {interests.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-10 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
+          style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)',
+          }}
         >
           <svg
             width="32"
@@ -92,7 +99,10 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
           <p className="text-sm font-medium" style={{ color: 'rgba(245,240,235,0.3)' }}>
             Nenhum candidato ainda
           </p>
-          <p className="text-xs mt-1 text-center" style={{ color: 'rgba(245,240,235,0.2)', maxWidth: 240 }}>
+          <p
+            className="text-xs mt-1 text-center"
+            style={{ color: 'rgba(245,240,235,0.2)', maxWidth: 240 }}
+          >
             Profissionais que demonstrarem interesse aparecem aqui
           </p>
         </div>
@@ -103,21 +113,37 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
               <select
                 value={filterProfession}
                 onChange={(e) => setFilterProfession(e.target.value)}
-                style={{ ...selectStyle, color: filterProfession ? 'var(--color-text)' : 'var(--color-text-dim)' }}
+                style={{
+                  ...selectStyle,
+                  color: filterProfession ? 'var(--color-text)' : 'var(--color-text-dim)',
+                }}
               >
-                <option value="" style={{ background: '#1A1916' }}>Todas as profissões</option>
+                <option value="" style={{ background: '#1A1916' }}>
+                  Todas as profissões
+                </option>
                 {availableProfessions.map((p) => (
-                  <option key={p} value={p} style={{ background: '#1A1916' }}>{p}</option>
+                  <option key={p} value={p} style={{ background: '#1A1916' }}>
+                    {p}
+                  </option>
                 ))}
               </select>
               <select
                 value={filterRating}
                 onChange={(e) => setFilterRating(Number(e.target.value))}
-                style={{ ...selectStyle, color: filterRating > 0 ? 'var(--color-text)' : 'var(--color-text-dim)' }}
+                style={{
+                  ...selectStyle,
+                  color: filterRating > 0 ? 'var(--color-text)' : 'var(--color-text-dim)',
+                }}
               >
-                <option value={0} style={{ background: '#1A1916' }}>Qualquer avaliação</option>
-                <option value={4} style={{ background: '#1A1916' }}>4+ estrelas</option>
-                <option value={4.5} style={{ background: '#1A1916' }}>4.5+ estrelas</option>
+                <option value={0} style={{ background: '#1A1916' }}>
+                  Qualquer avaliação
+                </option>
+                <option value={4} style={{ background: '#1A1916' }}>
+                  4+ estrelas
+                </option>
+                <option value={4.5} style={{ background: '#1A1916' }}>
+                  4.5+ estrelas
+                </option>
               </select>
             </div>
             <input
@@ -147,7 +173,10 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
                 <div
                   key={candidate.id}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
                 >
                   <div
                     style={{
@@ -179,7 +208,10 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
                         </span>
                       )}
                       {candidate.location && (
-                        <span className="text-xs flex items-center gap-0.5" style={{ color: 'rgba(245,240,235,0.3)' }}>
+                        <span
+                          className="text-xs flex items-center gap-0.5"
+                          style={{ color: 'rgba(245,240,235,0.3)' }}
+                        >
                           <svg width="8" height="8" viewBox="0 0 13 13" fill="none">
                             <path
                               d="M6.5 1a4 4 0 0 1 4 4c0 3.5-4 7.5-4 7.5S2.5 8.5 2.5 5a4 4 0 0 1 4-4z"
@@ -199,12 +231,14 @@ export function CandidatesSection({ contractorId, onChat }: CandidatesSectionPro
                   </div>
 
                   <button
-                    onClick={() => onChat(
-                      candidate.professionalId,
-                      candidate.professionalName,
-                      candidate.professionalInitials,
-                      candidate.profession,
-                    )}
+                    onClick={() =>
+                      onChat(
+                        candidate.professionalId,
+                        candidate.professionalName,
+                        candidate.professionalInitials,
+                        candidate.profession,
+                      )
+                    }
                     style={{
                       padding: '7px 14px',
                       borderRadius: 10,

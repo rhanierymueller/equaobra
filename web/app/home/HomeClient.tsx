@@ -5,9 +5,8 @@ import dynamic from 'next/dynamic'
 function HomeSkeleton() {
   return (
     <div className="flex flex-col h-screen" style={{ background: '#0D0C0B' }}>
-      {/* Navbar placeholder */}
+
       <div className="h-14 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(13,12,11,0.92)' }} />
-      {/* Body */}
       <div className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div

@@ -2,14 +2,17 @@
 
 import { useState } from 'react'
 
-import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
-import { ALL_PROFESSIONS } from '@/src/types/professional.types'
+import type { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import type { Opportunity } from '@/src/types/opportunity.types'
+import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { User } from '@/src/types/user.types'
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-dim)' }}>
+    <p
+      className="text-xs font-semibold uppercase tracking-widest mb-3"
+      style={{ color: 'var(--color-text-dim)' }}
+    >
       {children}
     </p>
   )
@@ -17,7 +20,10 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--color-text-muted)' }}>
+    <label
+      className="block text-xs font-medium mb-1.5"
+      style={{ color: 'var(--color-text-muted)' }}
+    >
       {children}
     </label>
   )
@@ -50,7 +56,13 @@ interface OppFormSectionProps {
   updateOpportunity: ReturnType<typeof useOpportunities>['updateOpportunity']
 }
 
-export function OppFormSection({ contractorId, user, opp, publish, updateOpportunity }: OppFormSectionProps) {
+export function OppFormSection({
+  contractorId,
+  user,
+  opp,
+  publish,
+  updateOpportunity,
+}: OppFormSectionProps) {
   const [active, setActive] = useState(opp?.active ?? false)
   const [description, setDescription] = useState(opp?.obraDescription ?? '')
   const [location, setLocation] = useState(opp?.obraLocation ?? '')
@@ -239,7 +251,12 @@ export function OppFormSection({ contractorId, user, opp, publish, updateOpportu
                   }}
                 >
                   <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                    <path
+                      d="M2 2L10 10M10 2L2 10"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </button>
               </span>
@@ -260,9 +277,13 @@ export function OppFormSection({ contractorId, user, opp, publish, updateOpportu
                 outline: 'none',
               }}
             >
-              <option value="" style={{ background: '#1A1916' }}>Selecione...</option>
+              <option value="" style={{ background: '#1A1916' }}>
+                Selecione...
+              </option>
               {ALL_PROFESSIONS.filter((p) => !professions.includes(p)).map((p) => (
-                <option key={p} value={p} style={{ background: '#1A1916' }}>{p}</option>
+                <option key={p} value={p} style={{ background: '#1A1916' }}>
+                  {p}
+                </option>
               ))}
             </select>
             <button
@@ -288,7 +309,9 @@ export function OppFormSection({ contractorId, user, opp, publish, updateOpportu
           <p
             className="text-xs px-3 py-2 rounded-xl"
             style={{
-              background: saveMsgIsSuccess ? 'var(--color-success-alpha-10)' : 'var(--color-danger-alpha-08)',
+              background: saveMsgIsSuccess
+                ? 'var(--color-success-alpha-10)'
+                : 'var(--color-danger-alpha-08)',
               color: saveMsgIsSuccess ? 'var(--color-success)' : 'var(--color-danger-light)',
               border: `1px solid ${saveMsgIsSuccess ? 'var(--color-success-alpha-20)' : 'var(--color-danger-alpha-15)'}`,
             }}

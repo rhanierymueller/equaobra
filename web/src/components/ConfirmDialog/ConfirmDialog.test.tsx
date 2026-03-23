@@ -43,13 +43,7 @@ describe('ConfirmDialog', () => {
   })
 
   it('renders custom confirmLabel and cancelLabel', () => {
-    render(
-      <ConfirmDialog
-        {...defaultProps}
-        confirmLabel="Excluir"
-        cancelLabel="Voltar"
-      />,
-    )
+    render(<ConfirmDialog {...defaultProps} confirmLabel="Excluir" cancelLabel="Voltar" />)
     expect(screen.getByRole('button', { name: /excluir/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /voltar/i })).toBeInTheDocument()
   })

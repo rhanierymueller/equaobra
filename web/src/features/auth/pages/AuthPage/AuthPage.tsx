@@ -24,7 +24,12 @@ function BackgroundGrid() {
     >
       <defs>
         <pattern id="auth-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--color-primary-alpha-10)" strokeWidth="1" />
+          <path
+            d="M 40 0 L 0 0 0 40"
+            fill="none"
+            stroke="var(--color-primary-alpha-10)"
+            strokeWidth="1"
+          />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#auth-grid)" />

@@ -196,10 +196,10 @@ function BarChart({ days, series }: { days: string[]; series: ChartSeries[] }) {
             const total = series.reduce((acc, s) => acc + (s.data[hoverDay] ?? 0), 0)
             return (
               <span style={{ fontSize: 11 }}>
-                <span style={{ color: 'rgba(245,240,235,0.35)' }}>
-                  {formatDate(hoverDay)} —{' '}
-                </span>
-                <strong style={{ color: total > 0 ? 'var(--color-primary)' : 'var(--color-text-faint)' }}>
+                <span style={{ color: 'rgba(245,240,235,0.35)' }}>{formatDate(hoverDay)} — </span>
+                <strong
+                  style={{ color: total > 0 ? 'var(--color-primary)' : 'var(--color-text-faint)' }}
+                >
                   {total > 0 ? `${total}h` : 'sem registro'}
                 </strong>
               </span>
@@ -245,7 +245,12 @@ function StatCard({
               height: '100%',
               borderRadius: 99,
               width: `${Math.min(100, progress)}%`,
-              background: progress >= 100 ? 'var(--color-success)' : progress > 60 ? 'var(--color-star)' : 'var(--color-primary)',
+              background:
+                progress >= 100
+                  ? 'var(--color-success)'
+                  : progress > 60
+                    ? 'var(--color-star)'
+                    : 'var(--color-primary)',
               transition: 'width 0.4s ease',
             }}
           />
@@ -394,7 +399,8 @@ export function WorkLogSection({
       const data: Record<string, number> = {}
       for (const l of getLogsForMember(m.professionalId))
         data[l.date] = (data[l.date] ?? 0) + l.hours
-      const color = PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
+      const color =
+        PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
       return { memberId: m.professionalId, color, data }
     })
   })()
@@ -485,7 +491,8 @@ export function WorkLogSection({
             <div className="flex flex-wrap gap-1.5 mb-3">
               {team.members.map((m) => {
                 const color =
-                  PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
+                  PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ??
+                  'var(--color-primary)'
                 const total = getTotalHours(m.professionalId)
                 const sel = selectedMemberId === m.professionalId
                 return (
@@ -584,7 +591,8 @@ export function WorkLogSection({
               >
                 {team.members.map((m) => {
                   const color =
-                    PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
+                    PROFESSION_COLORS[m.profession as keyof typeof PROFESSION_COLORS] ??
+                    'var(--color-primary)'
                   return (
                     <div
                       key={m.professionalId}
@@ -680,7 +688,7 @@ export function WorkLogSection({
                   flex: 1,
                   background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.09)',
-                  color: '#F5F0EB',
+                  color: 'var(--color-text)',
                   borderRadius: 8,
                   padding: '5px 10px',
                   fontSize: 11,
@@ -706,7 +714,9 @@ export function WorkLogSection({
               </button>
             </div>
             {formError && (
-              <p style={{ fontSize: 11, color: 'var(--color-danger-light)', marginTop: 6 }}>{formError}</p>
+              <p style={{ fontSize: 11, color: 'var(--color-danger-light)', marginTop: 6 }}>
+                {formError}
+              </p>
             )}
           </div>
 
@@ -742,7 +752,12 @@ export function WorkLogSection({
                         }}
                       >
                         <span
-                          style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', minWidth: 28 }}
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color: 'var(--color-primary)',
+                            minWidth: 28,
+                          }}
                         >
                           {log.hours}h
                         </span>

@@ -2,18 +2,16 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 import type { Interest } from '@/src/features/opportunity/hooks/useInterests'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import type { TeamMember } from '@/src/types/team.types'
-import type { User } from '@/src/types/user.types'
 import { formatDate } from '@/src/utils/date'
-
-const ACCENT = '#E07B2A'
 
 interface CardProps {
   interest: Interest
@@ -35,12 +33,16 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
   return (
     <div
       className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+      style={{
+        background: 'var(--color-surface-overlay)',
+        border: '1px solid var(--color-border-faint)',
+      }}
     >
       <div
         style={{
           height: 2,
-          background: `linear-gradient(to right, ${ACCENT}, ${ACCENT}44, transparent)`,
+          background:
+            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
         }}
       />
 
@@ -52,14 +54,14 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
               height: 46,
               borderRadius: 12,
               flexShrink: 0,
-              background: `${ACCENT}22`,
-              color: ACCENT,
+              background: 'var(--color-primary-alpha-15)',
+              color: 'var(--color-primary)',
               fontWeight: 800,
               fontSize: 16,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: `1.5px solid ${ACCENT}44`,
+              border: '1.5px solid var(--color-primary-alpha-30)',
             }}
           >
             {initials}
@@ -69,13 +71,13 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
               {opp?.companyName ?? opp?.contractorName ?? '—'}
             </p>
             {opp?.companyName && (
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,235,0.4)' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                 {opp.contractorName}
               </p>
             )}
             <p
               className="text-xs mt-0.5 flex items-center gap-1"
-              style={{ color: 'rgba(245,240,235,0.4)' }}
+              style={{ color: 'var(--color-text-muted)' }}
             >
               <svg width="9" height="9" viewBox="0 0 13 13" fill="none">
                 <path
@@ -142,9 +144,9 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
                 key={p}
                 className="text-xs px-2 py-0.5 rounded-full"
                 style={{
-                  background: `${ACCENT}12`,
-                  color: ACCENT,
-                  border: `1px solid ${ACCENT}25`,
+                  background: 'var(--color-primary-alpha-10)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid var(--color-primary-alpha-20)',
                 }}
               >
                 {p}
@@ -170,9 +172,9 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
               borderRadius: 10,
               fontSize: 12,
               fontWeight: 600,
-              background: 'rgba(255,255,255,0.05)',
-              color: 'rgba(245,240,235,0.7)',
-              border: '1px solid rgba(255,255,255,0.09)',
+              background: 'var(--color-surface-overlay)',
+              color: 'var(--color-text-readable)',
+              border: '1px solid var(--color-border-faint)',
               textDecoration: 'none',
               display: 'flex',
               alignItems: 'center',
@@ -195,7 +197,7 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
               borderRadius: 10,
               fontSize: 12,
               fontWeight: 700,
-              background: ACCENT,
+              background: 'var(--color-primary)',
               color: 'white',
               border: 'none',
               cursor: 'pointer',
@@ -211,38 +213,26 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
 
 export function MyApplications() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const { user } = useCurrentUser()
   const [chatTarget, setChatTarget] = useState<Pick<
     TeamMember,
     'professionalId' | 'name' | 'avatarInitials' | 'avatarUrl' | 'profession'
   > | null>(null)
 
   const { opportunities } = useOpportunities()
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-    setLoaded(true)
-  }, [])
-
   const { interests: myInterests } = useInterests()
-
-  if (!loaded) return null
 
   if (!user) {
     return (
       <div
         className="h-screen flex flex-col items-center justify-center gap-4"
-        style={{ background: '#0D0C0B' }}
+        style={{ background: 'var(--color-background)' }}
       >
         <p className="text-white font-semibold">Você precisa estar logado</p>
         <Link
           href="/auth"
           className="px-5 py-2.5 rounded-xl text-sm font-bold text-white"
-          style={{ background: ACCENT }}
+          style={{ background: 'var(--color-primary)' }}
         >
           Entrar
         </Link>
@@ -260,17 +250,18 @@ export function MyApplications() {
   }
 
   return (
-    <div style={{ background: '#0D0C0B', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
       <div
         style={{
           height: 3,
-          background: `linear-gradient(to right, ${ACCENT}, ${ACCENT}44, transparent)`,
+          background:
+            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
         }}
       />
 
       <div
         className="flex items-center justify-between px-5 py-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         <button
           onClick={() => router.push('/home')}
@@ -278,7 +269,7 @@ export function MyApplications() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'rgba(245,240,235,0.5)',
+            color: 'var(--color-text-secondary)',
             padding: 0,
             display: 'flex',
             alignItems: 'center',
@@ -291,51 +282,67 @@ export function MyApplications() {
           </svg>
           Voltar
         </button>
-        <span className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.25)' }}>
+        <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Minhas vagas
         </span>
         <div style={{ width: 40 }} />
       </div>
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
-        <div
-          className="py-6 flex items-center justify-between"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-        >
-          <div>
+      {/* Hero header */}
+      <div
+        style={{
+          background: 'linear-gradient(180deg, var(--color-primary-alpha-10) 0%, transparent 100%)',
+          borderBottom: '1px solid var(--color-border-subtle)',
+          padding: '32px 24px 28px',
+        }}
+      >
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            Candidaturas
+          </p>
+          <div className="flex items-end justify-between gap-4">
             <h1
-              className="font-bold text-white text-xl leading-tight"
-              style={{ letterSpacing: '-0.02em' }}
+              className="font-bold text-white"
+              style={{ fontSize: 36, lineHeight: 1, letterSpacing: '-0.03em' }}
             >
               Minhas vagas
             </h1>
-            <p className="text-sm mt-1" style={{ color: 'rgba(245,240,235,0.4)' }}>
-              {myInterests.length === 0
-                ? 'Nenhuma candidatura ainda'
-                : `${myInterests.length} vaga${myInterests.length !== 1 ? 's' : ''} onde você se candidatou`}
-            </p>
-          </div>
-          <Link
-            href="/home"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-80"
-            style={{ background: `${ACCENT}22`, color: ACCENT, border: `1px solid ${ACCENT}44` }}
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
+            <Link
+              href="/home"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all hover:opacity-80 shrink-0"
+              style={{
+                background: 'var(--color-primary-alpha-15)',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary-alpha-30)',
+              }}
             >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            Explorar obras
-          </Link>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Explorar obras
+            </Link>
+          </div>
+          <p className="text-sm mt-3" style={{ color: 'var(--color-text-secondary)' }}>
+            {myInterests.length === 0
+              ? 'Nenhuma candidatura ainda'
+              : `${myInterests.length} vaga${myInterests.length !== 1 ? 's' : ''} onde você se candidatou`}
+          </p>
         </div>
+      </div>
 
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
         <div className="pt-5">
           {myInterests.length === 0 ? (
             <div
@@ -351,8 +358,8 @@ export function MyApplications() {
                     width: 56,
                     height: 56,
                     borderRadius: 16,
-                    background: `${ACCENT}12`,
-                    border: `1px solid ${ACCENT}25`,
+                    background: 'var(--color-primary-alpha-10)',
+                    border: '1px solid var(--color-primary-alpha-20)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -363,7 +370,7 @@ export function MyApplications() {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke={ACCENT}
+                    stroke="var(--color-primary)"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                   >
@@ -384,9 +391,9 @@ export function MyApplications() {
                 href="/home"
                 className="inline-block px-5 py-2.5 rounded-xl text-sm font-semibold"
                 style={{
-                  background: `${ACCENT}22`,
-                  color: ACCENT,
-                  border: `1px solid ${ACCENT}44`,
+                  background: 'var(--color-primary-alpha-15)',
+                  color: 'var(--color-primary)',
+                  border: '1px solid var(--color-primary-alpha-30)',
                 }}
               >
                 Ver obras disponíveis

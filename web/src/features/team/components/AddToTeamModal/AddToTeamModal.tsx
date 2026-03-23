@@ -131,7 +131,8 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
     )
   }
 
-  const color = PROFESSION_COLORS[p.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
+  const color =
+    PROFESSION_COLORS[p.profession as keyof typeof PROFESSION_COLORS] ?? 'var(--color-primary)'
 
   const member = {
     professionalId: p.id,
@@ -418,7 +419,10 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                           {alreadyIn ? (
                             <span
                               className="text-xs font-medium px-2.5 py-1 rounded-lg"
-                              style={{ color: 'var(--color-success)', background: 'var(--color-success-alpha-10)' }}
+                              style={{
+                                color: 'var(--color-success)',
+                                background: 'var(--color-success-alpha-10)',
+                              }}
                             >
                               Adicionado ✓
                             </span>

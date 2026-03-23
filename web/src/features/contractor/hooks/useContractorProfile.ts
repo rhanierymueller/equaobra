@@ -1,33 +1,27 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import type { TeamMember } from '@/src/types/team.types'
-import type { User } from '@/src/types/user.types'
 
-type ChatTarget = Pick<TeamMember, 'professionalId' | 'name' | 'avatarInitials' | 'avatarUrl' | 'profession'>
+type ChatTarget = Pick<
+  TeamMember,
+  'professionalId' | 'name' | 'avatarInitials' | 'avatarUrl' | 'profession'
+>
 
 export function useContractorProfile(id: string) {
   const router = useRouter()
   const { opportunities, publish, updateOpportunity } = useOpportunities()
   const { addInterest } = useInterests(id)
-  const [user, setUser] = useState<User | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const { user } = useCurrentUser()
   const [chatTarget, setChatTarget] = useState<ChatTarget | null>(null)
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-    setLoaded(true)
-  }, [])
-
-  const isMe = loaded && user?.id === id
+  const isMe = user?.id === id
   const opp: Opportunity | undefined = opportunities.find((o) => o.contractorId === id)
 
   const displayName = opp
@@ -89,7 +83,6 @@ export function useContractorProfile(id: string) {
 
   return {
     user,
-    loaded,
     isMe,
     opp,
     displayName,

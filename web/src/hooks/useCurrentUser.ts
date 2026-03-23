@@ -1,20 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import type { User } from '@/src/types/user.types'
 
+function readStoredUser(): User | null {
+  try {
+    const raw = localStorage.getItem('equobra_user')
+    return raw ? (JSON.parse(raw) as User) : null
+  } catch {
+    return null
+  }
+}
+
 export function useCurrentUser() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const [user, setUser] = useState<User | null>(readStoredUser)
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) setUser(JSON.parse(raw) as User)
-    } catch {}
-    setLoaded(true)
-  }, [])
-
-  return { user, loaded }
+  return { user, setUser }
 }

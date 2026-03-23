@@ -28,47 +28,23 @@ const mockProfessional = {
 
 describe('ChatModal', () => {
   it('renders the professional name in the header', () => {
-    render(
-      <ChatModal
-        user={mockUser}
-        professional={mockProfessional}
-        onClose={jest.fn()}
-      />,
-    )
+    render(<ChatModal user={mockUser} professional={mockProfessional} onClose={jest.fn()} />)
     expect(screen.getByText('Carlos Pedreiro')).toBeInTheDocument()
   })
 
   it('renders the profession subtitle', () => {
-    render(
-      <ChatModal
-        user={mockUser}
-        professional={mockProfessional}
-        onClose={jest.fn()}
-      />,
-    )
+    render(<ChatModal user={mockUser} professional={mockProfessional} onClose={jest.fn()} />)
     expect(screen.getByText('Pedreiro')).toBeInTheDocument()
   })
 
   it('renders empty state when no messages', () => {
-    render(
-      <ChatModal
-        user={mockUser}
-        professional={mockProfessional}
-        onClose={jest.fn()}
-      />,
-    )
+    render(<ChatModal user={mockUser} professional={mockProfessional} onClose={jest.fn()} />)
     expect(screen.getByText(/iniciar conversa/i)).toBeInTheDocument()
   })
 
   it('calls onClose when close button is clicked', () => {
     const onClose = jest.fn()
-    render(
-      <ChatModal
-        user={mockUser}
-        professional={mockProfessional}
-        onClose={onClose}
-      />,
-    )
+    render(<ChatModal user={mockUser} professional={mockProfessional} onClose={onClose} />)
     const closeButtons = screen.getAllByRole('button')
     fireEvent.click(closeButtons[0])
     expect(onClose).toHaveBeenCalled()
