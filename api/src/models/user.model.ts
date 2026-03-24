@@ -1,23 +1,29 @@
 import { z } from 'zod'
 
 export const registerSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(6),
+  name: z.string().min(2).max(100),
+  email: z.string().email().max(255),
+  password: z
+    .string()
+    .min(8, 'Senha deve ter pelo menos 8 caracteres')
+    .regex(/[a-z]/, 'Senha deve conter pelo menos uma letra minúscula')
+    .regex(/[A-Z]/, 'Senha deve conter pelo menos uma letra maiúscula')
+    .regex(/[0-9]/, 'Senha deve conter pelo menos um número')
+    .regex(/[^a-zA-Z0-9]/, 'Senha deve conter pelo menos um caractere especial'),
   role: z.enum(['profissional', 'contratante']),
   roles: z.array(z.enum(['profissional', 'contratante'])).min(1),
-  profession: z.string().optional(),
-  professions: z.array(z.string()).optional(),
+  profession: z.string().max(100).optional(),
+  professions: z.array(z.string().max(100)).max(20).optional(),
   hourlyRate: z.number().positive().optional(),
-  phone: z.string().optional(),
-  companyName: z.string().optional(),
-  cnpj: z.string().optional(),
-  addrCep: z.string().optional(),
-  addrStreet: z.string().optional(),
-  addrNeighborhood: z.string().optional(),
-  addrCity: z.string().optional(),
-  addrState: z.string().optional(),
-  addrNumber: z.string().optional(),
+  phone: z.string().max(20).optional(),
+  companyName: z.string().max(200).optional(),
+  cnpj: z.string().max(18).optional(),
+  addrCep: z.string().max(10).optional(),
+  addrStreet: z.string().max(200).optional(),
+  addrNeighborhood: z.string().max(100).optional(),
+  addrCity: z.string().max(100).optional(),
+  addrState: z.string().max(2).optional(),
+  addrNumber: z.string().max(20).optional(),
   addrLat: z.number().optional(),
   addrLng: z.number().optional(),
   compAddrCep: z.string().optional(),
@@ -34,16 +40,21 @@ export const loginSchema = z.object({
 })
 
 export const updateUserSchema = z.object({
-  name: z.string().min(2).optional(),
-  profession: z.string().optional(),
-  professions: z.array(z.string()).optional(),
+  name: z.string().min(2).max(100).optional(),
+  role: z.enum(['profissional', 'contratante']).optional(),
+  roles: z
+    .array(z.enum(['profissional', 'contratante']))
+    .min(1)
+    .optional(),
+  profession: z.string().max(100).optional(),
+  professions: z.array(z.string().max(100)).max(20).optional(),
   hourlyRate: z.number().positive().nullable().optional(),
   showHourlyRate: z.boolean().optional(),
   avatarUrl: z.string().url().nullable().optional(),
-  bio: z.string().optional(),
+  bio: z.string().max(1000).optional(),
   available: z.boolean().optional(),
   phone: z.string().nullable().optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string().max(50)).max(30).optional(),
   companyName: z.string().nullable().optional(),
   cnpj: z.string().nullable().optional(),
   website: z.string().nullable().optional(),
@@ -68,6 +79,15 @@ export const updateUserSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
+
+function safeJsonParse<T>(value: string | null, fallback: T): T {
+  if (!value) return fallback
+  try {
+    return JSON.parse(value) as T
+  } catch {
+    return fallback
+  }
+}
 
 export function sanitizeUser(user: {
   id: string
@@ -112,9 +132,9 @@ export function sanitizeUser(user: {
     name: user.name,
     email: user.email,
     role: user.role,
-    roles: JSON.parse(user.roles),
+    roles: safeJsonParse<string[]>(user.roles, []),
     profession: user.profession,
-    professions: user.professions ? JSON.parse(user.professions) : [],
+    professions: safeJsonParse<string[]>(user.professions, []),
     hourlyRate: user.hourlyRate,
     showHourlyRate: user.showHourlyRate,
     avatarUrl: user.avatarUrl,
@@ -123,7 +143,7 @@ export function sanitizeUser(user: {
     reviewCount: user.reviewCount,
     available: user.available,
     phone: user.phone,
-    tags: user.tags ? JSON.parse(user.tags) : [],
+    tags: safeJsonParse<string[]>(user.tags, []),
     companyName: user.companyName,
     cnpj: user.cnpj,
     website: user.website,

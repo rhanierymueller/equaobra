@@ -19,7 +19,10 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
 
   const token = header.slice(7)
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload
+    const payload = jwt.verify(token, process.env.JWT_SECRET!, {
+      algorithms: ['HS256'],
+      issuer: 'equaobra-api',
+    }) as JwtPayload
     req.user = payload
     next()
   } catch {

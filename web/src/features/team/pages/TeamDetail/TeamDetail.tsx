@@ -429,18 +429,20 @@ export function TeamDetail({ id }: { id: string }) {
           </svg>
           Minhas equipes
         </button>
-        <button
-          onClick={handleDelete}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
-          style={{
-            color: 'var(--color-danger-light)',
-            background: 'var(--color-danger-alpha-08)',
-            border: '1px solid var(--color-danger-alpha-15)',
-            cursor: 'pointer',
-          }}
-        >
-          Excluir equipe
-        </button>
+        {user?.id === team.ownerId && (
+          <button
+            onClick={handleDelete}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+            style={{
+              color: 'var(--color-danger-light)',
+              background: 'var(--color-danger-alpha-08)',
+              border: '1px solid var(--color-danger-alpha-15)',
+              cursor: 'pointer',
+            }}
+          >
+            Excluir equipe
+          </button>
+        )}
       </div>
 
       {/* Hero header */}

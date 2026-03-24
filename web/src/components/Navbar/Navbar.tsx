@@ -77,6 +77,7 @@ function BellButton({ userId }: { userId: string }) {
 
 function UserAvatar({ user }: { user: User }) {
   const router = useRouter()
+  const { logout } = useCurrentUser()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const initials = user.name
@@ -95,7 +96,7 @@ function UserAvatar({ user }: { user: User }) {
   }, [])
 
   function handleLogout() {
-    localStorage.removeItem('equobra_user')
+    logout()
     router.push('/')
   }
 

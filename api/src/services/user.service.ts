@@ -13,6 +13,7 @@ export async function updateUser(id: string, data: UpdateUserInput) {
     where: { id },
     data: {
       ...data,
+      roles: data.roles !== undefined ? JSON.stringify(data.roles) : undefined,
       professions: data.professions !== undefined ? JSON.stringify(data.professions) : undefined,
       tags: data.tags !== undefined ? JSON.stringify(data.tags) : undefined,
     },
@@ -26,9 +27,7 @@ export async function addReview(targetId: string, rating: number) {
 
   // Média ponderada incremental: (ratingAtual * total + novoRating) / (total + 1)
   const newCount = user.reviewCount + 1
-  const newRating = parseFloat(
-    ((user.rating * user.reviewCount + rating) / newCount).toFixed(2),
-  )
+  const newRating = parseFloat(((user.rating * user.reviewCount + rating) / newCount).toFixed(2))
 
   const updated = await prisma.user.update({
     where: { id: targetId },

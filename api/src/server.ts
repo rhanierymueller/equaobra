@@ -30,12 +30,23 @@ app.use(helmet())
 app.use(
   cors({
     origin(origin, cb) {
+      if (!origin && process.env.NODE_ENV === 'production')
+        return cb(new Error('Bloqueado por CORS'))
       if (!origin || allowedOrigins.includes(origin)) return cb(null, true)
       cb(new Error('Bloqueado por CORS'))
     },
+    credentials: true,
   }),
 )
 app.use(express.json({ limit: '1mb' }))
+
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: 'Muitas requisições. Tente novamente em breve.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -45,6 +56,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 })
 
+app.use('/api', globalLimiter)
 app.use('/api/auth', authLimiter, authRoutes)
 app.use('/api/users', usersRoutes)
 app.use('/api/opportunities', opportunitiesRoutes)
@@ -68,7 +80,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`EquaObra API rodando em http://localhost:${PORT}`)
+  console.warn(`EquaObra API rodando em http://localhost:${PORT}`)
 })
 
 export default app

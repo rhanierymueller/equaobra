@@ -7,11 +7,13 @@ export function getToken(): string | null {
 
 export function setToken(token: string): void {
   localStorage.setItem('equobra_token', token)
+  document.cookie = `equobra_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`
 }
 
 export function clearAuth(): void {
   localStorage.removeItem('equobra_token')
   localStorage.removeItem('equobra_user')
+  document.cookie = 'equobra_token=; path=/; max-age=0'
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -23,6 +25,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   const res = await fetch(`${BASE}${path}`, { ...init, headers })
+
+  if (res.status === 401) {
+    clearAuth()
+    if (typeof window !== 'undefined') window.location.href = '/auth'
+    throw new Error('Sessão expirada')
+  }
 
   if (res.status === 204) return undefined as T
   const data = await res.json()

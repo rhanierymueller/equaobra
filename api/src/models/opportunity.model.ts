@@ -1,18 +1,18 @@
 import { z } from 'zod'
 
 export const opportunitySchema = z.object({
-  contractorName: z.string(),
-  companyName: z.string().optional(),
-  avatarInitials: z.string(),
-  obraDescription: z.string().min(10),
-  obraLocation: z.string().min(2),
+  contractorName: z.string().max(100),
+  companyName: z.string().max(200).optional(),
+  avatarInitials: z.string().max(5),
+  obraDescription: z.string().min(10).max(5000),
+  obraLocation: z.string().min(2).max(200),
   lat: z.number().optional(),
   lng: z.number().optional(),
-  obraStart: z.string().optional(),
-  obraDuration: z.string().optional(),
-  lookingForProfessions: z.array(z.string()).min(1),
-  contactEmail: z.string().email(),
-  contactPhone: z.string().optional(),
+  obraStart: z.string().max(50).optional(),
+  obraDuration: z.string().max(50).optional(),
+  lookingForProfessions: z.array(z.string().max(100)).min(1).max(20),
+  contactEmail: z.string().email().max(255),
+  contactPhone: z.string().max(20).optional(),
 })
 
 export type OpportunityInput = z.infer<typeof opportunitySchema>
@@ -36,5 +36,11 @@ export function deserializeOpportunity(opp: {
   createdAt: Date
   updatedAt: Date
 }) {
-  return { ...opp, lookingForProfessions: JSON.parse(opp.lookingForProfessions) as string[] }
+  let professions: string[] = []
+  try {
+    professions = JSON.parse(opp.lookingForProfessions) as string[]
+  } catch {
+    professions = []
+  }
+  return { ...opp, lookingForProfessions: professions }
 }

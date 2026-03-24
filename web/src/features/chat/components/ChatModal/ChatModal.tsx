@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
+import { useState, useEffect, useRef, useMemo } from 'react'
 
 import { useChat } from '../../hooks/useChat'
 
@@ -238,9 +238,12 @@ export function ChatModal({ user, professional, onClose }: ChatModalProps) {
                         }}
                       >
                         {professional.avatarUrl ? (
-                          <img
+                          <Image
                             src={professional.avatarUrl}
                             alt=""
+                            width={28}
+                            height={28}
+                            unoptimized
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         ) : (

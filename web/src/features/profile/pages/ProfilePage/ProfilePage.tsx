@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import type { ValidationError } from 'yup'
 
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
+import { passwordSchema, profileSchema } from '@/src/features/profile/validation/profileSchema'
 import { useTeams } from '@/src/features/team/hooks/useTeams'
 import { api } from '@/src/services/api'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
@@ -66,70 +68,110 @@ function InputField({
   style,
   onFocus,
   onBlur,
+  error,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+}: React.InputHTMLAttributes<HTMLInputElement> & { error?: string }) {
   const [isFocused, setIsFocused] = useState(false)
+  const hasError = !!error
+  const { flex, flexGrow, flexShrink, flexBasis, ...inputStyle } = (style ?? {}) as Record<
+    string,
+    unknown
+  >
+  const wrapperStyle =
+    flex !== undefined || flexGrow !== undefined || flexShrink !== undefined
+      ? ({ flex, flexGrow, flexShrink, flexBasis } as React.CSSProperties)
+      : undefined
   return (
-    <input
-      {...props}
-      style={{
-        width: '100%',
-        background: isFocused ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
-        border: `1px solid ${isFocused ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.09)'}`,
-        color: 'var(--color-text)',
-        borderRadius: 10,
-        padding: '9px 12px',
-        fontSize: 13,
-        outline: 'none',
-        transition: 'border-color 0.15s, background 0.15s',
-        ...style,
-      }}
-      onFocus={(e) => {
-        setIsFocused(true)
-        onFocus?.(e)
-      }}
-      onBlur={(e) => {
-        setIsFocused(false)
-        onBlur?.(e)
-      }}
-    />
+    <div style={wrapperStyle}>
+      <input
+        {...props}
+        style={{
+          width: '100%',
+          background: isFocused ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+          border: `1px solid ${hasError ? 'var(--color-danger-light)' : isFocused ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.09)'}`,
+          color: 'var(--color-text)',
+          borderRadius: 10,
+          padding: '9px 12px',
+          fontSize: 13,
+          outline: 'none',
+          transition: 'border-color 0.15s, background 0.15s',
+          ...(inputStyle as React.CSSProperties),
+        }}
+        onFocus={(e) => {
+          setIsFocused(true)
+          onFocus?.(e)
+        }}
+        onBlur={(e) => {
+          setIsFocused(false)
+          onBlur?.(e)
+        }}
+      />
+      {hasError && (
+        <p className="text-xs mt-1" style={{ color: 'var(--color-danger-light)' }}>
+          {error}
+        </p>
+      )}
+    </div>
   )
+}
+
+function readStoredUser(): User | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem('equobra_user')
+    return raw ? (JSON.parse(raw) as User) : null
+  } catch {
+    return null
+  }
 }
 
 export function ProfilePage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const [storedUser] = useState(readStoredUser)
+  const [user, setUser] = useState<User | null>(storedUser)
+  const loaded = true
 
-  const [name, setName] = useState('')
-  const [roles, setRoles] = useState<UserRole[]>(['profissional'])
-  const [professions, setProfessions] = useState<string[]>([])
+  const [name, setName] = useState(storedUser?.name ?? '')
+  const [roles, setRoles] = useState<UserRole[]>(
+    storedUser?.roles ?? (storedUser ? [storedUser.role] : ['profissional']),
+  )
+  const [professions, setProfessions] = useState<string[]>(
+    storedUser?.professions ?? (storedUser?.profession ? [storedUser.profession] : []),
+  )
   const [profInput, setProfInput] = useState('')
-  const [hourlyRate, setHourlyRate] = useState('')
-  const [showRate, setShowRate] = useState(true)
+  const [hourlyRate, setHourlyRate] = useState(
+    storedUser?.hourlyRate != null ? String(storedUser.hourlyRate) : '',
+  )
+  const [showRate, setShowRate] = useState(storedUser?.showHourlyRate !== false)
 
-  const [companyName, setCompanyName] = useState('')
-  const [cnpj, setCnpj] = useState('')
-  const [website, setWebsite] = useState('')
-  const [instagram, setInstagram] = useState('')
-  const [facebook, setFacebook] = useState('')
-  const [saveError, setSaveError] = useState('')
+  const [companyName, setCompanyName] = useState(storedUser?.companyName ?? '')
+  const [cnpj, setCnpj] = useState(storedUser?.cnpj ?? '')
+  const [website, setWebsite] = useState(storedUser?.website ?? '')
+  const [instagram, setInstagram] = useState(storedUser?.instagram ?? '')
+  const [facebook, setFacebook] = useState(storedUser?.facebook ?? '')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
-  const [cep, setCep] = useState('')
-  const [street, setStreet] = useState('')
-  const [neighborhood, setNeighborhood] = useState('')
-  const [city, setCity] = useState('')
-  const [addrState, setAddrState] = useState('')
-  const [addrNumber, setAddrNumber] = useState('')
+  const [cep, setCep] = useState(storedUser?.address?.cep ? formatCep(storedUser.address.cep) : '')
+  const [street, setStreet] = useState(storedUser?.address?.street ?? '')
+  const [neighborhood, setNeighborhood] = useState(storedUser?.address?.neighborhood ?? '')
+  const [city, setCity] = useState(storedUser?.address?.city ?? '')
+  const [addrState, setAddrState] = useState(storedUser?.address?.state ?? '')
+  const [addrNumber, setAddrNumber] = useState(storedUser?.address?.number ?? '')
   const [cepLoading, setCepLoading] = useState(false)
   const [cepError, setCepError] = useState('')
 
-  const [companyCep, setCompanyCep] = useState('')
-  const [companyStreet, setCompanyStreet] = useState('')
-  const [companyNeighborhood, setCompanyNeighborhood] = useState('')
-  const [companyCity, setCompanyCity] = useState('')
-  const [companyAddrState, setCompanyAddrState] = useState('')
-  const [companyAddrNumber, setCompanyAddrNumber] = useState('')
+  const [companyCep, setCompanyCep] = useState(
+    storedUser?.companyAddress?.cep ? formatCep(storedUser.companyAddress.cep) : '',
+  )
+  const [companyStreet, setCompanyStreet] = useState(storedUser?.companyAddress?.street ?? '')
+  const [companyNeighborhood, setCompanyNeighborhood] = useState(
+    storedUser?.companyAddress?.neighborhood ?? '',
+  )
+  const [companyCity, setCompanyCity] = useState(storedUser?.companyAddress?.city ?? '')
+  const [companyAddrState, setCompanyAddrState] = useState(storedUser?.companyAddress?.state ?? '')
+  const [companyAddrNumber, setCompanyAddrNumber] = useState(
+    storedUser?.companyAddress?.number ?? '',
+  )
   const [companyCepLoading, setCompanyCepLoading] = useState(false)
   const [companyCepError, setCompanyCepError] = useState('')
 
@@ -142,67 +184,25 @@ export function ProfilePage() {
   const [saveMsg, setSaveMsg] = useState('')
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
 
-  const [oppActive, setOppActive] = useState(false)
-  const [oppDescription, setOppDescription] = useState('')
-  const [oppLocation, setOppLocation] = useState('')
-  const [oppStart, setOppStart] = useState('')
-  const [oppDuration, setOppDuration] = useState('')
-  const [oppProfessions, setOppProfessions] = useState<string[]>([])
-  const [oppProfInput, setOppProfInput] = useState('')
-  const [oppSaveMsg, setOppSaveMsg] = useState('')
-
   const { teams } = useTeams()
   const { publish, updateOpportunity, getContractorOpportunities } = useOpportunities()
-  const [myOppId, setMyOppId] = useState<string | undefined>()
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('equobra_user')
-      if (raw) {
-        const u = JSON.parse(raw) as User
-        setUser(u)
-        setName(u.name)
-        setRoles(u.roles ?? [u.role])
-        setProfessions(u.professions ?? (u.profession ? [u.profession] : []))
-        setHourlyRate(u.hourlyRate != null ? String(u.hourlyRate) : '')
-        setShowRate(u.showHourlyRate !== false)
-        setCompanyName(u.companyName ?? '')
-        setCnpj(u.cnpj ?? '')
-        setWebsite(u.website ?? '')
-        setInstagram(u.instagram ?? '')
-        setFacebook(u.facebook ?? '')
-        if (u.address) {
-          setCep(u.address.cep ? formatCep(u.address.cep) : '')
-          setStreet(u.address.street ?? '')
-          setNeighborhood(u.address.neighborhood ?? '')
-          setCity(u.address.city ?? '')
-          setAddrState(u.address.state ?? '')
-          setAddrNumber(u.address.number ?? '')
-        }
-        if (u.companyAddress) {
-          setCompanyCep(u.companyAddress.cep ? formatCep(u.companyAddress.cep) : '')
-          setCompanyStreet(u.companyAddress.street ?? '')
-          setCompanyNeighborhood(u.companyAddress.neighborhood ?? '')
-          setCompanyCity(u.companyAddress.city ?? '')
-          setCompanyAddrState(u.companyAddress.state ?? '')
-          setCompanyAddrNumber(u.companyAddress.number ?? '')
-        }
-        if (u.role === 'contratante') {
-          const existing = getContractorOpportunities(u.id)[0]
-          if (existing) {
-            setMyOppId(existing.id)
-            setOppActive(existing.active)
-            setOppDescription(existing.obraDescription)
-            setOppLocation(existing.obraLocation)
-            setOppStart(existing.obraStart ?? '')
-            setOppDuration(existing.obraDuration ?? '')
-            setOppProfessions(existing.lookingForProfessions)
-          }
-        }
-      }
-    } catch {}
-    setLoaded(true)
-  }, [getContractorOpportunities])
+  const [initialOpp] = useState(() => {
+    if (!storedUser || storedUser.role !== 'contratante') return null
+    return getContractorOpportunities(storedUser.id)[0] ?? null
+  })
+
+  const [myOppId] = useState<string | undefined>(initialOpp?.id)
+  const [oppActive, setOppActive] = useState(initialOpp?.active ?? false)
+  const [oppDescription, setOppDescription] = useState(initialOpp?.obraDescription ?? '')
+  const [oppLocation, setOppLocation] = useState(initialOpp?.obraLocation ?? '')
+  const [oppStart, setOppStart] = useState(initialOpp?.obraStart ?? '')
+  const [oppDuration, setOppDuration] = useState(initialOpp?.obraDuration ?? '')
+  const [oppProfessions, setOppProfessions] = useState<string[]>(
+    initialOpp?.lookingForProfessions ?? [],
+  )
+  const [oppProfInput, setOppProfInput] = useState('')
+  const [oppSaveMsg, setOppSaveMsg] = useState('')
 
   const myTeams = user
     ? teams.filter(
@@ -254,12 +254,6 @@ export function ProfilePage() {
   const isPro = roles.includes('profissional')
   const isCont = roles.includes('contratante')
   const displayName = isCont && companyName ? companyName : user.name
-  const initials = displayName
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
 
   async function handleCepChange(raw: string) {
     const formatted = formatCep(raw)
@@ -297,52 +291,37 @@ export function ProfilePage() {
     }
   }
 
+  function yupErrorsToRecord(err: ValidationError): Record<string, string> {
+    const map: Record<string, string> = {}
+    if (err.inner.length === 0 && err.path) {
+      map[err.path] = err.message
+    } else {
+      for (const e of err.inner) {
+        if (e.path && !map[e.path]) map[e.path] = e.message
+      }
+    }
+    return map
+  }
+
   async function handleSaveProfile() {
-    setSaveError('')
+    setFieldErrors({})
 
-    if (!name.trim()) {
-      setSaveError('Nome é obrigatório')
+    try {
+      await profileSchema.validate(
+        { name, roles, companyName, cnpj, website, instagram, facebook },
+        { abortEarly: false, context: { isCont } },
+      )
+    } catch (err) {
+      const errors = yupErrorsToRecord(err as ValidationError)
+      setFieldErrors(errors)
       setShowSaveConfirm(false)
+      const firstKey = Object.keys(errors)[0]
+      const el = document.getElementById(`profile-${firstKey}`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        el.focus()
+      }
       return
-    }
-    if (roles.length === 0) {
-      setSaveError('Selecione um tipo de conta')
-      setShowSaveConfirm(false)
-      return
-    }
-
-    if (isCont) {
-      if (!companyName.trim()) {
-        setSaveError('Nome da empresa é obrigatório')
-        setShowSaveConfirm(false)
-        return
-      }
-      if (!cnpj.trim()) {
-        setSaveError('CNPJ é obrigatório')
-        setShowSaveConfirm(false)
-        return
-      }
-      const cnpjDigits = cnpj.replace(/\D/g, '')
-      if (cnpjDigits.length !== 14) {
-        setSaveError('CNPJ deve ter 14 dígitos')
-        setShowSaveConfirm(false)
-        return
-      }
-      if (website.trim() && !/^https?:\/\/.+\..+/.test(website.trim())) {
-        setSaveError('URL do site inválida (ex: https://site.com)')
-        setShowSaveConfirm(false)
-        return
-      }
-      if (instagram.trim() && /\s/.test(instagram.trim())) {
-        setSaveError('Instagram inválido')
-        setShowSaveConfirm(false)
-        return
-      }
-      if (facebook.trim() && /\s/.test(facebook.trim())) {
-        setSaveError('Facebook inválido')
-        setShowSaveConfirm(false)
-        return
-      }
     }
 
     const addrCep = cep.replace(/\D/g, '')
@@ -368,6 +347,8 @@ export function ProfilePage() {
     try {
       const apiPayload = {
         name: name.trim(),
+        role: roles[0],
+        roles,
         professions,
         profession: professions[0] ?? user!.profession,
         hourlyRate: showRate && hourlyRate ? Number(hourlyRate) : null,
@@ -484,28 +465,33 @@ export function ProfilePage() {
     }
   }
 
-  function handleChangePassword() {
+  async function handleChangePassword() {
     setPwError('')
     setPwSuccess(false)
-    const stored = localStorage.getItem('equobra_password') ?? '123456'
-    if (pwCurrent !== stored) {
-      setPwError('Senha atual incorreta')
+
+    try {
+      await passwordSchema.validate(
+        { currentPassword: pwCurrent, newPassword: pwNew, confirmPassword: pwConfirm },
+        { abortEarly: true },
+      )
+    } catch (err) {
+      setPwError((err as ValidationError).message)
       return
     }
-    if (pwNew.length < 6) {
-      setPwError('A nova senha precisa ter pelo menos 6 caracteres')
-      return
+
+    try {
+      await api.post('/api/auth/change-password', {
+        currentPassword: pwCurrent,
+        newPassword: pwNew,
+      })
+      setPwCurrent('')
+      setPwNew('')
+      setPwConfirm('')
+      setPwSuccess(true)
+      setTimeout(() => setPwSuccess(false), 3000)
+    } catch {
+      setPwError('Senha atual incorreta ou erro ao alterar')
     }
-    if (pwNew !== pwConfirm) {
-      setPwError('As senhas não coincidem')
-      return
-    }
-    localStorage.setItem('equobra_password', pwNew)
-    setPwCurrent('')
-    setPwNew('')
-    setPwConfirm('')
-    setPwSuccess(true)
-    setTimeout(() => setPwSuccess(false), 3000)
   }
 
   return (
@@ -650,9 +636,14 @@ export function ProfilePage() {
           <Section title="Dados pessoais">
             <Field label="Nome completo">
               <InputField
+                id="profile-name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value)
+                  setFieldErrors((prev) => ({ ...prev, name: '' }))
+                }}
                 placeholder="Seu nome"
+                error={fieldErrors.name}
               />
             </Field>
 
@@ -726,13 +717,19 @@ export function ProfilePage() {
               <>
                 <Field label="Nome da empresa *">
                   <InputField
+                    id="profile-companyName"
                     value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
+                    onChange={(e) => {
+                      setCompanyName(e.target.value)
+                      setFieldErrors((prev) => ({ ...prev, companyName: '' }))
+                    }}
                     placeholder="Ex: Construtora Silva Ltda"
+                    error={fieldErrors.companyName}
                   />
                 </Field>
                 <Field label="CNPJ *">
                   <InputField
+                    id="profile-cnpj"
                     value={cnpj}
                     onChange={(e) => {
                       const digits = e.target.value.replace(/\D/g, '').slice(0, 14)
@@ -742,16 +739,23 @@ export function ProfilePage() {
                         .replace(/\.(\d{3})(\d)/, '.$1/$2')
                         .replace(/(\d{4})(\d)/, '$1-$2')
                       setCnpj(formatted)
+                      setFieldErrors((prev) => ({ ...prev, cnpj: '' }))
                     }}
                     placeholder="00.000.000/0000-00"
                     maxLength={18}
+                    error={fieldErrors.cnpj}
                   />
                 </Field>
                 <Field label="Site (opcional)">
                   <InputField
+                    id="profile-website"
                     value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
+                    onChange={(e) => {
+                      setWebsite(e.target.value)
+                      setFieldErrors((prev) => ({ ...prev, website: '' }))
+                    }}
                     placeholder="https://suaempresa.com.br"
+                    error={fieldErrors.website}
                   />
                 </Field>
                 <Field label="Instagram (opcional)">
@@ -760,10 +764,15 @@ export function ProfilePage() {
                       @
                     </span>
                     <InputField
+                      id="profile-instagram"
                       value={instagram}
-                      onChange={(e) => setInstagram(e.target.value.replace(/^@/, ''))}
+                      onChange={(e) => {
+                        setInstagram(e.target.value.replace(/^@/, ''))
+                        setFieldErrors((prev) => ({ ...prev, instagram: '' }))
+                      }}
                       placeholder="suaempresa"
                       style={{ flex: 1 }}
+                      error={fieldErrors.instagram}
                     />
                   </div>
                 </Field>
@@ -779,10 +788,15 @@ export function ProfilePage() {
                       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                     </svg>
                     <InputField
+                      id="profile-facebook"
                       value={facebook}
-                      onChange={(e) => setFacebook(e.target.value)}
+                      onChange={(e) => {
+                        setFacebook(e.target.value)
+                        setFieldErrors((prev) => ({ ...prev, facebook: '' }))
+                      }}
                       placeholder="facebook.com/suaempresa ou nome de usuário"
                       style={{ flex: 1 }}
+                      error={fieldErrors.facebook}
                     />
                   </div>
                 </Field>
@@ -1175,11 +1189,6 @@ export function ProfilePage() {
               </div>
             )}
 
-            {saveError && (
-              <p className="text-xs mb-3" style={{ color: 'var(--color-danger-light)' }}>
-                {saveError}
-              </p>
-            )}
             <button
               onClick={() => setShowSaveConfirm(true)}
               className="w-full py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90"

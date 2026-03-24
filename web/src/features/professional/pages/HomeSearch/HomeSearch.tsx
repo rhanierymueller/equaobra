@@ -201,23 +201,6 @@ function oppToChatTarget(opp: Opportunity): ChatTarget {
 
 export default function HomeSearch() {
   const router = useRouter()
-  const {
-    professionals,
-    filters,
-    selected,
-    resultCount,
-    setSearch,
-    setLocality,
-    toggleProfession,
-    setMinRating,
-    setMaxDistance,
-    setAvailableOnly,
-    selectProfessional,
-    resetFilters,
-  } = useProfessionals()
-
-  const { opportunities } = useOpportunities()
-
   const { user } = useCurrentUser()
   const [filterOpen, setFilterOpen] = useState(true)
   const [listOpen, setListOpen] = useState(true)
@@ -231,6 +214,7 @@ export default function HomeSearch() {
   const [oppCenter, setOppCenter] = useState<[number, number] | null>(null)
   const [mapFlyTo, setMapFlyTo] = useState<[number, number] | null>(null)
   const [userGeoLoc, setUserGeoLoc] = useState<[number, number] | null>(null)
+  const [refLocation, setRefLocation] = useState<[number, number] | null>(null)
   const [mapKey] = useState(() => Date.now())
 
   useEffect(() => {
@@ -239,6 +223,7 @@ export default function HomeSearch() {
       ({ coords }) => {
         const pos: [number, number] = [coords.latitude, coords.longitude]
         setUserGeoLoc(pos)
+        setRefLocation(pos)
         setMapFlyTo(pos)
         setOppCenter(pos)
       },
@@ -246,6 +231,36 @@ export default function HomeSearch() {
       { timeout: 6000 },
     )
   }, [])
+
+  const {
+    professionals,
+    filters,
+    selected,
+    resultCount,
+    isLoading,
+    isError,
+    setSearch,
+    setLocality,
+    toggleProfession,
+    setMinRating,
+    setMaxDistance,
+    setAvailableOnly,
+    selectProfessional,
+    resetFilters,
+  } = useProfessionals(refLocation, user?.id)
+
+  const { opportunities } = useOpportunities()
+
+  function handleResetFilters() {
+    resetFilters()
+    setRefLocation(userGeoLoc)
+    if (userGeoLoc) setMapFlyTo(userGeoLoc)
+  }
+
+  function handleSetLocality(locality: string) {
+    setLocality(locality)
+    if (!locality) setRefLocation(userGeoLoc)
+  }
 
   function handleModeChange(m: MapMode) {
     if (m === 'obras' && !oppLocality && filters.locality) {
@@ -309,9 +324,12 @@ export default function HomeSearch() {
                   onSetMinRating={setMinRating}
                   onSetMaxDistance={setMaxDistance}
                   onSetAvailableOnly={setAvailableOnly}
-                  onSetLocality={setLocality}
-                  onLocationSelect={(lat, lng) => setMapFlyTo([lat, lng])}
-                  onReset={resetFilters}
+                  onSetLocality={handleSetLocality}
+                  onLocationSelect={(lat, lng) => {
+                    setRefLocation([lat, lng])
+                    setMapFlyTo([lat, lng])
+                  }}
+                  onReset={handleResetFilters}
                 />
               ) : (
                 <OpportunityFilterBar
@@ -509,8 +527,43 @@ export default function HomeSearch() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
-              {mapMode === 'profissionais'
-                ? professionals.map((p) => (
+              {mapMode === 'profissionais' ? (
+                isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <div
+                      className="w-8 h-8 rounded-full animate-spin"
+                      style={{
+                        border: '3px solid var(--color-primary-alpha-20)',
+                        borderTopColor: 'var(--color-primary)',
+                      }}
+                    />
+                    <p className="text-xs" style={{ color: 'rgba(245,240,235,0.4)' }}>
+                      Buscando profissionais...
+                    </p>
+                  </div>
+                ) : isError ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-2 text-center px-4">
+                    <p
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--color-danger-light)' }}
+                    >
+                      Erro ao carregar profissionais
+                    </p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,235,0.4)' }}>
+                      Verifique sua conexão e tente novamente.
+                    </p>
+                  </div>
+                ) : professionals.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-2 text-center px-4">
+                    <p className="text-sm font-medium" style={{ color: 'rgba(245,240,235,0.6)' }}>
+                      Nenhum profissional encontrado
+                    </p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,235,0.35)' }}>
+                      Tente ajustar os filtros ou buscar em outra localidade.
+                    </p>
+                  </div>
+                ) : (
+                  professionals.map((p) => (
                     <ProfessionalCard
                       key={p.id}
                       professional={p}
@@ -518,63 +571,75 @@ export default function HomeSearch() {
                       onClick={(pro) => selectProfessional(selected?.id === pro.id ? null : pro)}
                     />
                   ))
-                : filteredOpportunities.map((opp) => (
-                    <button
-                      key={opp.id}
-                      type="button"
-                      onClick={() => setSelectedOpp(selectedOpp?.id === opp.id ? null : opp)}
-                      style={{
-                        textAlign: 'left',
-                        background:
-                          selectedOpp?.id === opp.id
-                            ? 'var(--color-primary-alpha-10)'
-                            : 'var(--color-surface-overlay)',
-                        border: `1px solid ${selectedOpp?.id === opp.id ? 'var(--color-primary-alpha-30)' : 'var(--color-border-faint)'}`,
-                        borderRadius: 12,
-                        padding: '10px 12px',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                      }}
+                )
+              ) : filteredOpportunities.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-2 text-center px-4">
+                  <p className="text-sm font-medium" style={{ color: 'rgba(245,240,235,0.6)' }}>
+                    Nenhuma obra encontrada
+                  </p>
+                  <p className="text-xs" style={{ color: 'rgba(245,240,235,0.35)' }}>
+                    Tente ajustar os filtros ou buscar em outra região.
+                  </p>
+                </div>
+              ) : (
+                filteredOpportunities.map((opp) => (
+                  <button
+                    key={opp.id}
+                    type="button"
+                    onClick={() => setSelectedOpp(selectedOpp?.id === opp.id ? null : opp)}
+                    style={{
+                      textAlign: 'left',
+                      background:
+                        selectedOpp?.id === opp.id
+                          ? 'var(--color-primary-alpha-10)'
+                          : 'var(--color-surface-overlay)',
+                      border: `1px solid ${selectedOpp?.id === opp.id ? 'var(--color-primary-alpha-30)' : 'var(--color-border-faint)'}`,
+                      borderRadius: 12,
+                      padding: '10px 12px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <p className="text-sm font-semibold text-white truncate">
+                      {opp.companyName ?? opp.contractorName}
+                    </p>
+                    <p
+                      className="text-xs mt-0.5 truncate"
+                      style={{ color: 'rgba(245,240,235,0.4)' }}
                     >
-                      <p className="text-sm font-semibold text-white truncate">
-                        {opp.companyName ?? opp.contractorName}
-                      </p>
-                      <p
-                        className="text-xs mt-0.5 truncate"
-                        style={{ color: 'rgba(245,240,235,0.4)' }}
-                      >
-                        📍 {opp.obraLocation}
-                      </p>
-                      <p
-                        className="text-xs mt-1.5 line-clamp-2 leading-relaxed"
-                        style={{ color: 'rgba(245,240,235,0.6)' }}
-                      >
-                        {opp.obraDescription}
-                      </p>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {opp.lookingForProfessions.slice(0, 3).map((prof) => (
-                          <span
-                            key={prof}
-                            style={{
-                              fontSize: 10,
-                              padding: '2px 7px',
-                              borderRadius: 99,
-                              background: 'var(--color-primary-alpha-10)',
-                              color: 'var(--color-primary)',
-                              border: '1px solid var(--color-primary-alpha-20)',
-                            }}
-                          >
-                            {prof}
-                          </span>
-                        ))}
-                        {opp.lookingForProfessions.length > 3 && (
-                          <span style={{ fontSize: 10, color: 'rgba(245,240,235,0.3)' }}>
-                            +{opp.lookingForProfessions.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  ))}
+                      📍 {opp.obraLocation}
+                    </p>
+                    <p
+                      className="text-xs mt-1.5 line-clamp-2 leading-relaxed"
+                      style={{ color: 'rgba(245,240,235,0.6)' }}
+                    >
+                      {opp.obraDescription}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {opp.lookingForProfessions.slice(0, 3).map((prof) => (
+                        <span
+                          key={prof}
+                          style={{
+                            fontSize: 10,
+                            padding: '2px 7px',
+                            borderRadius: 99,
+                            background: 'var(--color-primary-alpha-10)',
+                            color: 'var(--color-primary)',
+                            border: '1px solid var(--color-primary-alpha-20)',
+                          }}
+                        >
+                          {prof}
+                        </span>
+                      ))}
+                      {opp.lookingForProfessions.length > 3 && (
+                        <span style={{ fontSize: 10, color: 'rgba(245,240,235,0.3)' }}>
+                          +{opp.lookingForProfessions.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </aside>

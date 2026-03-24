@@ -45,6 +45,19 @@ export async function registerUser(data: RegisterInput) {
   return { token, user: sanitizeUser(user) }
 }
 
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) return { error: 'Usuário não encontrado', status: 404 }
+
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash)
+  if (!valid) return { error: 'Senha atual incorreta', status: 401 }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10)
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } })
+
+  return { success: true }
+}
+
 export async function loginUser(data: LoginInput) {
   const user = await prisma.user.findUnique({ where: { email: data.email } })
   if (!user) return { error: 'E-mail ou senha incorretos', status: 401 }

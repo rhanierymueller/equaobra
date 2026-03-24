@@ -37,14 +37,21 @@ export async function getProfessionals(req: AuthRequest, res: Response): Promise
 }
 
 export async function postReview(req: AuthRequest, res: Response): Promise<void> {
+  const targetId = String(req.params.id)
+
+  if (targetId === req.user!.userId) {
+    res.status(403).json({ error: 'Não é permitido avaliar a si mesmo' })
+    return
+  }
+
   const { rating } = req.body as { rating: unknown }
 
-  if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+  if (typeof rating !== 'number' || !Number.isFinite(rating) || rating < 1 || rating > 5) {
     res.status(400).json({ error: 'rating deve ser um número entre 1 e 5' })
     return
   }
 
-  const updated = await addReview(String(req.params.id), rating)
+  const updated = await addReview(targetId, rating)
   if (!updated) {
     res.status(404).json({ error: 'Usuário não encontrado' })
     return

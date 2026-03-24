@@ -2,10 +2,9 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 
-import { MOCK_PROFESSIONALS } from '../professional.mock'
-
 import { api } from '@/src/services/api'
 import type { Professional, ProfessionalFilters, Profession } from '@/src/types/professional.types'
+import { haversineKm } from '@/src/utils/geolocation'
 
 const DEFAULT_FILTERS: ProfessionalFilters = {
   search: '',
@@ -61,7 +60,24 @@ function userToProfessional(u: RawUser): Professional {
   }
 }
 
-function matchesFilters(p: Professional, f: ProfessionalFilters): boolean {
+function isValidCoord(lat: number, lng: number): boolean {
+  return lat !== 0 || lng !== 0
+}
+
+function roundToOneDecimal(value: number): number {
+  return Math.round(value * 10) / 10
+}
+
+function withDistance(pros: Professional[], origin: [number, number] | null): Professional[] {
+  if (!origin || !isValidCoord(origin[0], origin[1])) return pros
+  return pros.map((p) => {
+    if (!isValidCoord(p.location.lat, p.location.lng)) return p
+    const km = haversineKm(origin, [p.location.lat, p.location.lng])
+    return { ...p, distanceKm: roundToOneDecimal(km) }
+  })
+}
+
+function matchesFilters(p: Professional, f: ProfessionalFilters, hasRef: boolean): boolean {
   if (f.search) {
     const q = f.search.toLowerCase()
     const matches =
@@ -81,7 +97,7 @@ function matchesFilters(p: Professional, f: ProfessionalFilters): boolean {
   }
   if (f.professions.length > 0 && !f.professions.includes(p.profession)) return false
   if (p.rating < f.minRating) return false
-  if (p.distanceKm > f.maxDistanceKm) return false
+  if (hasRef && f.maxDistanceKm < 50 && p.distanceKm > f.maxDistanceKm) return false
   if (f.availableOnly && !p.available) return false
   return true
 }
@@ -91,6 +107,8 @@ export interface UseProfessionalsReturn {
   filters: ProfessionalFilters
   selected: Professional | null
   resultCount: number
+  isLoading: boolean
+  isError: boolean
   setSearch: (search: string) => void
   setLocality: (locality: string) => void
   toggleProfession: (profession: Profession) => void
@@ -101,21 +119,43 @@ export interface UseProfessionalsReturn {
   resetFilters: () => void
 }
 
-export function useProfessionals(): UseProfessionalsReturn {
-  const [allProfessionals, setAllProfessionals] = useState<Professional[]>(MOCK_PROFESSIONALS)
+export function useProfessionals(
+  referenceLocation: [number, number] | null = null,
+  currentUserId?: string,
+): UseProfessionalsReturn {
+  const [allProfessionals, setAllProfessionals] = useState<Professional[]>([])
   const [filters, setFilters] = useState<ProfessionalFilters>(DEFAULT_FILTERS)
   const [selected, setSelected] = useState<Professional | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     api
       .get<RawUser[]>('/api/users/professionals')
-      .then((data) => setAllProfessionals(data.map(userToProfessional)))
-      .catch(() => setAllProfessionals(MOCK_PROFESSIONALS))
+      .then((data) => {
+        setAllProfessionals(data.map(userToProfessional))
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setIsError(true)
+        setIsLoading(false)
+      })
   }, [])
 
+  const withDist = useMemo(
+    () => withDistance(allProfessionals, referenceLocation),
+    [allProfessionals, referenceLocation],
+  )
+
+  const hasRef =
+    referenceLocation !== null && (referenceLocation[0] !== 0 || referenceLocation[1] !== 0)
+
   const professionals = useMemo(
-    () => allProfessionals.filter((p) => matchesFilters(p, filters)),
-    [allProfessionals, filters],
+    () =>
+      withDist
+        .filter((p) => p.id !== currentUserId && matchesFilters(p, filters, hasRef))
+        .sort((a, b) => a.distanceKm - b.distanceKm),
+    [withDist, filters, hasRef, currentUserId],
   )
 
   const setSearch = useCallback((search: string) => setFilters((prev) => ({ ...prev, search })), [])
@@ -151,6 +191,8 @@ export function useProfessionals(): UseProfessionalsReturn {
     filters,
     selected,
     resultCount: professionals.length,
+    isLoading,
+    isError,
     setSearch,
     setLocality,
     toggleProfession,

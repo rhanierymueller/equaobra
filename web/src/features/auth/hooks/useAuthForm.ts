@@ -20,8 +20,10 @@ function validateEmail(email: string): string | null {
 function validatePassword(password: string): string | null {
   if (!password) return 'Senha é obrigatória'
   if (password.length < 8) return 'Mínimo de 8 caracteres'
+  if (!/[a-z]/.test(password)) return 'Deve conter pelo menos uma letra minúscula'
+  if (!/[A-Z]/.test(password)) return 'Deve conter pelo menos uma letra maiúscula'
   if (!/\d/.test(password)) return 'Deve conter pelo menos um número'
-  if (!/[a-zA-Z]/.test(password)) return 'Deve conter pelo menos uma letra'
+  if (!/[^a-zA-Z0-9]/.test(password)) return 'Deve conter pelo menos um caractere especial'
   return null
 }
 
@@ -87,11 +89,7 @@ export function useLoginForm(): UseLoginFormReturn {
       const errs = validate(values)
       setErrors(errs)
       if (Object.keys(errs).length > 0) return
-      setIsSubmitting(true)
-      setTimeout(() => {
-        setIsSubmitting(false)
-        onSuccess(values)
-      }, 800)
+      onSuccess(values)
     },
     [values, validate],
   )
@@ -242,11 +240,7 @@ export function useRegisterForm(): UseRegisterFormReturn {
       const errs = validate(values)
       setErrors(errs)
       if (Object.keys(errs).length > 0) return
-      setIsSubmitting(true)
-      setTimeout(() => {
-        setIsSubmitting(false)
-        onSuccess(values)
-      }, 800)
+      onSuccess(values)
     },
     [values, validate],
   )
