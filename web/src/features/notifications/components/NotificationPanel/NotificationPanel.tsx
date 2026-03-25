@@ -1,12 +1,102 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useState } from 'react'
 
 import { useNotifications } from '../../hooks/useNotifications'
 
+
+import { api } from '@/src/services/api'
 import type { AppNotification } from '@/src/types/notification.types'
 
 function NotifIcon({ type }: { type: AppNotification['type'] }) {
+  if (type === 'team_invite') {
+    return (
+      <div
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 10,
+          background: 'rgba(224,123,42,0.12)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--color-primary)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <line x1="19" y1="8" x2="19" y2="14" />
+          <line x1="22" y1="11" x2="16" y2="11" />
+        </svg>
+      </div>
+    )
+  }
+  if (type === 'invite_accepted') {
+    return (
+      <div
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 10,
+          background: 'rgba(76,175,80,0.12)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#4CAF50"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+    )
+  }
+  if (type === 'invite_rejected') {
+    return (
+      <div
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 10,
+          background: 'rgba(255,107,107,0.12)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--color-danger-light)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </div>
+    )
+  }
   if (type === 'log_delete_request') {
     return (
       <div
@@ -107,26 +197,81 @@ function timeAgo(iso: string): string {
   return `${Math.floor(h / 24)}d`
 }
 
-interface NotificationPanelProps {
-  userId: string
-  onClose: () => void
+function InviteActions({
+  notif,
+  onRespond,
+}: {
+  notif: AppNotification
+  onRespond: (id: string, action: 'accept' | 'reject') => void
+}) {
+  const [loading, setLoading] = useState(false)
+
+  async function handle(action: 'accept' | 'reject') {
+    setLoading(true)
+    await api
+      .patch(`/api/teams/${notif.teamId}/members/${notif.toMemberId}/respond`, { action })
+      .catch(() => {})
+    onRespond(notif.id, action)
+    setLoading(false)
+  }
+
+  return (
+    <div className="flex gap-2 mt-2">
+      <button
+        disabled={loading}
+        onClick={(e) => { e.stopPropagation(); handle('accept') }}
+        style={{
+          flex: 1,
+          padding: '5px 0',
+          borderRadius: 8,
+          fontSize: 11,
+          fontWeight: 700,
+          background: 'rgba(76,175,80,0.15)',
+          color: '#4CAF50',
+          border: '1px solid rgba(76,175,80,0.3)',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          opacity: loading ? 0.6 : 1,
+        }}
+      >
+        Aceitar
+      </button>
+      <button
+        disabled={loading}
+        onClick={(e) => { e.stopPropagation(); handle('reject') }}
+        style={{
+          flex: 1,
+          padding: '5px 0',
+          borderRadius: 8,
+          fontSize: 11,
+          fontWeight: 700,
+          background: 'rgba(255,107,107,0.12)',
+          color: 'var(--color-danger-light)',
+          border: '1px solid rgba(255,107,107,0.25)',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          opacity: loading ? 0.6 : 1,
+        }}
+      >
+        Recusar
+      </button>
+    </div>
+  )
 }
 
-export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
-  const { mine, unreadCount, markRead, markAllRead, remove } = useNotifications(userId)
-  const ref = useRef<HTMLDivElement>(null)
+interface NotificationPanelProps {
+  userId: string
+}
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [onClose])
+export function NotificationPanel({ userId }: NotificationPanelProps) {
+  const { mine, unreadCount, markRead, markAllRead, remove, refresh } = useNotifications(userId)
+
+  function handleRespond(id: string, action: 'accept' | 'reject') {
+    markRead(id)
+    remove(id)
+    refresh()
+  }
 
   return (
     <div
-      ref={ref}
       style={{
         position: 'absolute',
         top: 'calc(100% + 8px)',
@@ -228,6 +373,9 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
                     />
                   )}
                 </div>
+                {n.type === 'team_invite' && (
+                  <InviteActions notif={n} onRespond={handleRespond} />
+                )}
               </div>
               <button
                 onClick={(e) => {

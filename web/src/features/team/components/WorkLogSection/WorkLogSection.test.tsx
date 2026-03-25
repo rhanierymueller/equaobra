@@ -42,6 +42,7 @@ const mockTeam = {
       phone: '',
       avatarInitials: 'JS',
       isLeader: true,
+      status: 'accepted' as const,
     },
   ],
 }

@@ -8,7 +8,8 @@ import { haversineKm } from '@/src/utils/geolocation'
 
 const DEFAULT_FILTERS: ProfessionalFilters = {
   search: '',
-  locality: '',
+  state: '',
+  city: '',
   professions: [],
   minRating: 0,
   maxDistanceKm: 50,
@@ -77,24 +78,41 @@ function withDistance(pros: Professional[], origin: [number, number] | null): Pr
   })
 }
 
-function matchesFilters(p: Professional, f: ProfessionalFilters, hasRef: boolean): boolean {
+function normalize(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+function matchesFilters(
+  p: Professional,
+  f: ProfessionalFilters,
+  hasRef: boolean,
+  stateCities: string[],
+): boolean {
   if (f.search) {
-    const q = f.search.toLowerCase()
+    const q = normalize(f.search)
     const matches =
-      p.name.toLowerCase().includes(q) ||
-      p.profession.toLowerCase().includes(q) ||
-      p.location.neighborhood.toLowerCase().includes(q) ||
-      p.location.city.toLowerCase().includes(q)
+      normalize(p.name).includes(q) ||
+      normalize(p.profession).includes(q) ||
+      normalize(p.location.neighborhood).includes(q) ||
+      normalize(p.location.city).includes(q)
     if (!matches) return false
   }
-  if (f.locality) {
-    const loc = f.locality.toLowerCase()
-    const city = p.location.city.toLowerCase()
-    const hood = p.location.neighborhood.toLowerCase()
-    const matches =
-      hood.includes(loc) || loc.includes(hood) || city.includes(loc) || loc.includes(city)
-    if (!matches) return false
+
+  // City filter (exact dropdown selection)
+  if (f.city) {
+    const cityQ = normalize(f.city)
+    const proCity = normalize(p.location.city)
+    if (!proCity.includes(cityQ) && !cityQ.includes(proCity)) return false
+  } else if (f.state && stateCities.length > 0) {
+    // State-only filter: check if professional's city belongs to the state
+    const proCity = normalize(p.location.city)
+    const inState = stateCities.some((c) => normalize(c) === proCity)
+    if (!inState) return false
   }
+
   if (f.professions.length > 0 && !f.professions.includes(p.profession)) return false
   if (p.rating < f.minRating) return false
   if (hasRef && f.maxDistanceKm < 50 && p.distanceKm > f.maxDistanceKm) return false
@@ -110,7 +128,9 @@ export interface UseProfessionalsReturn {
   isLoading: boolean
   isError: boolean
   setSearch: (search: string) => void
-  setLocality: (locality: string) => void
+  setState: (state: string) => void
+  setCity: (city: string) => void
+  setStateCities: (cities: string[]) => void
   toggleProfession: (profession: Profession) => void
   setMinRating: (rating: number) => void
   setMaxDistance: (km: number) => void
@@ -125,6 +145,7 @@ export function useProfessionals(
 ): UseProfessionalsReturn {
   const [allProfessionals, setAllProfessionals] = useState<Professional[]>([])
   const [filters, setFilters] = useState<ProfessionalFilters>(DEFAULT_FILTERS)
+  const [stateCities, setStateCitiesState] = useState<string[]>([])
   const [selected, setSelected] = useState<Professional | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
@@ -153,16 +174,19 @@ export function useProfessionals(
   const professionals = useMemo(
     () =>
       withDist
-        .filter((p) => p.id !== currentUserId && matchesFilters(p, filters, hasRef))
+        .filter((p) => p.id !== currentUserId && matchesFilters(p, filters, hasRef, stateCities))
         .sort((a, b) => a.distanceKm - b.distanceKm),
-    [withDist, filters, hasRef, currentUserId],
+    [withDist, filters, hasRef, currentUserId, stateCities],
   )
 
   const setSearch = useCallback((search: string) => setFilters((prev) => ({ ...prev, search })), [])
-  const setLocality = useCallback(
-    (locality: string) => setFilters((prev) => ({ ...prev, locality })),
+  const setState = useCallback(
+    (state: string) => setFilters((prev) => ({ ...prev, state, city: '' })),
     [],
   )
+  const setCity = useCallback((city: string) => setFilters((prev) => ({ ...prev, city })), [])
+  const setStateCities = useCallback((cities: string[]) => setStateCitiesState(cities), [])
+
   const toggleProfession = useCallback((profession: Profession) => {
     setFilters((prev) => ({
       ...prev,
@@ -184,7 +208,10 @@ export function useProfessionals(
     [],
   )
   const selectProfessional = useCallback((p: Professional | null) => setSelected(p), [])
-  const resetFilters = useCallback(() => setFilters(DEFAULT_FILTERS), [])
+  const resetFilters = useCallback(() => {
+    setFilters(DEFAULT_FILTERS)
+    setStateCitiesState([])
+  }, [])
 
   return {
     professionals,
@@ -194,7 +221,9 @@ export function useProfessionals(
     isLoading,
     isError,
     setSearch,
-    setLocality,
+    setState,
+    setCity,
+    setStateCities,
     toggleProfession,
     setMinRating,
     setMaxDistance,

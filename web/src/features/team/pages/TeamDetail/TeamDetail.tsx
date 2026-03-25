@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { BackButton } from '@/src/components/BackButton'
+
 import { WorkLogSection } from '../../components/WorkLogSection/WorkLogSection'
 import { useTeams } from '../../hooks/useTeams'
 
@@ -151,6 +153,18 @@ function MemberRow({
                 }}
               >
                 você
+              </span>
+            )}
+            {m.status === 'pending' && (
+              <span
+                className="text-xs px-2 py-0.5 rounded-lg font-medium"
+                style={{
+                  background: 'rgba(255,209,102,0.1)',
+                  color: 'var(--color-star)',
+                  border: '1px solid rgba(255,209,102,0.25)',
+                }}
+              >
+                pendente
               </span>
             )}
           </div>
@@ -360,25 +374,57 @@ export function TeamDetail({ id }: { id: string }) {
         style={{ background: 'var(--color-background)' }}
       >
         <p className="text-white font-semibold">Equipe não encontrada</p>
-        <button
-          onClick={() => router.push('/profile')}
-          style={{
-            color: 'var(--color-primary)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 14,
-          }}
-        >
-          ← Voltar
-        </button>
+        <BackButton href="/profile" />
       </div>
     )
   }
 
-  const { total, perMember } = teamTotalCost(team)
-  const leader = team.members.find((m) => m.isLeader)
-  const userInTeam = user ? team.members.some((m) => m.professionalId === user.id) : false
+  const isOwner = user?.id === team.ownerId
+  const myMembership = user ? team.members.find((m) => m.professionalId === user.id) : null
+  const isPendingMember = !isOwner && myMembership?.status === 'pending'
+
+  if (isPendingMember) {
+    return (
+      <div
+        className="h-screen flex flex-col items-center justify-center gap-4 px-6 text-center"
+        style={{ background: 'var(--color-background)' }}
+      >
+        <div
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 18,
+            background: 'var(--color-primary-alpha-10)',
+            border: '1px solid var(--color-primary-alpha-30)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <line x1="19" y1="8" x2="19" y2="14" />
+            <line x1="22" y1="11" x2="16" y2="11" />
+          </svg>
+        </div>
+        <div>
+          <p className="font-bold text-white mb-1" style={{ fontSize: 18 }}>Convite pendente</p>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            Você foi convidado para a equipe <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{team.name}</span>.
+            <br />Aceite o convite para ter acesso aos detalhes.
+          </p>
+        </div>
+        <BackButton href="/my-invitations" label="Ver meus convites" />
+      </div>
+    )
+  }
+
+  const acceptedMembers = team.members.filter((m) => m.status === 'accepted')
+  const pendingMembers = team.members.filter((m) => m.status === 'pending')
+  const { total, perMember } = teamTotalCost({ ...team, members: acceptedMembers })
+  const leader = acceptedMembers.find((m) => m.isLeader)
+  const userInTeam = !!myMembership && myMembership.status === 'accepted'
   const isLeader = leader?.professionalId === user?.id
 
   function handleDelete() {
@@ -396,7 +442,6 @@ export function TeamDetail({ id }: { id: string }) {
 
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
-      {/* Accent bar */}
       <div
         style={{
           height: 3,
@@ -410,26 +455,8 @@ export function TeamDetail({ id }: { id: string }) {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/profile')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-secondary)',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Minhas equipes
-        </button>
-        {user?.id === team.ownerId && (
+        <BackButton href="/profile" label="Minhas equipes" />
+        {isOwner && (
           <button
             onClick={handleDelete}
             className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
@@ -488,6 +515,38 @@ export function TeamDetail({ id }: { id: string }) {
       </div>
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 80px' }}>
+        {!team.active && (
+          <div
+            className="flex items-center gap-3 rounded-2xl px-5 py-4 mt-6"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--color-text-dim)"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--color-text-muted)' }}>
+                Equipe inativa
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-dim)' }}>
+                Todos os membros foram removidos. Convide profissionais para reativar esta equipe.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Stats grid — full width */}
         <div
           className="grid grid-cols-2 gap-3 py-6"
@@ -585,7 +644,8 @@ export function TeamDetail({ id }: { id: string }) {
                 Membros
               </h2>
               <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                {team.members.length} {team.members.length === 1 ? 'profissional' : 'profissionais'}
+                {acceptedMembers.length}{' '}
+                {acceptedMembers.length === 1 ? 'profissional' : 'profissionais'}
                 {leader && (
                   <span>
                     {' '}
@@ -600,7 +660,7 @@ export function TeamDetail({ id }: { id: string }) {
           </div>
 
           <div className="flex flex-col gap-3">
-            {team.members.map((member, i) => (
+            {acceptedMembers.map((member, i) => (
               <MemberRow
                 key={member.professionalId}
                 member={member}
@@ -634,6 +694,100 @@ export function TeamDetail({ id }: { id: string }) {
             ))}
           </div>
         </div>
+
+        {/* Pending invitations — only for owner */}
+        {isOwner && pendingMembers.length > 0 && (
+          <div className="pt-6 pb-6" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <h2 className="font-bold text-white mb-1" style={{ fontSize: 20, letterSpacing: '-0.02em' }}>
+              Convites pendentes
+            </h2>
+            <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>
+              {pendingMembers.length}{' '}
+              {pendingMembers.length === 1 ? 'convite aguardando resposta' : 'convites aguardando resposta'}
+            </p>
+
+            <div className="flex flex-col gap-3">
+              {pendingMembers.map((m) => (
+                <div
+                  key={m.professionalId}
+                  className="rounded-2xl overflow-hidden"
+                  style={{
+                    background: 'rgba(255,209,102,0.04)',
+                    border: '1px solid rgba(255,209,102,0.15)',
+                  }}
+                >
+                  <div
+                    style={{
+                      height: 2,
+                      background: 'linear-gradient(to right, rgba(255,209,102,0.6), rgba(255,209,102,0.1), transparent)',
+                    }}
+                  />
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                        background: 'rgba(255,209,102,0.1)',
+                        border: '1.5px solid rgba(255,209,102,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--color-star)',
+                        fontWeight: 700,
+                        fontSize: 13,
+                      }}
+                    >
+                      {m.avatarInitials}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-white text-sm">{m.name}</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                        {m.profession}
+                      </p>
+                      {m.invitationMessage && (
+                        <p className="text-xs mt-1 italic" style={{ color: 'var(--color-text-secondary)' }}>
+                          &ldquo;{m.invitationMessage}&rdquo;
+                        </p>
+                      )}
+                    </div>
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0 mr-2"
+                      style={{
+                        background: 'rgba(255,209,102,0.1)',
+                        color: 'var(--color-star)',
+                        border: '1px solid rgba(255,209,102,0.25)',
+                      }}
+                    >
+                      Pendente
+                    </span>
+                    <button
+                      onClick={() =>
+                        confirm({
+                          title: `Cancelar convite de ${m.name.split(' ')[0]}?`,
+                          description: 'O convite será cancelado e o profissional removido da lista.',
+                          confirmLabel: 'Cancelar convite',
+                          variant: 'danger',
+                          onConfirm: () => removeMember(team.id, m.professionalId),
+                        })
+                      }
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all hover:opacity-80 shrink-0"
+                      style={{
+                        background: 'var(--color-danger-alpha-08)',
+                        color: 'var(--color-danger-light)',
+                        border: '1px solid var(--color-danger-alpha-15)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Work log section */}
         <div className="pt-7">

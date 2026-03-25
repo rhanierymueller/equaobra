@@ -35,7 +35,8 @@ export interface Professional {
 
 export interface ProfessionalFilters {
   search: string
-  locality: string
+  state: string
+  city: string
   professions: Profession[]
   minRating: number
   maxDistanceKm: number

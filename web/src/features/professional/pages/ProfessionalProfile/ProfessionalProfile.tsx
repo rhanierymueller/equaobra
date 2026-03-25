@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
+import { BackButton } from '@/src/components/BackButton'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import { api } from '@/src/services/api'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Professional } from '@/src/types/professional.types'
+import type { User } from '@/src/types/user.types'
 
 const REVIEWERS = [
   { name: 'Carlos M.', initials: 'CM' },
@@ -133,12 +135,7 @@ export function ProfessionalProfile({ id }: { id: string }) {
       >
         <div className="text-center">
           <p className="text-white font-semibold mb-3">Profissional não encontrado</p>
-          <button
-            onClick={() => router.push('/home')}
-            style={{ color: 'var(--color-primary)', fontSize: 14 }}
-          >
-            ← Voltar
-          </button>
+          <BackButton href="/home" />
         </div>
       </div>
     )
@@ -161,22 +158,7 @@ export function ProfessionalProfile({ id }: { id: string }) {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/home')}
-          className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-60"
-          style={{
-            color: 'var(--color-text-secondary)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Perfil do profissional
         </span>

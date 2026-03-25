@@ -2,9 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { BackButton } from '@/src/components/BackButton'
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { useTeams } from '@/src/features/team/hooks/useTeams'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
@@ -20,11 +20,12 @@ function teamCost(team: Team): string {
 
 interface TeamCardProps {
   team: Team
+  isOwner: boolean
   onDelete: (id: string) => void
 }
 
-function TeamCard({ team, onDelete }: TeamCardProps) {
-  const leader = team.members.find((m) => m.isLeader)
+function TeamCard({ team, isOwner, onDelete }: TeamCardProps) {
+  const leader = team.members.find((m) => m.isLeader && m.status === 'accepted')
   const cost = teamCost(team)
   const hasCost = cost !== 'A combinar'
 
@@ -42,8 +43,9 @@ function TeamCard({ team, onDelete }: TeamCardProps) {
       <div
         style={{
           height: 3,
-          background:
-            'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)',
+          background: team.active
+            ? 'linear-gradient(to right, var(--color-primary), var(--color-primary-alpha-30), transparent)'
+            : 'linear-gradient(to right, var(--color-text-dim), transparent)',
         }}
       />
 
@@ -57,12 +59,30 @@ function TeamCard({ team, onDelete }: TeamCardProps) {
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h3
-              className="font-bold text-white leading-tight"
-              style={{ fontSize: 18, letterSpacing: '-0.02em' }}
-            >
-              {team.name}
-            </h3>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3
+                className="font-bold leading-tight"
+                style={{
+                  fontSize: 18,
+                  letterSpacing: '-0.02em',
+                  color: team.active ? 'white' : 'var(--color-text-muted)',
+                }}
+              >
+                {team.name}
+              </h3>
+              {!team.active && (
+                <span
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: 'var(--color-text-dim)',
+                  }}
+                >
+                  Inativa
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1.5 mt-1.5">
               <svg
                 width="11"
@@ -183,7 +203,8 @@ function TeamCard({ team, onDelete }: TeamCardProps) {
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            {team.members.length} {team.members.length === 1 ? 'membro' : 'membros'}
+            {team.members.filter((m) => m.status === 'accepted').length}{' '}
+            {team.members.filter((m) => m.status === 'accepted').length === 1 ? 'membro' : 'membros'}
           </span>
         </div>
 
@@ -279,18 +300,20 @@ function TeamCard({ team, onDelete }: TeamCardProps) {
           >
             Ver equipe
           </Link>
-          <button
-            onClick={() => onDelete(team.id)}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
-            style={{
-              background: 'var(--color-danger-alpha-08)',
-              color: 'var(--color-danger-light)',
-              border: '1px solid var(--color-danger-alpha-15)',
-              cursor: 'pointer',
-            }}
-          >
-            Excluir
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => onDelete(team.id)}
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
+              style={{
+                background: 'var(--color-danger-alpha-08)',
+                color: 'var(--color-danger-light)',
+                border: '1px solid var(--color-danger-alpha-15)',
+                cursor: 'pointer',
+              }}
+            >
+              Excluir
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -298,7 +321,6 @@ function TeamCard({ team, onDelete }: TeamCardProps) {
 }
 
 export function MyTeams() {
-  const router = useRouter()
   const { user } = useCurrentUser()
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
@@ -306,11 +328,16 @@ export function MyTeams() {
 
   const myTeams = user
     ? teams.filter(
-        (t) => t.ownerId === user.id || t.members.some((m) => m.professionalId === user.id),
+        (t) =>
+          t.ownerId === user.id ||
+          t.members.some((m) => m.professionalId === user.id && m.status === 'accepted'),
       )
     : []
 
-  const totalMembers = myTeams.reduce((sum, t) => sum + t.members.length, 0)
+  const totalMembers = myTeams.reduce(
+    (sum, t) => sum + t.members.filter((m) => m.status === 'accepted').length,
+    0,
+  )
 
   function handleDelete(teamId: string) {
     setDeleteTarget(teamId)
@@ -343,7 +370,6 @@ export function MyTeams() {
 
   return (
     <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
-      {/* Top accent */}
       <div
         style={{
           height: 3,
@@ -352,30 +378,11 @@ export function MyTeams() {
         }}
       />
 
-      {/* Nav bar */}
       <div
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-secondary)',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Minhas equipes
         </span>
@@ -538,7 +545,12 @@ export function MyTeams() {
           ) : (
             <div className="flex flex-col gap-4">
               {myTeams.map((team) => (
-                <TeamCard key={team.id} team={team} onDelete={handleDelete} />
+                <TeamCard
+                  key={team.id}
+                  team={team}
+                  isOwner={team.ownerId === user.id}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           )}

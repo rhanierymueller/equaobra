@@ -13,5 +13,6 @@ router.delete('/:id', requireAuth, ctrl.remove)
 router.post('/:id/members', requireAuth, ctrl.addMember)
 router.patch('/:id/members/:professionalId', requireAuth, ctrl.updateMember)
 router.delete('/:id/members/:professionalId', requireAuth, ctrl.removeMember)
+router.patch('/:id/members/:professionalId/respond', requireAuth, ctrl.respondToInvite)
 
 export default router

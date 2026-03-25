@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 import { useOpportunities } from '../../hooks/useOpportunities'
 
+import { BackButton } from '@/src/components/BackButton'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
@@ -225,6 +226,7 @@ export function OpportunitiesPage() {
       phone: opp.contactPhone ?? '',
       avatarInitials: opp.avatarInitials,
       isLeader: false,
+      status: 'accepted',
     }
   }
 
@@ -243,25 +245,7 @@ export function OpportunitiesPage() {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-secondary)',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Oportunidades
         </span>

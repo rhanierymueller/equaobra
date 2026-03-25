@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const notificationSchema = z.object({
-  type: z.enum(['log_delete_request', 'log_deleted', 'log_edited']),
+  type: z.enum(['log_delete_request', 'log_deleted', 'log_edited', 'team_invite', 'invite_accepted', 'invite_rejected']),
   teamId: z.string().max(50),
   teamName: z.string().max(200),
   toMemberId: z.string().max(50),

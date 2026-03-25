@@ -220,16 +220,36 @@ export default function HomeSearch() {
   useEffect(() => {
     if (!navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
+      async ({ coords }) => {
         const pos: [number, number] = [coords.latitude, coords.longitude]
         setUserGeoLoc(pos)
         setRefLocation(pos)
         setMapFlyTo(pos)
         setOppCenter(pos)
+
+        // Reverse geocode to pre-fill state/city filters
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&accept-language=pt-BR`,
+            { headers: { 'User-Agent': 'equaobra-app' } },
+          )
+          const data = await res.json()
+          const uf = (data.address?.state_code as string | undefined)?.toUpperCase() ?? ''
+          const city =
+            (data.address?.city as string | undefined) ??
+            (data.address?.town as string | undefined) ??
+            (data.address?.village as string | undefined) ??
+            ''
+          if (uf) setState(uf)
+          if (city) setCity(city)
+        } catch {
+          // ignore reverse geocode errors
+        }
       },
       () => {},
       { timeout: 6000 },
     )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const {
@@ -240,7 +260,9 @@ export default function HomeSearch() {
     isLoading,
     isError,
     setSearch,
-    setLocality,
+    setState,
+    setCity,
+    setStateCities,
     toggleProfession,
     setMinRating,
     setMaxDistance,
@@ -257,14 +279,9 @@ export default function HomeSearch() {
     if (userGeoLoc) setMapFlyTo(userGeoLoc)
   }
 
-  function handleSetLocality(locality: string) {
-    setLocality(locality)
-    if (!locality) setRefLocation(userGeoLoc)
-  }
-
   function handleModeChange(m: MapMode) {
-    if (m === 'obras' && !oppLocality && filters.locality) {
-      setOppLocality(filters.locality)
+    if (m === 'obras' && !oppLocality && filters.city) {
+      setOppLocality(filters.city)
     }
     setMapMode(m)
     setSelectedOpp(null)
@@ -324,7 +341,9 @@ export default function HomeSearch() {
                   onSetMinRating={setMinRating}
                   onSetMaxDistance={setMaxDistance}
                   onSetAvailableOnly={setAvailableOnly}
-                  onSetLocality={handleSetLocality}
+                  onSetState={setState}
+                  onSetCity={setCity}
+                  onStateCitiesChange={setStateCities}
                   onLocationSelect={(lat, lng) => {
                     setRefLocation([lat, lng])
                     setMapFlyTo([lat, lng])
@@ -405,12 +424,13 @@ export default function HomeSearch() {
             (filters.professions.length > 0 ||
               filters.availableOnly ||
               filters.minRating > 0 ||
-              filters.locality) && (
+              filters.state ||
+              filters.city) && (
               <div
                 className="absolute left-3 flex gap-2 flex-wrap pointer-events-none"
                 style={{ top: 56, right: 12, zIndex: 1001 }}
               >
-                {filters.locality && (
+                {(filters.state || filters.city) && (
                   <span
                     className="text-xs px-3 py-1.5 rounded-full font-medium pointer-events-auto"
                     style={{
@@ -419,7 +439,7 @@ export default function HomeSearch() {
                       color: 'var(--color-info)',
                     }}
                   >
-                    📍 {filters.locality}
+                    📍 {filters.city || filters.state}
                   </span>
                 )}
                 {filters.availableOnly && (

@@ -1,4 +1,10 @@
-export type NotificationType = 'log_delete_request' | 'log_deleted' | 'log_edited'
+export type NotificationType =
+  | 'log_delete_request'
+  | 'log_deleted'
+  | 'log_edited'
+  | 'team_invite'
+  | 'invite_accepted'
+  | 'invite_rejected'
 
 export interface AppNotification {
   id: string
@@ -14,4 +20,5 @@ export interface AppNotification {
   message: string
   read: boolean
   createdAt: string
+  responded?: boolean
 }

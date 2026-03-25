@@ -9,6 +9,7 @@ export const memberSchema = z.object({
   avatarInitials: z.string(),
   hourlyRate: z.number().optional(),
   isLeader: z.boolean().default(false),
+  invitationMessage: z.string().max(500).optional(),
 })
 
 export const teamSchema = z.object({
@@ -27,6 +28,11 @@ export const updateMemberSchema = z.object({
   hourlyRate: z.number().nullable().optional(),
 })
 
+export const respondInviteSchema = z.object({
+  action: z.enum(['accept', 'reject']),
+})
+
 export type MemberInput = z.infer<typeof memberSchema>
 export type TeamInput = z.infer<typeof teamSchema>
 export type UpdateMemberInput = z.infer<typeof updateMemberSchema>
+export type RespondInviteInput = z.infer<typeof respondInviteSchema>

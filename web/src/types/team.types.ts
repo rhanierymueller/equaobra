@@ -1,3 +1,5 @@
+export type InviteStatus = 'pending' | 'accepted' | 'rejected'
+
 export interface TeamMember {
   professionalId: string
   name: string
@@ -7,6 +9,8 @@ export interface TeamMember {
   avatarInitials: string
   hourlyRate?: number
   isLeader: boolean
+  status: InviteStatus
+  invitationMessage?: string
 }
 
 export interface Team {
@@ -18,5 +22,6 @@ export interface Team {
   scheduledStart: string
   members: TeamMember[]
   ownerId: string
+  active: boolean
   createdAt: string
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import type { UseLoginFormReturn } from '../../hooks/useAuthForm'
 
 import type { LoginCredentials } from '@/src/types/auth.types'
@@ -76,9 +78,25 @@ interface LoginFormProps {
   isLoading?: boolean
 }
 
+function EyeIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  )
+}
+
 export function LoginForm({ form, onSuccess, isLoading }: LoginFormProps) {
   const { values, errors, isSubmitting, handleChange, handleBlur, handleSubmit } = form
   const busy = isSubmitting || !!isLoading
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <form
@@ -114,32 +132,42 @@ export function LoginForm({ form, onSuccess, isLoading }: LoginFormProps) {
             Esqueceu a senha?
           </button>
         </div>
-        <input
-          id="login-password"
-          type="password"
-          value={values.password}
-          placeholder="••••••••"
-          autoComplete="current-password"
-          onChange={(e) => handleChange('password', e.target.value)}
-          onBlur={() => handleBlur('password')}
-          className="px-4 py-3 rounded-xl text-white outline-none transition-all duration-200 text-sm"
-          style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: `1.5px solid ${errors.password ? '#E53935' : 'rgba(255,255,255,0.1)'}`,
-            boxShadow: errors.password ? '0 0 0 3px rgba(229,57,53,0.1)' : 'none',
-          }}
-          onFocus={(e) => {
-            if (!errors.password) e.currentTarget.style.borderColor = '#E07B2A'
-            if (!errors.password)
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(224,123,42,0.15)'
-          }}
-          onBlurCapture={(e) => {
-            if (!errors.password) {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-              e.currentTarget.style.boxShadow = 'none'
-            }
-          }}
-        />
+        <div className="relative">
+          <input
+            id="login-password"
+            type={showPassword ? 'text' : 'password'}
+            value={values.password}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            onChange={(e) => handleChange('password', e.target.value)}
+            onBlur={() => handleBlur('password')}
+            className="w-full px-4 py-3 pr-11 rounded-xl text-white outline-none transition-all duration-200 text-sm"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: `1.5px solid ${errors.password ? '#E53935' : 'rgba(255,255,255,0.1)'}`,
+              boxShadow: errors.password ? '0 0 0 3px rgba(229,57,53,0.1)' : 'none',
+            }}
+            onFocus={(e) => {
+              if (!errors.password) e.currentTarget.style.borderColor = '#E07B2A'
+              if (!errors.password)
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(224,123,42,0.15)'
+            }}
+            onBlurCapture={(e) => {
+              if (!errors.password) {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+            style={{ color: 'rgba(245,240,235,0.4)', cursor: 'pointer' }}
+          >
+            <EyeIcon open={showPassword} />
+          </button>
+        </div>
         {errors.password && (
           <span className="text-xs" style={{ color: '#FF6B6B' }}>
             {errors.password.message}

@@ -1,7 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
+import { BackButton } from '@/src/components/BackButton'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { CandidatesSection } from '@/src/features/contractor/components/CandidatesSection'
 import { ContractorHeader } from '@/src/features/contractor/components/ContractorHeader'
@@ -10,7 +9,6 @@ import { useContractorProfile } from '@/src/features/contractor/hooks/useContrac
 import { formatDate } from '@/src/utils/date'
 
 export function ContractorProfile({ id }: { id: string }) {
-  const router = useRouter()
   const {
     user,
     isMe,
@@ -33,18 +31,7 @@ export function ContractorProfile({ id }: { id: string }) {
       >
         <div className="text-center">
           <p className="text-white font-semibold mb-3">Contratante não encontrado</p>
-          <button
-            onClick={() => router.back()}
-            style={{
-              color: 'var(--color-primary)',
-              fontSize: 14,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            ← Voltar
-          </button>
+          <BackButton href="/home" />
         </div>
       </div>
     )
@@ -64,22 +51,7 @@ export function ContractorProfile({ id }: { id: string }) {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
       >
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm transition-opacity hover:opacity-60"
-          style={{
-            color: 'var(--color-text-secondary)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           {isMe ? 'Meu perfil' : 'Perfil da construtora'}
         </span>

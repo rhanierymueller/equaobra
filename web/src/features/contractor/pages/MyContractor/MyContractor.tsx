@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { BackButton } from '@/src/components/BackButton'
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { LocalityAutocomplete } from '@/src/components/LocalityAutocomplete/LocalityAutocomplete'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
@@ -11,6 +11,7 @@ import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
+import type { User } from '@/src/types/user.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
 
@@ -843,7 +844,6 @@ function CandidatesSection({ contractorId, onChat }: CandidatesSectionProps) {
 }
 
 export function MyContractor() {
-  const router = useRouter()
   const { publish, updateOpportunity, deleteOpportunity, getContractorOpportunities } =
     useOpportunities()
   const { user } = useCurrentUser()
@@ -938,25 +938,7 @@ export function MyContractor() {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-secondary)',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Minha construtora
         </span>

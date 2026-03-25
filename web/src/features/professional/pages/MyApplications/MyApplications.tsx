@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { BackButton } from '@/src/components/BackButton'
 import { ChatModal } from '@/src/features/chat/components/ChatModal/ChatModal'
 import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 import type { Interest } from '@/src/features/opportunity/hooks/useInterests'
@@ -212,7 +212,6 @@ function ApplicationCard({ interest, opp, onChat }: CardProps) {
 }
 
 export function MyApplications() {
-  const router = useRouter()
   const { user } = useCurrentUser()
   const [chatTarget, setChatTarget] = useState<Pick<
     TeamMember,
@@ -263,25 +262,7 @@ export function MyApplications() {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-secondary)',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Minhas vagas
         </span>

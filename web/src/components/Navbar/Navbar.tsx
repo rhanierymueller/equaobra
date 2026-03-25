@@ -12,6 +12,7 @@ import type { User } from '@/src/types/user.types'
 function BellButton({ userId }: { userId: string }) {
   const { unreadCount, refresh } = useNotifications(userId)
   const [open, setOpen] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onFocus = () => refresh()
@@ -19,8 +20,18 @@ function BellButton({ userId }: { userId: string }) {
     return () => window.removeEventListener('focus', onFocus)
   }, [refresh])
 
+  useEffect(() => {
+    function handleMouseDown(e: MouseEvent) {
+      if (open && wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [open])
+
   return (
-    <div style={{ position: 'relative' }}>
+    <div ref={wrapperRef} style={{ position: 'relative' }}>
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center justify-center rounded-xl transition-all hover:opacity-80"
@@ -70,7 +81,7 @@ function BellButton({ userId }: { userId: string }) {
         )}
       </button>
 
-      {open && <NotificationPanel userId={userId} onClose={() => setOpen(false)} />}
+      {open && <NotificationPanel userId={userId} />}
     </div>
   )
 }
@@ -341,13 +352,14 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
 
   return (
     <header
-      className="sticky top-0 z-50 flex items-center gap-4 px-5 py-3"
+      className="sticky top-0 flex items-center gap-4 px-5 py-3"
       style={{
         background: 'rgba(13,12,11,0.92)',
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         height: 60,
-        position: 'relative',
+        position: 'sticky',
+        zIndex: 1200,
       }}
     >
       <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -421,6 +433,30 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
               <circle cx="12" cy="14" r="2" />
             </svg>
             Oportunidades
+          </Link>
+        )}
+
+        {user?.role === 'profissional' && (
+          <Link
+            href="/my-invitations"
+            className="hidden md:flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl transition-all duration-150"
+            style={{ color: 'rgba(245,240,235,0.6)' }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+            Convites
           </Link>
         )}
 
@@ -503,9 +539,7 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
           </button>
         )}
 
-        {/* MVP: notificações ocultas temporariamente — reativar após validação do ciclo principal
         {user && <BellButton userId={user.id} />}
-        */}
 
         {user ? (
           <UserAvatar user={user} />
@@ -553,6 +587,16 @@ export function Navbar({ searchValue = '', onSearchChange }: NavbarProps) {
               style={{ color: 'rgba(245,240,235,0.75)' }}
             >
               Oportunidades
+            </Link>
+          )}
+          {user.role === 'profissional' && (
+            <Link
+              href="/my-invitations"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-5 py-3 text-sm"
+              style={{ color: 'rgba(245,240,235,0.75)' }}
+            >
+              Convites
             </Link>
           )}
           {user.role === 'contratante' && (

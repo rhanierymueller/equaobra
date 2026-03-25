@@ -9,12 +9,9 @@ import { RegisterForm } from '../../components/RegisterForm'
 import { useLoginForm, useRegisterForm } from '../../hooks/useAuthForm'
 
 import { api, setToken } from '@/src/services/api'
+import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { AuthMode, LoginCredentials, RegisterCredentials } from '@/src/types/auth.types'
-
-function persistUser(user: Record<string, unknown> | undefined) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem('equobra_user', JSON.stringify(user))
-}
+import type { User } from '@/src/types/user.types'
 
 function BackgroundGrid() {
   return (
@@ -99,6 +96,7 @@ function Tabs({ mode, onChange }: TabsProps) {
 
 export default function AuthPage() {
   const router = useRouter()
+  const { setUser } = useCurrentUser()
   const [mode, setMode] = useState<AuthMode>('login')
   const [authError, setAuthError] = useState('')
   const [isAuthenticating, setIsAuthenticating] = useState(false)
@@ -128,7 +126,7 @@ export default function AuthPage() {
           },
         )
         setToken(res.token)
-        persistUser(res.user)
+        setUser(res.user as unknown as User)
         router.push('/home')
       } catch (e: unknown) {
         setAuthError(e instanceof Error ? e.message : 'Erro ao entrar. Tente novamente.')
@@ -171,7 +169,7 @@ export default function AuthPage() {
           },
         )
         setToken(res.token)
-        persistUser(res.user)
+        setUser(res.user as unknown as User)
         router.push('/home')
       } catch (e: unknown) {
         setAuthError(e instanceof Error ? e.message : 'Erro ao criar conta. Tente novamente.')

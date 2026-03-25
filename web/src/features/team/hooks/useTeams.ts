@@ -18,9 +18,9 @@ export function useTeams(ownerId?: string) {
   const createTeam = useCallback(
     async (
       data: Omit<Team, 'id' | 'createdAt' | 'members' | 'ownerId'>,
-      professional: Omit<TeamMember, 'isLeader'>,
+      professional: Omit<TeamMember, 'isLeader' | 'status'>,
       userId: string,
-      ownerMember?: Omit<TeamMember, 'isLeader'>,
+      ownerMember?: Omit<TeamMember, 'isLeader' | 'status'>,
     ): Promise<Team> => {
       const members = ownerMember
         ? [
@@ -36,14 +36,44 @@ export function useTeams(ownerId?: string) {
   )
 
   const addMemberToTeam = useCallback(
-    async (teamId: string, member: Omit<TeamMember, 'isLeader'>) => {
+    async (teamId: string, member: Omit<TeamMember, 'isLeader' | 'status'>, invitationMessage?: string) => {
       const newMember = await api.post<TeamMember>(`/api/teams/${teamId}/members`, {
         ...member,
         isLeader: false,
+        invitationMessage,
       })
       setTeams((prev) =>
         prev.map((t) => (t.id === teamId ? { ...t, members: [...t.members, newMember] } : t)),
       )
+    },
+    [],
+  )
+
+  const respondToInvite = useCallback(
+    async (teamId: string, professionalId: string, action: 'accept' | 'reject') => {
+      await api.patch(`/api/teams/${teamId}/members/${professionalId}/respond`, { action })
+      if (action === 'accept') {
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === teamId
+              ? {
+                  ...t,
+                  members: t.members.map((m) =>
+                    m.professionalId === professionalId ? { ...m, status: 'accepted' as const } : m,
+                  ),
+                }
+              : t,
+          ),
+        )
+      } else {
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === teamId
+              ? { ...t, members: t.members.filter((m) => m.professionalId !== professionalId) }
+              : t,
+          ),
+        )
+      }
     },
     [],
   )
@@ -145,6 +175,7 @@ export function useTeams(ownerId?: string) {
     myTeams,
     createTeam,
     addMemberToTeam,
+    respondToInvite,
     removeMember,
     setLeader,
     updateMemberProfession,

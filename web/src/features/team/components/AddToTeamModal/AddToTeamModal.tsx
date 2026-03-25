@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import { useTeams } from '../../hooks/useTeams'
 
-import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Professional } from '@/src/types/professional.types'
 import type { User } from '@/src/types/user.types'
@@ -80,6 +79,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
   const [loading, setLoading] = useState(false)
   const [successTeam, setSuccessTeam] = useState<string | null>(null)
   const [pendingAdd, setPendingAdd] = useState<{ teamId: string; teamName: string } | null>(null)
+  const [inviteMessage, setInviteMessage] = useState('')
 
   if (user.role !== 'contratante') {
     return (
@@ -145,14 +145,16 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
   }
 
   function handleAddToExisting(teamId: string, teamName: string) {
+    setInviteMessage('')
     setPendingAdd({ teamId, teamName })
   }
 
   function confirmAddToExisting() {
     if (!pendingAdd) return
-    addMemberToTeam(pendingAdd.teamId, member)
+    addMemberToTeam(pendingAdd.teamId, member, inviteMessage.trim() || undefined)
     setSuccessTeam(pendingAdd.teamName)
     setPendingAdd(null)
+    setInviteMessage('')
   }
 
   async function handleCreate() {
@@ -336,23 +338,25 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                     width: 52,
                     height: 52,
                     borderRadius: '50%',
-                    background: 'rgba(76,175,80,0.12)',
-                    border: '1.5px solid rgba(76,175,80,0.3)',
+                    background: 'rgba(224,123,42,0.12)',
+                    border: '1.5px solid rgba(224,123,42,0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'var(--color-success)',
-                    fontSize: 22,
                   }}
                 >
-                  ✓
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white mb-1">
-                    {p.name} adicionado à equipe!
+                    Convite enviado para {p.name.split(' ')[0]}!
                   </p>
                   <p className="text-xs" style={{ color: 'rgba(245,240,235,0.45)' }}>
-                    Equipe: <span style={{ color }}>{successTeam}</span>
+                    Aguardando aceitação para a equipe{' '}
+                    <span style={{ color }}>"{successTeam}"</span>
                   </p>
                 </div>
                 <div className="flex gap-2 w-full">
@@ -396,7 +400,9 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                 ) : (
                   <div className="flex flex-col gap-2">
                     {myTeams.map((team) => {
-                      const alreadyIn = isInTeam(p.id, team.id)
+                      const existingMember = team.members.find((m) => m.professionalId === p.id)
+                      const alreadyIn = !!existingMember
+                      const isPending = existingMember?.status === 'pending'
                       return (
                         <div
                           key={team.id}
@@ -419,12 +425,16 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                           {alreadyIn ? (
                             <span
                               className="text-xs font-medium px-2.5 py-1 rounded-lg"
-                              style={{
+                              style={isPending ? {
+                                color: 'var(--color-star)',
+                                background: 'rgba(255,209,102,0.1)',
+                                border: '1px solid rgba(255,209,102,0.2)',
+                              } : {
                                 color: 'var(--color-success)',
                                 background: 'var(--color-success-alpha-10)',
                               }}
                             >
-                              Adicionado ✓
+                              {isPending ? 'Pendente ·' : 'Na equipe ✓'}
                             </span>
                           ) : (
                             <button
@@ -513,15 +523,95 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
         </div>
       </div>
       {pendingAdd && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2500 }}>
-          <ConfirmDialog
-            title={`Adicionar ${p.name.split(' ')[0]} à equipe?`}
-            description={`${p.profession} será adicionado à equipe "${pendingAdd.teamName}".`}
-            confirmLabel="Adicionar"
-            variant="info"
-            onConfirm={confirmAddToExisting}
-            onCancel={() => setPendingAdd(null)}
-          />
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2500,
+            background: 'rgba(0,0,0,0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+        >
+          <div
+            className="rounded-2xl w-full max-w-sm"
+            style={{
+              background: 'rgba(20,18,16,0.99)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              padding: 24,
+            }}
+          >
+            <p className="font-bold text-white text-base mb-1">
+              Convidar {p.name.split(' ')[0]}
+            </p>
+            <p className="text-xs mb-4" style={{ color: 'rgba(245,240,235,0.45)' }}>
+              {p.profession} será convidado para a equipe{' '}
+              <span style={{ color: 'var(--color-primary)' }}>"{pendingAdd.teamName}"</span>.
+              O profissional precisará aceitar o convite.
+            </p>
+            <div className="flex flex-col gap-1 mb-4">
+              <label className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.5)' }}>
+                Observação (opcional)
+              </label>
+              <textarea
+                rows={3}
+                value={inviteMessage}
+                onChange={(e) => setInviteMessage(e.target.value)}
+                placeholder="Ex: Precisamos de você para a fase de acabamento..."
+                maxLength={500}
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1.5px solid rgba(255,255,255,0.08)',
+                  borderRadius: 12,
+                  padding: '10px 12px',
+                  fontSize: 13,
+                  color: 'var(--color-text)',
+                  resize: 'none',
+                  outline: 'none',
+                  width: '100%',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(224,123,42,0.5)' }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPendingAdd(null)}
+                style={{
+                  flex: 1,
+                  padding: '10px 0',
+                  borderRadius: 12,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  background: 'rgba(255,255,255,0.05)',
+                  color: 'rgba(245,240,235,0.6)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmAddToExisting}
+                style={{
+                  flex: 1,
+                  padding: '10px 0',
+                  borderRadius: 12,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  background: 'var(--color-primary)',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Enviar convite
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

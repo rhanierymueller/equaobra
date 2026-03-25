@@ -72,6 +72,7 @@ model Team {
   observations   String   @default("")
   scheduledStart String
   ownerId        String
+  active         Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -82,16 +83,18 @@ model Team {
 }
 
 model TeamMember {
-  id             String  @id @default(cuid())
-  teamId         String
-  professionalId String
-  name           String
-  profession     String
-  phone          String
-  avatarUrl      String?
-  avatarInitials String
-  hourlyRate     Float?
-  isLeader       Boolean @default(false)
+  id                String  @id @default(cuid())
+  teamId            String
+  professionalId    String
+  name              String
+  profession        String
+  phone             String
+  avatarUrl         String?
+  avatarInitials    String
+  hourlyRate        Float?
+  isLeader          Boolean @default(false)
+  status            String  @default("pending")
+  invitationMessage String?
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }

@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { ValidationError } from 'yup'
 
+import { BackButton } from '@/src/components/BackButton'
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import { passwordSchema, profileSchema } from '@/src/features/profile/validation/profileSchema'
@@ -47,6 +47,21 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       </div>
       <div className="px-5 py-5">{children}</div>
     </div>
+  )
+}
+
+function EyeIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
   )
 }
 
@@ -126,7 +141,6 @@ function readStoredUser(): User | null {
 }
 
 export function ProfilePage() {
-  const router = useRouter()
   const [storedUser] = useState(readStoredUser)
   const [user, setUser] = useState<User | null>(storedUser)
   const loaded = true
@@ -180,6 +194,9 @@ export function ProfilePage() {
   const [pwConfirm, setPwConfirm] = useState('')
   const [pwError, setPwError] = useState('')
   const [pwSuccess, setPwSuccess] = useState(false)
+  const [showPwCurrent, setShowPwCurrent] = useState(false)
+  const [showPwNew, setShowPwNew] = useState(false)
+  const [showPwConfirm, setShowPwConfirm] = useState(false)
 
   const [saveMsg, setSaveMsg] = useState('')
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
@@ -508,25 +525,7 @@ export function ProfilePage() {
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text-secondary)',
-            padding: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 14,
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          </svg>
-          Voltar
-        </button>
+        <BackButton href="/home" />
         <span className="text-xs font-medium" style={{ color: 'var(--color-text-faint)' }}>
           Meu perfil
         </span>
@@ -759,11 +758,22 @@ export function ProfilePage() {
                   />
                 </Field>
                 <Field label="Instagram (opcional)">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm" style={{ color: 'rgba(245,240,235,0.4)' }}>
+                  <div
+                    className="flex items-center w-full"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${fieldErrors.instagram ? 'var(--color-danger-light)' : 'rgba(255,255,255,0.09)'}`,
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <span
+                      className="text-sm px-3"
+                      style={{ color: 'rgba(245,240,235,0.35)', flexShrink: 0 }}
+                    >
                       @
                     </span>
-                    <InputField
+                    <input
                       id="profile-instagram"
                       value={instagram}
                       onChange={(e) => {
@@ -771,23 +781,39 @@ export function ProfilePage() {
                         setFieldErrors((prev) => ({ ...prev, instagram: '' }))
                       }}
                       placeholder="suaempresa"
-                      style={{ flex: 1 }}
-                      error={fieldErrors.instagram}
+                      style={{
+                        flex: 1,
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: 'var(--color-text)',
+                        padding: '9px 12px 9px 0',
+                        fontSize: 13,
+                      }}
                     />
                   </div>
+                  {fieldErrors.instagram && (
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-danger-light)' }}>
+                      {fieldErrors.instagram}
+                    </p>
+                  )}
                 </Field>
                 <Field label="Facebook (opcional)">
-                  <div className="flex items-center gap-2">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="rgba(245,240,235,0.4)"
-                      style={{ flexShrink: 0 }}
-                    >
-                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                    </svg>
-                    <InputField
+                  <div
+                    className="flex items-center w-full"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${fieldErrors.facebook ? 'var(--color-danger-light)' : 'rgba(255,255,255,0.09)'}`,
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <span className="flex items-center px-3" style={{ flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(245,240,235,0.35)">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                      </svg>
+                    </span>
+                    <input
                       id="profile-facebook"
                       value={facebook}
                       onChange={(e) => {
@@ -795,10 +821,22 @@ export function ProfilePage() {
                         setFieldErrors((prev) => ({ ...prev, facebook: '' }))
                       }}
                       placeholder="facebook.com/suaempresa ou nome de usuário"
-                      style={{ flex: 1 }}
-                      error={fieldErrors.facebook}
+                      style={{
+                        flex: 1,
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: 'var(--color-text)',
+                        padding: '9px 12px 9px 0',
+                        fontSize: 13,
+                      }}
                     />
                   </div>
+                  {fieldErrors.facebook && (
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-danger-light)' }}>
+                      {fieldErrors.facebook}
+                    </p>
+                  )}
                 </Field>
               </>
             )}
@@ -847,18 +885,29 @@ export function ProfilePage() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <InputField
+                  <select
                     value={profInput}
                     onChange={(e) => setProfInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        addProfession()
-                      }
+                    style={{
+                      flex: 1,
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.09)',
+                      color: profInput ? 'var(--color-text)' : 'rgba(245,240,235,0.35)',
+                      borderRadius: 10,
+                      padding: '9px 12px',
+                      fontSize: 13,
+                      outline: 'none',
                     }}
-                    placeholder="Ex: Pedreiro, Eletricista..."
-                    style={{ flex: 1 }}
-                  />
+                  >
+                    <option value="" style={{ background: '#1A1916' }}>
+                      Selecione uma profissão...
+                    </option>
+                    {ALL_PROFESSIONS.filter((p) => !professions.includes(p)).map((p) => (
+                      <option key={p} value={p} style={{ background: '#1A1916' }}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     onClick={addProfession}
                     style={{
@@ -915,23 +964,42 @@ export function ProfilePage() {
                   </button>
                 </div>
                 {showRate && (
-                  <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center w-full"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.09)',
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                    }}
+                  >
                     <span
-                      className="text-sm font-semibold"
-                      style={{ color: 'rgba(245,240,235,0.5)' }}
+                      className="text-sm font-semibold px-3"
+                      style={{ color: 'rgba(245,240,235,0.4)', flexShrink: 0 }}
                     >
                       R$
                     </span>
-                    <InputField
+                    <input
                       type="number"
                       min="0"
                       step="1"
                       value={hourlyRate}
                       onChange={(e) => setHourlyRate(e.target.value)}
                       placeholder="Ex: 85"
-                      style={{ flex: 1 }}
+                      style={{
+                        flex: 1,
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: 'var(--color-text)',
+                        padding: '9px 0',
+                        fontSize: 13,
+                      }}
                     />
-                    <span className="text-sm" style={{ color: 'rgba(245,240,235,0.4)' }}>
+                    <span
+                      className="text-sm px-3"
+                      style={{ color: 'rgba(245,240,235,0.4)', flexShrink: 0 }}
+                    >
                       /h
                     </span>
                   </div>
@@ -957,8 +1025,8 @@ export function ProfilePage() {
                   Seu endereço
                 </span>
               </div>
-              <div className="flex gap-2 mb-2">
-                <div style={{ flex: '0 0 150px' }}>
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                <div className="col-span-2">
                   <label
                     className="block text-xs font-medium mb-1"
                     style={{ color: 'rgba(245,240,235,0.4)' }}
@@ -987,7 +1055,7 @@ export function ProfilePage() {
                     </p>
                   )}
                 </div>
-                <div style={{ flex: '0 0 80px' }}>
+                <div>
                   <label
                     className="block text-xs font-medium mb-1"
                     style={{ color: 'rgba(245,240,235,0.4)' }}
@@ -1082,8 +1150,8 @@ export function ProfilePage() {
                     Endereço da empresa
                   </span>
                 </div>
-                <div className="flex gap-2 mb-2">
-                  <div style={{ flex: '0 0 150px' }}>
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  <div className="col-span-2">
                     <label
                       className="block text-xs font-medium mb-1"
                       style={{ color: 'rgba(245,240,235,0.4)' }}
@@ -1112,7 +1180,7 @@ export function ProfilePage() {
                       </p>
                     )}
                   </div>
-                  <div style={{ flex: '0 0 80px' }}>
+                  <div>
                     <label
                       className="block text-xs font-medium mb-1"
                       style={{ color: 'rgba(245,240,235,0.4)' }}
@@ -1206,31 +1274,64 @@ export function ProfilePage() {
 
           <Section title="Alterar senha">
             <Field label="Senha atual">
-              <InputField
-                type="password"
-                value={pwCurrent}
-                onChange={(e) => setPwCurrent(e.target.value)}
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <InputField
+                  type={showPwCurrent ? 'text' : 'password'}
+                  value={pwCurrent}
+                  onChange={(e) => setPwCurrent(e.target.value)}
+                  placeholder="••••••••"
+                  style={{ paddingRight: 40 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPwCurrent((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'rgba(245,240,235,0.35)', cursor: 'pointer' }}
+                >
+                  <EyeIcon open={showPwCurrent} />
+                </button>
+              </div>
             </Field>
             <Field label="Nova senha">
-              <InputField
-                type="password"
-                value={pwNew}
-                onChange={(e) => setPwNew(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-              />
+              <div className="relative">
+                <InputField
+                  type={showPwNew ? 'text' : 'password'}
+                  value={pwNew}
+                  onChange={(e) => setPwNew(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  style={{ paddingRight: 40 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPwNew((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'rgba(245,240,235,0.35)', cursor: 'pointer' }}
+                >
+                  <EyeIcon open={showPwNew} />
+                </button>
+              </div>
             </Field>
             <Field label="Confirmar nova senha">
-              <InputField
-                type="password"
-                value={pwConfirm}
-                onChange={(e) => setPwConfirm(e.target.value)}
-                placeholder="••••••••"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleChangePassword()
-                }}
-              />
+              <div className="relative">
+                <InputField
+                  type={showPwConfirm ? 'text' : 'password'}
+                  value={pwConfirm}
+                  onChange={(e) => setPwConfirm(e.target.value)}
+                  placeholder="••••••••"
+                  style={{ paddingRight: 40 }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleChangePassword()
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPwConfirm((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'rgba(245,240,235,0.35)', cursor: 'pointer' }}
+                >
+                  <EyeIcon open={showPwConfirm} />
+                </button>
+              </div>
             </Field>
             {pwError && (
               <p className="text-xs mb-3" style={{ color: 'var(--color-danger-light)' }}>

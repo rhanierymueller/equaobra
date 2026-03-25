@@ -2,7 +2,7 @@ import type { Response } from 'express'
 
 import { isServiceError } from '../lib/errors'
 import type { AuthRequest } from '../middleware/auth'
-import { teamSchema, memberSchema, updateMemberSchema } from '../models/team.model'
+import { teamSchema, memberSchema, updateMemberSchema, respondInviteSchema } from '../models/team.model'
 import * as service from '../services/team.service'
 
 export async function list(req: AuthRequest, res: Response): Promise<void> {
@@ -97,4 +97,24 @@ export async function removeMember(req: AuthRequest, res: Response): Promise<voi
     return
   }
   res.status(204).send()
+}
+
+export async function respondToInvite(req: AuthRequest, res: Response): Promise<void> {
+  const parsed = respondInviteSchema.safeParse(req.body)
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Ação inválida. Use "accept" ou "reject".' })
+    return
+  }
+
+  const result = await service.respondToInvite(
+    String(req.params.id),
+    String(req.params.professionalId),
+    req.user!.userId,
+    parsed.data.action,
+  )
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
+  res.json(result.data)
 }
