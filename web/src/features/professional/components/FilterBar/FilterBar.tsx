@@ -91,10 +91,12 @@ function SearchableDropdown({
   }, [])
 
   useEffect(() => {
-    if (open) {
+    if (!open) return
+    const timer = setTimeout(() => {
       setSearch('')
-      setTimeout(() => inputRef.current?.focus(), 50)
-    }
+      inputRef.current?.focus()
+    }, 0)
+    return () => clearTimeout(timer)
   }, [open])
 
   const filtered = options

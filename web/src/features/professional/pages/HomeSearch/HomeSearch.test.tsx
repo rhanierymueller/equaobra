@@ -2,7 +2,11 @@ import { render, screen } from '@testing-library/react'
 
 import HomeSearch from './HomeSearch'
 
-jest.mock('next/dynamic', () => () => () => <div data-testid="map-placeholder" />)
+jest.mock('next/dynamic', () => () => {
+  const MockComponent = () => <div data-testid="map-placeholder" />
+  MockComponent.displayName = 'MockDynamic'
+  return MockComponent
+})
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push: jest.fn() }) }))
 
 describe('HomeSearch', () => {

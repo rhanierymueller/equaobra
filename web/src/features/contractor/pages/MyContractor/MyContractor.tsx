@@ -137,25 +137,28 @@ function OppForm({
   const [msg, setMsg] = useState('')
 
   useEffect(() => {
-    if (editing) {
-      setDescription(editing.obraDescription)
-      setLocation(editing.obraLocation)
-      setLocationLat(editing.lat)
-      setLocationLng(editing.lng)
-      setStart(editing.obraStart ?? '')
-      setDuration(editing.obraDuration ?? '')
-      setProfessions(editing.lookingForProfessions)
-    } else {
-      setDescription(EMPTY_FORM.description)
-      setLocation(EMPTY_FORM.location)
-      setLocationLat(undefined)
-      setLocationLng(undefined)
-      setStart(EMPTY_FORM.start)
-      setDuration(EMPTY_FORM.duration)
-      setProfessions(EMPTY_FORM.professions)
-    }
-    setProfInput('')
-    setMsg('')
+    const timer = setTimeout(() => {
+      if (editing) {
+        setDescription(editing.obraDescription)
+        setLocation(editing.obraLocation)
+        setLocationLat(editing.lat)
+        setLocationLng(editing.lng)
+        setStart(editing.obraStart ?? '')
+        setDuration(editing.obraDuration ?? '')
+        setProfessions(editing.lookingForProfessions)
+      } else {
+        setDescription(EMPTY_FORM.description)
+        setLocation(EMPTY_FORM.location)
+        setLocationLat(undefined)
+        setLocationLng(undefined)
+        setStart(EMPTY_FORM.start)
+        setDuration(EMPTY_FORM.duration)
+        setProfessions(EMPTY_FORM.professions)
+      }
+      setProfInput('')
+      setMsg('')
+    }, 0)
+    return () => clearTimeout(timer)
   }, [editing?.id])
 
   async function handleSave() {
@@ -861,7 +864,9 @@ export function MyContractor() {
   }
 
   useEffect(() => {
-    if (user) refreshVagas(user.id)
+    if (!user) return
+    const timer = setTimeout(() => refreshVagas(user.id), 0)
+    return () => clearTimeout(timer)
   }, [user])
 
   if (!user || (user.role !== 'contratante' && !user.roles?.includes('contratante'))) {

@@ -371,7 +371,7 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                   </p>
                   <p className="text-xs" style={{ color: 'rgba(245,240,235,0.45)' }}>
                     Aguardando aceitação para a equipe{' '}
-                    <span style={{ color }}>"{successTeam}"</span>
+                    <span style={{ color }}>&quot;{successTeam}&quot;</span>
                   </p>
                 </div>
                 <div className="flex gap-2 w-full">
@@ -566,8 +566,10 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
             <p className="font-bold text-white text-base mb-1">Convidar {p.name.split(' ')[0]}</p>
             <p className="text-xs mb-4" style={{ color: 'rgba(245,240,235,0.45)' }}>
               {p.profession} será convidado para a equipe{' '}
-              <span style={{ color: 'var(--color-primary)' }}>"{pendingAdd.teamName}"</span>. O
-              profissional precisará aceitar o convite.
+              <span style={{ color: 'var(--color-primary)' }}>
+                &quot;{pendingAdd.teamName}&quot;
+              </span>
+              . O profissional precisará aceitar o convite.
             </p>
             <div className="flex flex-col gap-1 mb-4">
               <label className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.5)' }}>
