@@ -4,11 +4,13 @@ import Link from 'next/link'
 import { useState } from 'react'
 import type { ValidationError } from 'yup'
 
+import { AvatarUpload } from '@/src/components/AvatarUpload'
 import { BackButton } from '@/src/components/BackButton'
 import { ConfirmDialog } from '@/src/components/ConfirmDialog'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import { passwordSchema, profileSchema } from '@/src/features/profile/validation/profileSchema'
 import { useTeams } from '@/src/features/team/hooks/useTeams'
+import { useToast } from '@/src/hooks/useToast'
 import { api } from '@/src/services/api'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { User, UserRole, Address } from '@/src/types/user.types'
@@ -52,12 +54,30 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function EyeIcon({ open }: { open: boolean }) {
   return open ? (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
   ) : (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
       <line x1="1" y1="1" x2="23" y2="23" />
@@ -200,7 +220,11 @@ export function ProfilePage() {
 
   const [saveMsg, setSaveMsg] = useState('')
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null)
+  const [pendingAvatarPreview, setPendingAvatarPreview] = useState<string | null>(null)
+  const [removingAvatar, setRemovingAvatar] = useState(false)
 
+  const toast = useToast()
   const { teams } = useTeams()
   const { publish, updateOpportunity, getContractorOpportunities } = useOpportunities()
 
@@ -362,6 +386,21 @@ export function ProfilePage() {
         : user!.companyAddress
 
     try {
+      // Upload avatar if pending or remove if flagged
+      let resolvedAvatarUrl = user!.avatarUrl ?? null
+      if (pendingAvatarFile) {
+        const formData = new FormData()
+        formData.append('avatar', pendingAvatarFile)
+        const uploaded = await api.upload<User>('/api/upload/avatar', formData)
+        resolvedAvatarUrl = uploaded.avatarUrl ?? null
+        setPendingAvatarFile(null)
+        setPendingAvatarPreview(null)
+      } else if (removingAvatar) {
+        await api.delete('/api/upload/avatar')
+        resolvedAvatarUrl = null
+        setRemovingAvatar(false)
+      }
+
       const apiPayload = {
         name: name.trim(),
         role: roles[0],
@@ -370,6 +409,7 @@ export function ProfilePage() {
         profession: professions[0] ?? user!.profession,
         hourlyRate: showRate && hourlyRate ? Number(hourlyRate) : null,
         showHourlyRate: showRate,
+        avatarUrl: resolvedAvatarUrl,
         companyName: isCont ? companyName.trim() || null : null,
         cnpj: isCont ? cnpj.replace(/\D/g, '') || null : null,
         website: isCont ? website.trim() || null : null,
@@ -392,6 +432,8 @@ export function ProfilePage() {
 
       saveUser(apiUser)
       setUser(apiUser)
+      toast.success('Perfil salvo com sucesso.')
+      setSaveMsg('')
     } catch {
       const updated: User = {
         ...user!,
@@ -412,10 +454,9 @@ export function ProfilePage() {
       }
       saveUser(updated)
       setUser(updated)
+      toast.warning('Salvo localmente. Sem conexão com o servidor.')
     }
 
-    setSaveMsg('Salvo!')
-    setTimeout(() => setSaveMsg(''), 2500)
     setShowSaveConfirm(false)
   }
 
@@ -434,8 +475,7 @@ export function ProfilePage() {
     if (!on) {
       if (myOppId) updateOpportunity(myOppId, { active: false })
       setOppActive(false)
-      setOppSaveMsg('Oportunidade removida do feed.')
-      setTimeout(() => setOppSaveMsg(''), 3000)
+      toast.info('Oportunidade removida do feed.')
     } else {
       setOppActive(true)
     }
@@ -444,15 +484,15 @@ export function ProfilePage() {
   async function handleSaveOpportunity() {
     if (!user) return
     if (!oppDescription.trim()) {
-      setOppSaveMsg('Descreva a obra')
+      toast.warning('Descreva a obra antes de publicar.')
       return
     }
     if (!oppLocation.trim()) {
-      setOppSaveMsg('Informe a localização')
+      toast.warning('Informe a localização da obra.')
       return
     }
     if (oppProfessions.length === 0) {
-      setOppSaveMsg('Adicione ao menos uma profissão')
+      toast.warning('Adicione ao menos uma profissão necessária.')
       return
     }
     try {
@@ -474,11 +514,11 @@ export function ProfilePage() {
         contactEmail: user.email,
       })
       setOppActive(true)
-      setOppSaveMsg('Publicado! Profissionais já podem ver sua oportunidade.')
-      setTimeout(() => setOppSaveMsg(''), 4000)
+      setOppSaveMsg('Publicado!')
+      setTimeout(() => setOppSaveMsg(''), 2000)
+      toast.success('Oportunidade publicada! Profissionais já podem ver sua vaga.')
     } catch {
-      setOppSaveMsg('Erro ao publicar. Verifique se você está logado.')
-      setTimeout(() => setOppSaveMsg(''), 4000)
+      toast.error('Erro ao publicar. Verifique se você está logado.')
     }
   }
 
@@ -492,7 +532,9 @@ export function ProfilePage() {
         { abortEarly: true },
       )
     } catch (err) {
-      setPwError((err as ValidationError).message)
+      const msg = (err as ValidationError).message
+      setPwError(msg)
+      toast.error(msg)
       return
     }
 
@@ -506,8 +548,11 @@ export function ProfilePage() {
       setPwConfirm('')
       setPwSuccess(true)
       setTimeout(() => setPwSuccess(false), 3000)
+      toast.success('Senha alterada com sucesso.')
     } catch {
-      setPwError('Senha atual incorreta ou erro ao alterar')
+      const msg = 'Senha atual incorreta ou erro ao alterar'
+      setPwError(msg)
+      toast.error(msg)
     }
   }
 
@@ -633,6 +678,35 @@ export function ProfilePage() {
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 40px' }}>
         <div className="pt-5">
           <Section title="Dados pessoais">
+            <div
+              className="mb-5 pb-5"
+              style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+            >
+              <p className="text-xs font-medium mb-3" style={{ color: 'var(--color-text-muted)' }}>
+                Foto de perfil
+              </p>
+              <AvatarUpload
+                user={user}
+                pendingPreview={pendingAvatarPreview}
+                onFileReady={(file, preview) => {
+                  setPendingAvatarFile(file)
+                  setPendingAvatarPreview(preview)
+                  setRemovingAvatar(false)
+                }}
+                onClear={() => {
+                  if (pendingAvatarPreview) {
+                    // só descarta o pending, não remove a foto atual
+                    setPendingAvatarFile(null)
+                    setPendingAvatarPreview(null)
+                  } else {
+                    // marca para remoção da foto atual ao salvar
+                    setRemovingAvatar(true)
+                    setUser((u) => (u ? { ...u, avatarUrl: undefined } : u))
+                  }
+                }}
+              />
+            </div>
+
             <Field label="Nome completo">
               <InputField
                 id="profile-name"

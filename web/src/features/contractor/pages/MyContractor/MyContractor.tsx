@@ -11,9 +11,9 @@ import { useInterests } from '@/src/features/opportunity/hooks/useInterests'
 import { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import type { Opportunity } from '@/src/types/opportunity.types'
-import type { User } from '@/src/types/user.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { TeamMember } from '@/src/types/team.types'
+import type { User } from '@/src/types/user.types'
 
 const ACCENT = '#E07B2A'
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { HiShieldCheck } from 'react-icons/hi2'
+import { HiShieldCheck, HiArrowRightOnRectangle, HiUserPlus } from 'react-icons/hi2'
 import { IoChatbubblesSharp } from 'react-icons/io5'
 import { MdConstruction } from 'react-icons/md'
 
@@ -156,13 +156,6 @@ function PhaseContent({ phase }: { phase: PhaseId }) {
           >
             Começar agora
           </Link>
-          <Link
-            href="/home"
-            className="px-9 py-4 rounded-full font-semibold text-white text-lg border transition-all duration-200 hover:bg-white/10 active:scale-95"
-            style={{ borderColor: 'rgba(255,255,255,0.22)' }}
-          >
-            Ver profissionais
-          </Link>
         </div>
       </div>
     </>
@@ -197,6 +190,39 @@ export default function LandingPage() {
         <div className="sticky top-0 h-screen overflow-hidden">
           <LandingCanvas progressRef={progressRef} />
 
+          {/* Nav */}
+          <nav className="absolute top-0 inset-x-0 z-20 flex items-center justify-between px-8 py-5">
+            <div className="flex items-baseline gap-0">
+              <span
+                className="font-black text-2xl tracking-[0.15em] uppercase"
+                style={{ color: '#E07B2A' }}
+              >
+                Equa
+              </span>
+              <span className="font-black text-2xl tracking-[0.15em] uppercase text-white">
+                Obra
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/auth?mode=login"
+                className="flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-sm text-white border transition-all duration-200 hover:bg-white/10 active:scale-95 pointer-events-auto"
+                style={{ borderColor: 'rgba(255,255,255,0.22)' }}
+              >
+                <HiArrowRightOnRectangle size={16} />
+                Entrar
+              </Link>
+              <Link
+                href="/auth?mode=register"
+                className="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-sm text-white transition-all duration-200 hover:brightness-110 active:scale-95 pointer-events-auto"
+                style={{ background: '#E07B2A' }}
+              >
+                <HiUserPlus size={16} />
+                Cadastrar
+              </Link>
+            </div>
+          </nav>
+
           <div
             className="absolute inset-0 z-1 pointer-events-none"
             style={{
@@ -207,7 +233,7 @@ export default function LandingPage() {
 
           <div className="relative z-10 h-full flex flex-col items-center pointer-events-none select-none px-6">
             <div
-              className="mt-[30vh] flex items-baseline gap-0 transition-opacity duration-700"
+              className="mt-[20vh] flex items-baseline gap-0 transition-opacity duration-700"
               style={{ opacity: phase < 3 ? 1 : 0.55 }}
             >
               <span

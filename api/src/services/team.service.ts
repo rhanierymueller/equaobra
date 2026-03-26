@@ -13,12 +13,35 @@ export async function listTeams(userId: string) {
 
 export async function createTeam(userId: string, data: TeamInput) {
   const { members, ...teamData } = data
-  // Members created along with the team are accepted immediately (owner-initiated)
-  const membersWithStatus = members.map((m) => ({ ...m, status: 'accepted' }))
-  return prisma.team.create({
+  // Owner's own member record is accepted immediately; invited professionals are pending
+  const membersWithStatus = members.map((m) => ({
+    ...m,
+    status: m.professionalId === userId ? 'accepted' : 'pending',
+  }))
+  const team = await prisma.team.create({
     data: { ...teamData, ownerId: userId, members: { create: membersWithStatus } },
     include: { members: true },
   })
+
+  // Notify invited (non-owner) professionals
+  const inviter = await prisma.user.findUnique({ where: { id: userId } })
+  const inviterName = inviter?.companyName ?? inviter?.name ?? 'Contratante'
+  const pendingMembers = members.filter((m) => m.professionalId !== userId)
+  for (const m of pendingMembers) {
+    await prisma.notification.create({
+      data: {
+        type: 'team_invite',
+        teamId: team.id,
+        teamName: team.name,
+        fromMemberId: userId,
+        fromMemberName: inviterName,
+        toMemberId: m.professionalId,
+        message: `${inviterName} convidou você para a equipe "${team.name}"`,
+      },
+    })
+  }
+
+  return team
 }
 
 export async function getTeamById(id: string, userId: string) {
@@ -161,6 +184,28 @@ export async function updateMember(
 
   const updated = await prisma.teamMember.update({ where: { id: member.id }, data })
   return { data: updated }
+}
+
+export async function leaveTeam(teamId: string, professionalId: string, userId: string) {
+  if (professionalId !== userId) return { error: 'Sem permissão', status: 403 }
+
+  const team = await prisma.team.findUnique({ where: { id: teamId } })
+  if (!team) return { error: 'Equipe não encontrada', status: 404 }
+  if (team.ownerId === userId) return { error: 'O dono não pode sair da equipe. Exclua a equipe se desejar.', status: 400 }
+
+  const member = await prisma.teamMember.findFirst({ where: { teamId, professionalId } })
+  if (!member) return { error: 'Você não é membro desta equipe', status: 404 }
+
+  await prisma.teamMember.delete({ where: { id: member.id } })
+
+  const remainingAccepted = await prisma.teamMember.count({
+    where: { teamId, status: 'accepted' },
+  })
+  if (remainingAccepted === 0) {
+    await prisma.team.update({ where: { id: teamId }, data: { active: false } })
+  }
+
+  return { success: true }
 }
 
 export async function removeMember(teamId: string, professionalId: string, userId: string) {

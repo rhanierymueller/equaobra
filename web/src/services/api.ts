@@ -51,4 +51,21 @@ export const api = {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
   delete: <T = void>(path: string) => request<T>(path, { method: 'DELETE' }),
+  upload: <T>(path: string, formData: FormData) => {
+    const token = getToken()
+    return fetch(`${BASE}${path}`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    }).then(async (res) => {
+      if (res.status === 401) {
+        clearAuth()
+        if (typeof window !== 'undefined') window.location.href = '/auth'
+        throw new Error('Sessão expirada')
+      }
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Erro no upload')
+      return data as T
+    })
+  },
 }

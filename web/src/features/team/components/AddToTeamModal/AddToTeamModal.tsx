@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { useTeams } from '../../hooks/useTeams'
 
+import { useToast } from '@/src/hooks/useToast'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'
 import type { Professional } from '@/src/types/professional.types'
 import type { User } from '@/src/types/user.types'
@@ -73,6 +74,7 @@ function Field({ label, value, placeholder, type = 'text', required, onChange }:
 
 export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: AddToTeamModalProps) {
   const { myTeams, createTeam, addMemberToTeam, isInTeam } = useTeams(user.id)
+  const toast = useToast()
   const [tab, setTab] = useState<Tab>(myTeams.length > 0 ? 'existing' : 'new')
   const [form, setForm] = useState<NewTeamForm>(EMPTY_FORM)
   const [error, setError] = useState('')
@@ -152,6 +154,9 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
   function confirmAddToExisting() {
     if (!pendingAdd) return
     addMemberToTeam(pendingAdd.teamId, member, inviteMessage.trim() || undefined)
+    toast.success(
+      `Convite enviado para ${p.name.split(' ')[0]} entrar em "${pendingAdd.teamName}".`,
+    )
     setSuccessTeam(pendingAdd.teamName)
     setPendingAdd(null)
     setInviteMessage('')
@@ -203,9 +208,11 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
         user.id,
         ownerMember,
       )
+      toast.success(`Equipe "${form.name.trim()}" criada e convite enviado!`)
       setSuccessTeam(form.name.trim())
     } catch {
       setError('Erro ao criar equipe. Tente novamente.')
+      toast.error('Erro ao criar equipe. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -345,7 +352,15 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                     justifyContent: 'center',
                   }}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--color-primary)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
                     <line x1="22" y1="2" x2="11" y2="13" />
                     <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>
@@ -425,14 +440,18 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                           {alreadyIn ? (
                             <span
                               className="text-xs font-medium px-2.5 py-1 rounded-lg"
-                              style={isPending ? {
-                                color: 'var(--color-star)',
-                                background: 'rgba(255,209,102,0.1)',
-                                border: '1px solid rgba(255,209,102,0.2)',
-                              } : {
-                                color: 'var(--color-success)',
-                                background: 'var(--color-success-alpha-10)',
-                              }}
+                              style={
+                                isPending
+                                  ? {
+                                      color: 'var(--color-star)',
+                                      background: 'rgba(255,209,102,0.1)',
+                                      border: '1px solid rgba(255,209,102,0.2)',
+                                    }
+                                  : {
+                                      color: 'var(--color-success)',
+                                      background: 'var(--color-success-alpha-10)',
+                                    }
+                              }
                             >
                               {isPending ? 'Pendente ·' : 'Na equipe ✓'}
                             </span>
@@ -544,13 +563,11 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
               padding: 24,
             }}
           >
-            <p className="font-bold text-white text-base mb-1">
-              Convidar {p.name.split(' ')[0]}
-            </p>
+            <p className="font-bold text-white text-base mb-1">Convidar {p.name.split(' ')[0]}</p>
             <p className="text-xs mb-4" style={{ color: 'rgba(245,240,235,0.45)' }}>
               {p.profession} será convidado para a equipe{' '}
-              <span style={{ color: 'var(--color-primary)' }}>"{pendingAdd.teamName}"</span>.
-              O profissional precisará aceitar o convite.
+              <span style={{ color: 'var(--color-primary)' }}>"{pendingAdd.teamName}"</span>. O
+              profissional precisará aceitar o convite.
             </p>
             <div className="flex flex-col gap-1 mb-4">
               <label className="text-xs font-medium" style={{ color: 'rgba(245,240,235,0.5)' }}>
@@ -573,8 +590,12 @@ export function AddToTeamModal({ professional: p, user, onClose, onSuccess }: Ad
                   outline: 'none',
                   width: '100%',
                 }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(224,123,42,0.5)' }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(224,123,42,0.5)'
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                }}
               />
             </div>
             <div className="flex gap-2">

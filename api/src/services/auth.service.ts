@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 
+import { geocodeAddress } from '../lib/geocode'
 import { signToken } from '../lib/jwt'
 import { prisma } from '../lib/prisma'
 import type { RegisterInput, LoginInput } from '../models/user.model'
@@ -10,6 +11,21 @@ export async function registerUser(data: RegisterInput) {
   if (existing) return { error: 'E-mail já cadastrado', status: 409 }
 
   const passwordHash = await bcrypt.hash(data.password, 10)
+
+  let { addrLat, addrLng } = data
+  if (addrLat == null && addrLng == null && data.addrCity) {
+    const geo = await geocodeAddress({
+      street: data.addrStreet,
+      neighborhood: data.addrNeighborhood,
+      city: data.addrCity,
+      state: data.addrState,
+      cep: data.addrCep,
+    })
+    if (geo) {
+      addrLat = geo.lat
+      addrLng = geo.lng
+    }
+  }
 
   const user = await prisma.user.create({
     data: {
@@ -30,8 +46,8 @@ export async function registerUser(data: RegisterInput) {
       addrCity: data.addrCity,
       addrState: data.addrState,
       addrNumber: data.addrNumber,
-      addrLat: data.addrLat,
-      addrLng: data.addrLng,
+      addrLat,
+      addrLng,
       compAddrCep: data.compAddrCep,
       compAddrStreet: data.compAddrStreet,
       compAddrNeighborhood: data.compAddrNeighborhood,

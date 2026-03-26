@@ -8,8 +8,8 @@ import { LoginForm } from '../../components/LoginForm'
 import { RegisterForm } from '../../components/RegisterForm'
 import { useLoginForm, useRegisterForm } from '../../hooks/useAuthForm'
 
-import { api, setToken } from '@/src/services/api'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
+import { api, setToken } from '@/src/services/api'
 import type { AuthMode, LoginCredentials, RegisterCredentials } from '@/src/types/auth.types'
 import type { User } from '@/src/types/user.types'
 

@@ -114,7 +114,11 @@ function SearchableDropdown({
         style={{
           background: open ? 'rgba(224,123,42,0.08)' : 'rgba(255,255,255,0.04)',
           border: `1.5px solid ${isActive || open ? 'rgba(224,123,42,0.5)' : 'rgba(255,255,255,0.08)'}`,
-          color: isActive ? 'var(--color-primary)' : disabled ? 'rgba(245,240,235,0.25)' : 'rgba(245,240,235,0.55)',
+          color: isActive
+            ? 'var(--color-primary)'
+            : disabled
+              ? 'rgba(245,240,235,0.25)'
+              : 'rgba(245,240,235,0.55)',
           cursor: disabled ? 'not-allowed' : 'pointer',
         }}
       >
@@ -184,11 +188,17 @@ function SearchableDropdown({
 
           <div style={{ maxHeight: 200, overflowY: 'auto' }}>
             {loading ? (
-              <p className="text-xs px-3 py-4 text-center" style={{ color: 'rgba(245,240,235,0.35)' }}>
+              <p
+                className="text-xs px-3 py-4 text-center"
+                style={{ color: 'rgba(245,240,235,0.35)' }}
+              >
                 Carregando...
               </p>
             ) : filtered.length === 0 ? (
-              <p className="text-xs px-3 py-4 text-center" style={{ color: 'rgba(245,240,235,0.35)' }}>
+              <p
+                className="text-xs px-3 py-4 text-center"
+                style={{ color: 'rgba(245,240,235,0.35)' }}
+              >
                 Nenhum resultado
               </p>
             ) : (
@@ -415,9 +425,7 @@ export function FilterBar({
       return
     }
     setLoadingCities(true)
-    fetch(
-      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${filters.state}/municipios`,
-    )
+    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${filters.state}/municipios`)
       .then((r) => r.json())
       .then((data: { nome: string }[]) => {
         const sorted = data.map((c) => c.nome).sort((a, b) => a.localeCompare(b, 'pt-BR'))
@@ -426,7 +434,7 @@ export function FilterBar({
         setLoadingCities(false)
       })
       .catch(() => setLoadingCities(false))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.state])
 
   async function handleSelectCity(cityName: string) {

@@ -1,3 +1,4 @@
+import { geocodeAddress } from '../lib/geocode'
 import { prisma } from '../lib/prisma'
 import type { UpdateUserInput } from '../models/user.model'
 import { sanitizeUser } from '../models/user.model'
@@ -9,14 +10,32 @@ export async function getUserById(id: string) {
 }
 
 export async function updateUser(id: string, data: UpdateUserInput) {
+  const updateData: Record<string, unknown> = {
+    ...data,
+    roles: data.roles !== undefined ? JSON.stringify(data.roles) : undefined,
+    professions: data.professions !== undefined ? JSON.stringify(data.professions) : undefined,
+    tags: data.tags !== undefined ? JSON.stringify(data.tags) : undefined,
+  }
+
+  const hasCity = data.addrCity !== undefined
+  const missingCoords = data.addrLat == null && data.addrLng == null
+  if (hasCity && missingCoords) {
+    const geo = await geocodeAddress({
+      street: data.addrStreet,
+      neighborhood: data.addrNeighborhood,
+      city: data.addrCity,
+      state: data.addrState,
+      cep: data.addrCep,
+    })
+    if (geo) {
+      updateData.addrLat = geo.lat
+      updateData.addrLng = geo.lng
+    }
+  }
+
   const updated = await prisma.user.update({
     where: { id },
-    data: {
-      ...data,
-      roles: data.roles !== undefined ? JSON.stringify(data.roles) : undefined,
-      professions: data.professions !== undefined ? JSON.stringify(data.professions) : undefined,
-      tags: data.tags !== undefined ? JSON.stringify(data.tags) : undefined,
-    },
+    data: updateData,
   })
   return sanitizeUser(updated)
 }

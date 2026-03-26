@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useToast } from '@/src/hooks/useToast'
 import { api } from '@/src/services/api'
 
 export interface Interest {
@@ -19,6 +20,7 @@ export interface Interest {
 
 export function useInterests(contractorId?: string) {
   const [interests, setInterests] = useState<Interest[]>([])
+  const toast = useToast()
 
   useEffect(() => {
     const url = contractorId ? `/api/interests/contractor/${contractorId}` : '/api/interests'
@@ -41,8 +43,9 @@ export function useInterests(contractorId?: string) {
       })
     } catch (e: unknown) {
       if (e instanceof Error && e.message.includes('já registrado')) return
-      console.error('useInterests.addInterest:', e)
+      toast.error('Erro ao salvar interesse.')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return { interests, addInterest }

@@ -2,11 +2,13 @@
 
 import { useState, useCallback, useEffect } from 'react'
 
+import { useToast } from '@/src/hooks/useToast'
 import { api } from '@/src/services/api'
 import type { WorkLog } from '@/src/types/worklog.types'
 
 export function useWorkLogs(teamId: string) {
   const [logs, setLogs] = useState<WorkLog[]>([])
+  const toast = useToast()
 
   const refresh = useCallback(() => {
     api
@@ -27,15 +29,21 @@ export function useWorkLogs(teamId: string) {
       hours: number,
       description?: string,
     ) => {
-      const log = await api.post<WorkLog>(`/api/teams/${teamId}/worklogs`, {
-        memberId,
-        memberName,
-        date,
-        hours,
-        description,
-      })
-      setLogs((prev) => [log, ...prev])
+      try {
+        const log = await api.post<WorkLog>(`/api/teams/${teamId}/worklogs`, {
+          memberId,
+          memberName,
+          date,
+          hours,
+          description,
+        })
+        setLogs((prev) => [log, ...prev])
+        toast.success('Registro de horas adicionado.')
+      } catch {
+        toast.error('Erro ao registrar horas. Tente novamente.')
+      }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [teamId],
   )
 
@@ -44,10 +52,13 @@ export function useWorkLogs(teamId: string) {
       setLogs((prev) => prev.filter((l) => l.id !== logId))
       try {
         await api.delete(`/api/teams/${teamId}/worklogs/${logId}`)
+        toast.success('Registro removido.')
       } catch {
+        toast.error('Erro ao remover registro.')
         refresh()
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [teamId, refresh],
   )
 

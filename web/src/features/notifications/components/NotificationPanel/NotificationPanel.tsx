@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import { useNotifications } from '../../hooks/useNotifications'
 
-
 import { api } from '@/src/services/api'
 import type { AppNotification } from '@/src/types/notification.types'
 
@@ -219,7 +218,10 @@ function InviteActions({
     <div className="flex gap-2 mt-2">
       <button
         disabled={loading}
-        onClick={(e) => { e.stopPropagation(); handle('accept') }}
+        onClick={(e) => {
+          e.stopPropagation()
+          handle('accept')
+        }}
         style={{
           flex: 1,
           padding: '5px 0',
@@ -237,7 +239,10 @@ function InviteActions({
       </button>
       <button
         disabled={loading}
-        onClick={(e) => { e.stopPropagation(); handle('reject') }}
+        onClick={(e) => {
+          e.stopPropagation()
+          handle('reject')
+        }}
         style={{
           flex: 1,
           padding: '5px 0',
@@ -373,9 +378,7 @@ export function NotificationPanel({ userId }: NotificationPanelProps) {
                     />
                   )}
                 </div>
-                {n.type === 'team_invite' && (
-                  <InviteActions notif={n} onRespond={handleRespond} />
-                )}
+                {n.type === 'team_invite' && <InviteActions notif={n} onRespond={handleRespond} />}
               </div>
               <button
                 onClick={(e) => {

@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useToast } from '@/src/hooks/useToast'
 import { api, getToken } from '@/src/services/api'
 import type { Opportunity } from '@/src/types/opportunity.types'
 
 export function useOpportunities() {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([])
+  const toast = useToast()
 
   const refresh = useCallback(async () => {
     try {
@@ -56,9 +58,11 @@ export function useOpportunities() {
         const updated = await api.patch<Opportunity>(`/api/opportunities/${id}`, data)
         setOpportunities((prev) => prev.map((o) => (o.id === id ? updated : o)))
       } catch {
+        toast.error('Erro ao atualizar oportunidade.')
         refresh()
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [refresh],
   )
 
@@ -68,9 +72,11 @@ export function useOpportunities() {
       try {
         await api.delete(`/api/opportunities/${id}`)
       } catch {
+        toast.error('Erro ao remover oportunidade.')
         refresh()
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [refresh],
   )
 

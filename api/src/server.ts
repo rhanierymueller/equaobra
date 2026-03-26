@@ -1,4 +1,6 @@
 import 'dotenv/config'
+import path from 'path'
+
 import cors from 'cors'
 import type { Request, Response, NextFunction } from 'express'
 import express from 'express'
@@ -11,6 +13,7 @@ import interestsRoutes from './routes/interests'
 import notificationsRoutes from './routes/notifications'
 import opportunitiesRoutes from './routes/opportunities'
 import teamsRoutes from './routes/teams'
+import uploadRoutes from './routes/upload'
 import usersRoutes from './routes/users'
 import worklogsRoutes from './routes/worklogs'
 
@@ -26,7 +29,11 @@ const allowedOrigins = ['http://localhost:3000', process.env.FRONTEND_URL].filte
   Boolean,
 ) as string[]
 
-app.use(helmet())
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }),
+)
 app.use(
   cors({
     origin(origin, cb) {
@@ -38,6 +45,7 @@ app.use(
     credentials: true,
   }),
 )
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')))
 app.use(express.json({ limit: '1mb' }))
 
 const globalLimiter = rateLimit({
@@ -65,6 +73,7 @@ app.use('/api/teams/:id/worklogs', worklogsRoutes)
 app.use('/api/interests', interestsRoutes)
 app.use('/api/chats', chatsRoutes)
 app.use('/api/notifications', notificationsRoutes)
+app.use('/api/upload', uploadRoutes)
 
 app.get('/api/health', (_, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })

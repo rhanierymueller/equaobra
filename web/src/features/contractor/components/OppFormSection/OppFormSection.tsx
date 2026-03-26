@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import type { useOpportunities } from '@/src/features/opportunity/hooks/useOpportunities'
+import { useToast } from '@/src/hooks/useToast'
 import type { Opportunity } from '@/src/types/opportunity.types'
 import { ALL_PROFESSIONS } from '@/src/types/professional.types'
 import type { User } from '@/src/types/user.types'
@@ -71,11 +72,11 @@ export function OppFormSection({
   const [professions, setProfessions] = useState<string[]>(opp?.lookingForProfessions ?? [])
   const [profInput, setProfInput] = useState('')
   const [saveMsg, setSaveMsg] = useState('')
+  const toast = useToast()
 
   function handleSave() {
     if (!description.trim() || !location.trim() || professions.length === 0) {
-      setSaveMsg('Preencha descrição, localização e ao menos uma profissão.')
-      setTimeout(() => setSaveMsg(''), 3000)
+      toast.warning('Preencha descrição, localização e ao menos uma profissão.')
       return
     }
     const displayName = user.companyName || user.name
@@ -98,20 +99,23 @@ export function OppFormSection({
       contactEmail: user.email ?? '',
       contactPhone: undefined,
     })
-    setActive(true)
-    setSaveMsg('Vaga publicada com sucesso!')
-    setTimeout(() => setSaveMsg(''), 3000)
+      .then(() => {
+        setActive(true)
+        setSaveMsg('Publicado!')
+        setTimeout(() => setSaveMsg(''), 2000)
+        toast.success('Vaga publicada! Profissionais já podem encontrá-la.')
+      })
+      .catch(() => toast.error('Erro ao publicar vaga. Tente novamente.'))
   }
 
   function handleToggle(val: boolean) {
     setActive(val)
     if (!val) {
       if (opp) updateOpportunity(opp.id, { active: false })
-      setSaveMsg('Vaga removida do feed.')
+      toast.info('Vaga removida do feed.')
     } else {
       handleSave()
     }
-    setTimeout(() => setSaveMsg(''), 3000)
   }
 
   function addProfession() {

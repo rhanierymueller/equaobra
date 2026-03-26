@@ -7,11 +7,13 @@ import { useTeams } from '../../hooks/useTeams'
 
 import { BackButton } from '@/src/components/BackButton'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
+import { useToast } from '@/src/hooks/useToast'
 import { formatDate } from '@/src/utils/date'
 
 export function MyInvitations() {
   const { user } = useCurrentUser()
   const { teams, respondToInvite } = useTeams()
+  const toast = useToast()
   const [responding, setResponding] = useState<string | null>(null)
 
   if (!user) {
@@ -40,6 +42,13 @@ export function MyInvitations() {
     setResponding(teamId + action)
     try {
       await respondToInvite(teamId, user!.id, action)
+      if (action === 'accept') {
+        toast.success('Convite aceito! Você agora faz parte da equipe.')
+      } else {
+        toast.info('Convite recusado.')
+      }
+    } catch {
+      // error toast already shown by useTeams
     } finally {
       setResponding(null)
     }
@@ -234,9 +243,7 @@ export function MyInvitations() {
                         <p className="text-xs" style={{ color: 'rgba(245,240,235,0.3)' }}>
                           Membros
                         </p>
-                        <p className="text-xs font-semibold text-white">
-                          {team.members.length}
-                        </p>
+                        <p className="text-xs font-semibold text-white">{team.members.length}</p>
                       </div>
                     </div>
 

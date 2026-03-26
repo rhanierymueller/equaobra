@@ -73,7 +73,7 @@ function MapController({
   const markersRef = useRef<Map<string, L.Marker>>(new Map())
 
   useEffect(() => {
-    if (selected) {
+    if (selected && !(selected.location.lat === 0 && selected.location.lng === 0)) {
       map.flyTo([selected.location.lat, selected.location.lng], Math.max(map.getZoom(), 15), {
         duration: 0.9,
       })
@@ -102,9 +102,12 @@ function MapController({
     markersRef.current.clear()
 
     professionals.forEach((pro) => {
+      const { lat, lng } = pro.location
+      if (lat === 0 && lng === 0) return
+
       const isSelected = selected?.id === pro.id
       const icon = createCircleMarker(pro, isSelected)
-      const marker = L.marker([pro.location.lat, pro.location.lng], {
+      const marker = L.marker([lat, lng], {
         icon,
         zIndexOffset: isSelected ? 1000 : 0,
       })

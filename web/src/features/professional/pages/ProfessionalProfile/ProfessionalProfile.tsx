@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
-import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
 import { BackButton } from '@/src/components/BackButton'
+import { AddToTeamModal } from '@/src/features/team/components/AddToTeamModal'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import { api } from '@/src/services/api'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'

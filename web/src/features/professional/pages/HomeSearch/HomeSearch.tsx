@@ -249,7 +249,7 @@ export default function HomeSearch() {
       () => {},
       { timeout: 6000 },
     )
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const {

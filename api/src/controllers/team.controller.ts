@@ -99,6 +99,19 @@ export async function removeMember(req: AuthRequest, res: Response): Promise<voi
   res.status(204).send()
 }
 
+export async function leaveTeam(req: AuthRequest, res: Response): Promise<void> {
+  const result = await service.leaveTeam(
+    String(req.params.id),
+    String(req.params.professionalId),
+    req.user!.userId,
+  )
+  if (isServiceError(result)) {
+    res.status(result.status).json({ error: result.error })
+    return
+  }
+  res.status(204).send()
+}
+
 export async function respondToInvite(req: AuthRequest, res: Response): Promise<void> {
   const parsed = respondInviteSchema.safeParse(req.body)
   if (!parsed.success) {
