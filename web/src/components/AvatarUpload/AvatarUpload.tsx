@@ -8,11 +8,8 @@ import type { User } from '@/src/types/user.types'
 
 interface AvatarUploadProps {
   user: User
-  /** Preview URL a exibir (gerada após o crop, controlada pelo pai) */
   pendingPreview: string | null
-  /** Chamado quando o usuário confirma o crop; pai guarda o arquivo */
   onFileReady: (file: File, preview: string) => void
-  /** Chamado quando o usuário remove a foto pendente ou a atual */
   onClear: () => void
 }
 

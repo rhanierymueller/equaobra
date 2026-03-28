@@ -251,12 +251,12 @@ export function ProfessionalProfile({ id }: { id: string }) {
                 <span>·</span>
                 <span>{p.completedJobs} obras</span>
               </div>
-              <div className="flex gap-2.5 mt-5">
+              <div className="flex items-center gap-2 mt-5">
                 <a
                   href={`https://wa.me/55${p.phone.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm flex-1 transition-opacity hover:opacity-85"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-opacity hover:opacity-85"
                   style={{ background: '#25D366', color: 'white', textDecoration: 'none' }}
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -269,7 +269,7 @@ export function ProfessionalProfile({ id }: { id: string }) {
                   <button
                     type="button"
                     onClick={() => (user ? setShowModal(true) : router.push('/auth'))}
-                    className="flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm flex-1 transition-all hover:opacity-85"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all hover:opacity-85"
                     style={{
                       background: successMsg ? `${color}1a` : 'rgba(255,255,255,0.05)',
                       border: `1px solid ${successMsg ? color + '55' : 'rgba(255,255,255,0.1)'}`,

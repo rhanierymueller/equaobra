@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 
 import 'leaflet/dist/leaflet.css'
+import { colors, font } from '@/src/design-system/tokens'
 import type { Professional } from '@/src/types/professional.types'
 import { PROFESSION_COLORS } from '@/src/types/professional.types'
 
@@ -191,6 +192,7 @@ function FloatingCard({
           overflow: 'hidden',
           backdropFilter: 'blur(24px)',
           boxShadow: `0 0 0 1px ${color}18 inset, 0 2px 0 ${color}33 inset`,
+          fontFamily: font.family,
         }}
       >
         <div
@@ -392,7 +394,7 @@ function FloatingCard({
                 flex: 1,
                 padding: '8px 0',
                 borderRadius: 10,
-                background: color,
+                background: colors.primary,
                 color: 'white',
                 fontWeight: 700,
                 fontSize: 11,
